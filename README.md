@@ -10,10 +10,9 @@ A comprehensive dotfiles and system configuration framework.
 To clone all repositories and recreate the complete directory structure:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dotbrains/set-me-up/main/setup.sh |
+curl -fsSL \
+  https://raw.githubusercontent.com/dotbrains/set-me-up/main/setup.sh |
   bash
-```
-curl -fsSL https://raw.githubusercontent.com/dotbrains/set-me-up/master/setup.sh | bash
 ```
 
 Or manually:
@@ -22,6 +21,8 @@ Or manually:
 git clone https://github.com/dotbrains/set-me-up.git
 cd set-me-up
 chmod +x setup.sh
+./setup.sh
+```
 ./setup.sh
 ```
 
