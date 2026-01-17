@@ -1,4 +1,4 @@
-# set-me-up
+# set-me-up 👷🏼
 
 [![Lint](https://github.com/dotbrains/set-me-up/workflows/Lint/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/lint.yml)
 [![Tests](https://github.com/dotbrains/set-me-up/workflows/Tests/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/tests.yml)
