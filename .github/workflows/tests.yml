@@ -64,18 +64,26 @@ jobs:
           # Create a mock directory to test the skip logic
           mkdir -p blueprint
           
-          # Extract and test just the clone_repo function logic
-          bash -c '
-            source <(grep -A 10 "clone_repo()" '"$GITHUB_WORKSPACE/setup.sh"')
-            
-            # Test that it properly detects existing directories
-            if clone_repo "https://example.com/test.git" "blueprint" 2>&1 | grep -q "already exists"; then
-              echo "✓ Idempotency check works correctly"
-            else
-              echo "✗ Idempotency check failed"
-              exit 1
-            fi
-          '
+          # Test the idempotency by checking if script detects existing directory
+          # Extract the clone_repo function from setup.sh
+          sed -n '/^clone_repo()/,/^}/p' "$GITHUB_WORKSPACE/setup.sh" > clone_test.sh
+          
+          # Create a test script that sources the function
+          cat > test_idempotency.sh << 'EOF'
+          #!/bin/bash
+          source ./clone_test.sh
+          clone_repo "https://example.com/test.git" "blueprint"
+          EOF
+          
+          chmod +x test_idempotency.sh
+          
+          # Run the test and check output
+          if ./test_idempotency.sh 2>&1 | grep -q "already exists"; then
+            echo "✓ Idempotency check works correctly"
+          else
+            echo "✗ Idempotency check failed"
+            exit 1
+          fi
 
       - name: Verify file structure
         run: |

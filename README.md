@@ -1,5 +1,8 @@
 # set-me-up
 
+[![Lint](https://github.com/dotbrains/set-me-up/workflows/Lint/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/lint.yml)
+[![Tests](https://github.com/dotbrains/set-me-up/workflows/Tests/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/tests.yml)
+
 A comprehensive dotfiles and system configuration framework.
 
 ⚠️ **Note**: This repository is built for the explicit purpose of making the development of `set-me-up` easier.
@@ -9,7 +12,7 @@ A comprehensive dotfiles and system configuration framework.
 To clone all repositories and recreate the complete directory structure:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dotbrains/set-me-up/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/dotbrains/set-me-up/master/setup.sh | bash
 ```
 
 Or manually:
