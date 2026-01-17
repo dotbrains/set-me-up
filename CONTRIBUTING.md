@@ -9,8 +9,10 @@ Thank you for contributing to set-me-up!
 Install the required linting tools:
 
 ```bash
-# Install markdownlint-cli2
+# Install markdownlint-cli2 globally (optional)
 npm install -g markdownlint-cli2
+
+# Or use npx without installing (see commands below)
 
 # Install shellcheck (macOS)
 brew install shellcheck
@@ -18,6 +20,8 @@ brew install shellcheck
 # Install shellcheck (Ubuntu/Debian)
 sudo apt-get install shellcheck
 ```
+
+> **Note:** You can use `npx markdownlint-cli2` instead of installing globally. All markdown linting examples below show both options.
 
 ## Running Lint Checks Locally
 
@@ -28,8 +32,11 @@ Before pushing changes, run these checks locally to catch issues early:
 Run all linting checks at once:
 
 ```bash
-# Markdown linting
-markdownlint-cli2 "**/*.md"
+# Markdown linting (installed globally)
+markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
+
+# Or with npx (no installation needed)
+npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
 
 # ShellCheck
 shellcheck setup.sh
@@ -43,8 +50,14 @@ bash -n setup.sh
 #### Markdown Linting
 
 ```bash
-markdownlint-cli2 "**/*.md"
+# With global installation
+markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
+
+# Or with npx (no installation needed)
+npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
 ```
+
+Glob patterns starting with `#` exclude those directories from linting, matching the entries in `.gitignore`.
 
 Common markdown rules:
 
@@ -117,7 +130,7 @@ cat > .git/hooks/pre-commit << 'EOF'
 echo "Running pre-commit checks..."
 
 # Markdown lint
-if ! markdownlint-cli2 "**/*.md"; then
+if ! markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"; then
     echo "❌ Markdown linting failed"
     exit 1
 fi
