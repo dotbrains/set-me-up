@@ -21,7 +21,8 @@ brew install shellcheck
 sudo apt-get install shellcheck
 ```
 
-> **Note:** You can use `npx markdownlint-cli2` instead of installing globally. All markdown linting examples below show both options.
+> **Note:** You can use `npx markdownlint-cli2` instead of installing
+> globally. All markdown linting examples below show both options.
 
 ## Running Lint Checks Locally
 
@@ -33,10 +34,12 @@ Run all linting checks at once:
 
 ```bash
 # Markdown linting (installed globally)
-markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
+markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
+  "#installer" "#modules" "#utilities"
 
 # Or with npx (no installation needed)
-npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
+npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
+  "#installer" "#modules" "#utilities"
 
 # ShellCheck
 shellcheck setup.sh
@@ -51,13 +54,16 @@ bash -n setup.sh
 
 ```bash
 # With global installation
-markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
+markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
+  "#installer" "#modules" "#utilities"
 
 # Or with npx (no installation needed)
-npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"
+npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
+  "#installer" "#modules" "#utilities"
 ```
 
-Glob patterns starting with `#` exclude those directories from linting, matching the entries in `.gitignore`.
+Glob patterns starting with `#` exclude those directories from linting,
+matching the entries in `.gitignore`.
 
 Common markdown rules:
 
@@ -130,7 +136,8 @@ cat > .git/hooks/pre-commit << 'EOF'
 echo "Running pre-commit checks..."
 
 # Markdown lint
-if ! markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#utilities"; then
+if ! markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
+    "#installer" "#modules" "#utilities"; then
     echo "❌ Markdown linting failed"
     exit 1
 fi
