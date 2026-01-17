@@ -23,10 +23,12 @@ Runs code quality and style checks on pull requests and pushes to main/master br
 Runs comprehensive tests on both Ubuntu and macOS environments.
 
 **Triggers:**
+
 - All pushes
 - All pull requests
 
 **Jobs:**
+
 - **test**: Runs on both `ubuntu-latest` and `macos-latest`
   - Tests bash syntax for `setup.sh`
   - Verifies git is installed
