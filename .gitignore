@@ -1,0 +1,7 @@
+# Ignore all cloned repository directories
+blueprint/
+docs/
+home/
+installer/
+modules/
+utilities/

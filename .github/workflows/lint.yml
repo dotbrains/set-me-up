@@ -1,0 +1,80 @@
+name: Lint
+
+on:
+  pull_request:
+    paths:
+      - '**.md'
+      - '**.sh'
+      - '**.bash'
+      - '.github/workflows/lint.yml'
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - '**.md'
+      - '**.sh'
+      - '**.bash'
+      - '.github/workflows/lint.yml'
+
+jobs:
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v14
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
+
+  link-checker:
+    name: Check Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check links in Markdown files
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: warning
+          ignore_paths: |
+            node_modules
+            .git
+
+  bash-syntax:
+    name: Bash Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Bash syntax
+        run: |
+          # Check all .sh and .bash files for syntax errors
+          find . -type f \( -name "*.sh" -o -name "*.bash" \) -not -path "*/.*" | while read -r file; do
+            echo "Checking $file"
+            bash -n "$file" || exit 1
+          done
