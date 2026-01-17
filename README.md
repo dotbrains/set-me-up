@@ -23,7 +23,6 @@ cd set-me-up
 chmod +x setup.sh
 ./setup.sh
 ```
-./setup.sh
 ```
 
 ## Directory Structure

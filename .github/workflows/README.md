@@ -6,19 +6,20 @@ This directory contains CI/CD workflows for the set-me-up repository.
 
 ### Lint (`lint.yml`)
 
-Runs code quality and style checks on pull requests and pushes to main/master branches.
+Runs code quality and style checks on pull requests and pushes to main/master
+branches.
 
 **Triggers:**
+
 - Pull requests that modify `.md`, `.sh`, or `.bash` files
 - Pushes to `main`/`master` branches with the same file changes
 
 **Jobs:**
+
 - **markdown-lint**: Validates Markdown formatting and style
 - **link-checker**: Verifies all links in Markdown files are valid
 - **shellcheck**: Static analysis for shell scripts
 - **bash-syntax**: Validates bash syntax for all shell scripts
-
-### Tests (`tests.yml`)
 
 Runs comprehensive tests on both Ubuntu and macOS environments.
 
