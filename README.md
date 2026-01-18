@@ -5,6 +5,10 @@
 
 A comprehensive dotfiles and system configuration framework.
 
+## Documentation
+
+For detailed information about how set-me-up works, see the [documentation](https://github.com/dotbrains/set-me-up-docs).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and how to run
