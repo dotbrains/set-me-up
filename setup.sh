@@ -2,6 +2,10 @@
 
 set -e
 
+# Constants
+readonly GITHUB_ORG="https://github.com/dotbrains"
+readonly REPO_NAME="set-me-up"
+
 # Check if git is installed
 if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed. Please install git and try again."
@@ -12,21 +16,31 @@ echo ""
 echo "🚀 Setting up set-me-up directory structure..."
 echo ""
 
-# Create and navigate to the set-me-up parent directory
-SETUP_DIR="set-me-up"
+# Ensure we're in the set-me-up root directory
+ensure_setup_root() {
+    # Already in the repo?
+    if [ -f "setup.sh" ] && [ -f "README.md" ] && git rev-parse --git-dir &> /dev/null; then
+        echo "✅ Detected existing $REPO_NAME repository"
+        return 0
+    fi
+    
+    # Need to clone or enter directory
+    if [ ! -d "$REPO_NAME" ]; then
+        echo "📦 Cloning $REPO_NAME repository..."
+        git clone "${GITHUB_ORG}/${REPO_NAME}.git" "$REPO_NAME"
+        echo "✨ Repository cloned successfully"
+    fi
+    
+    cd "$REPO_NAME"
+}
 
-if [ ! -d "$SETUP_DIR" ]; then
-    echo "📁 Creating $SETUP_DIR directory..."
-    mkdir -p "$SETUP_DIR"
-fi
-
-cd "$SETUP_DIR"
+ensure_setup_root
 echo "📂 Working in: $(pwd)"
 echo ""
 
-# Helper function to clone repositories
+# Clone a repository if it doesn't exist
 clone_repo() {
-    local url="$1"
+    local repo="$1"
     local path="$2"
     
     if [ -d "$path" ]; then
@@ -35,47 +49,55 @@ clone_repo() {
     fi
     
     echo "  ⬇️  Cloning into $path..."
-    git clone --recursive "$url" "$path" 2>&1 | sed 's/^/     /'
+    git clone --recursive "${GITHUB_ORG}/${repo}.git" "$path" 2>&1 | sed 's/^/     /'
     echo "  ✨ Done: $path"
+}
+
+# Clone a batch of repositories
+clone_batch() {
+    local category="$1"
+    local icon="$2"
+    shift 2
+    
+    echo "${icon} Cloning ${category} repositories..."
+    echo ""
+    
+    while [ $# -gt 0 ]; do
+        clone_repo "$1" "$2"
+        shift 2
+    done
+    
+    echo ""
 }
 
 # Create base directories
 mkdir -p modules home/.config
-
-# create .gitkeep file in home directory to prevent the directory from being deleted
 touch home/.gitkeep
 echo "home sweet ~/" > home/.gitkeep
 
-# Clone top-level repositories
-echo "📦 Cloning top-level repositories..."
-echo ""
-clone_repo "https://github.com/dotbrains/set-me-up-blueprint.git" "blueprint"
-clone_repo "https://github.com/dotbrains/set-me-up-docs" "docs"
-clone_repo "https://github.com/dotbrains/set-me-up-installer.git" "installer"
-clone_repo "https://github.com/dotbrains/utilities.git" "utilities"
-echo ""
+# Clone all repositories
+clone_batch "top-level" "📦" \
+    "set-me-up-blueprint" "blueprint" \
+    "set-me-up-docs" "docs" \
+    "set-me-up-installer" "installer" \
+    "utilities" "utilities"
 
-# Clone module repositories
-echo "🧩 Cloning module repositories..."
-echo ""
-clone_repo "https://github.com/dotbrains/colorschemes.git" "modules/colorschemes"
-clone_repo "https://github.com/dotbrains/macports-module.git" "modules/macports"
-clone_repo "https://github.com/dotbrains/preferences-module.git" "modules/preferences"
-clone_repo "https://github.com/dotbrains/template-module.git" "modules/template-module"
-clone_repo "https://github.com/dotbrains/set-me-up-universal-modules.git" "modules/universal"
-clone_repo "https://github.com/dotbrains/xcode-module.git" "modules/xcode"
-echo ""
+clone_batch "module" "🧩" \
+    "colorschemes" "modules/colorschemes" \
+    "macports-module" "modules/macports" \
+    "preferences-module" "modules/preferences" \
+    "template-module" "modules/template-module" \
+    "set-me-up-universal-modules" "modules/universal" \
+    "xcode-module" "modules/xcode"
 
-# Clone config repositories
-echo "⚙️  Cloning config repositories..."
-echo ""
-clone_repo "https://github.com/dotbrains/alacritty.git" "home/.config/alacritty"
-clone_repo "https://github.com/dotbrains/bash.git" "home/.config/bash"
-clone_repo "https://github.com/dotbrains/fish.git" "home/.config/fish"
-clone_repo "https://github.com/dotbrains/nushell.git" "home/.config/nushell"
-clone_repo "https://github.com/dotbrains/nvim.git" "home/.config/nvim"
-clone_repo "https://github.com/dotbrains/tmux.git" "home/.config/tmux"
-clone_repo "https://github.com/dotbrains/zsh.git" "home/.config/zsh"
-echo ""
+clone_batch "config" "⚙️" \
+    "alacritty" "home/.config/alacritty" \
+    "bash" "home/.config/bash" \
+    "fish" "home/.config/fish" \
+    "nushell" "home/.config/nushell" \
+    "nvim" "home/.config/nvim" \
+    "tmux" "home/.config/tmux" \
+    "zsh" "home/.config/zsh"
+
 echo "🎉 Setup complete! All repositories have been cloned."
 echo ""
