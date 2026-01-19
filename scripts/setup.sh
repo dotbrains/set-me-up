@@ -5,8 +5,10 @@ set -e
 # Constants
 readonly GITHUB_ORG="https://github.com/dotbrains"
 readonly REPO_NAME="set-me-up"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+readonly REPO_ROOT
 readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
 
 # Check if git is installed

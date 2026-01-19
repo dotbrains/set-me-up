@@ -3,7 +3,8 @@
 set -e
 
 # Constants
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
 readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
 
 # Check if git is installed

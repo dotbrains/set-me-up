@@ -55,8 +55,8 @@ Remote execution (recommended for first-time setup):
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/dotbrains/set-me-up/master/scripts/setup.sh | \
-  bash
+  https://raw.githubusercontent.com/dotbrains/set-me-up/master/\
+scripts/setup.sh | bash
 ```
 
 Local execution:
@@ -87,14 +87,14 @@ chmod +x scripts/setup.sh
 
 Update script that pulls the latest changes for all repositories.
 
-### Usage
+### Update Usage
 
 ```bash
 cd set-me-up
 ./scripts/update.sh
 ```
 
-### Features
+### Update Features
 
 - Updates all repositories defined in `repos.txt`
 - Skips repositories with uncommitted changes
@@ -141,7 +141,8 @@ To add a new repository to the set-me-up collection:
    new-repo-name|path/to/clone|category
    ```
 
-3. Run `./scripts/setup.sh` to clone it (if setting up fresh) or manually clone it
+3. Run `./scripts/setup.sh` to clone it (if setting up fresh) or
+   manually clone it
 4. Future runs of `./scripts/update.sh` will automatically include it
 
 ## Removing a Repository

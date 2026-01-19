@@ -22,8 +22,8 @@ To clone all repositories and recreate the complete directory structure:
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/dotbrains/set-me-up/master/scripts/setup.sh |
-  bash
+  https://raw.githubusercontent.com/dotbrains/set-me-up/master/\
+scripts/setup.sh | bash
 ```
 
 Or manually:
@@ -44,9 +44,11 @@ cd set-me-up
 ./scripts/update.sh
 ```
 
-The update script will automatically skip repositories with uncommitted changes.
+The update script will automatically skip repositories with uncommitted
+changes.
 
-See [scripts/SCRIPTS.md](scripts/SCRIPTS.md) for detailed documentation on both scripts.
+See [scripts/SCRIPTS.md](scripts/SCRIPTS.md) for detailed documentation on
+both scripts.
 
 ## Directory Structure
 
@@ -100,7 +102,6 @@ set-me-up/
 - [nvim](https://github.com/dotbrains/nvim)
 - [tmux](https://github.com/dotbrains/tmux)
 - [zsh](https://github.com/dotbrains/zsh)
-
 
 ## License
 
