@@ -17,7 +17,6 @@ branches.
 **Jobs:**
 
 - **markdown-lint**: Validates Markdown formatting and style
-- **link-checker**: Verifies all links in Markdown files are valid
 - **shellcheck**: Static analysis for shell scripts
 - **bash-syntax**: Validates bash syntax for all shell scripts
 
