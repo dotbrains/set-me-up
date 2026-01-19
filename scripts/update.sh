@@ -59,14 +59,36 @@ update_repo() {
     fi
     
     echo "  ⬆️  Updating $path..."
-    (
-        cd "$path"
-        git pull --rebase --recurse-submodules 2>&1 | sed 's/^/     /'
-        if [ -f ".gitmodules" ]; then
-            git submodule update --init --recursive 2>&1 | sed 's/^/     /'
+    
+    local git_output
+    local git_exit_code
+    
+    # Pull changes
+    git_output=$(cd "$path" && git pull --rebase --recurse-submodules 2>&1)
+    git_exit_code=$?
+    
+    if [ $git_exit_code -ne 0 ]; then
+        echo "     ❌ Error updating $path:"
+        echo "$git_output" | sed 's/^/        /'
+        return 1
+    fi
+    echo "$git_output" | sed 's/^/     /'
+    
+    # Update submodules if they exist
+    if [ -f "$path/.gitmodules" ]; then
+        git_output=$(cd "$path" && git submodule update --init --recursive 2>&1)
+        git_exit_code=$?
+        
+        if [ $git_exit_code -ne 0 ]; then
+            echo "     ❌ Error updating submodules in $path:"
+            echo "$git_output" | sed 's/^/        /'
+            return 1
         fi
-    )
+        echo "$git_output" | sed 's/^/     /'
+    fi
+    
     echo "  ✨ Done: $path"
+    return 0
 }
 
 # Update repositories by category
@@ -74,6 +96,7 @@ update_category() {
     local category="$1"
     local icon="$2"
     local count=0
+    local failed=0
     
     echo "${icon} Updating ${category} repositories..."
     echo ""
@@ -83,16 +106,21 @@ update_category() {
         [[ "$repo" =~ ^#.*$ || -z "$repo" ]] && continue
         
         if [ "$cat" = "$category" ]; then
-            update_repo "$repo" "$path"
+            if ! update_repo "$repo" "$path"; then
+                ((failed++))
+            fi
             ((count++))
         fi
     done < "$REPOS_FILE"
     
     if [ $count -eq 0 ]; then
         echo "  ℹ️  No repositories to update in this category"
+    elif [ $failed -gt 0 ]; then
+        echo "  ⚠️  $failed out of $count repositories failed to update"
     fi
     
     echo ""
+    return $failed
 }
 
 # Check if repos.txt exists
@@ -102,9 +130,17 @@ if [ ! -f "$REPOS_FILE" ]; then
 fi
 
 # Update all repository categories
-update_category "top-level" "📦"
-update_category "module" "🧩"
-update_category "config" "⚙️"
+total_failed=0
 
-echo "🎉 Update complete! All repositories have been updated."
-echo ""
+update_category "top-level" "📦" || ((total_failed+=$?))
+update_category "module" "🧩" || ((total_failed+=$?))
+update_category "config" "⚙️" || ((total_failed+=$?))
+
+if [ $total_failed -gt 0 ]; then
+    echo "⚠️  Update completed with errors. $total_failed repositories failed to update."
+    echo ""
+    exit 1
+else
+    echo "🎉 Update complete! All repositories have been updated."
+    echo ""
+fi
