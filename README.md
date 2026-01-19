@@ -100,3 +100,8 @@ set-me-up/
 - [nvim](https://github.com/dotbrains/nvim)
 - [tmux](https://github.com/dotbrains/tmux)
 - [zsh](https://github.com/dotbrains/zsh)
+
+
+## License
+
+This project is open source. See the repository for license details.
