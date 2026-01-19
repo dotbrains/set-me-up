@@ -34,18 +34,19 @@ jobs:
             **/*.md
             !node_modules/**
 
-  link-checker:
-    name: Check Links
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check links in Markdown files
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          use-quiet-mode: 'yes'
+  # Disabled due to false positives with GitHub URLs
+  # link-checker:
+  #   name: Check Links
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Check links in Markdown files
+  #       uses: gaurav-nelson/github-action-markdown-link-check@v1
+  #       with:
+  #         use-quiet-mode: 'yes'
 
   shellcheck:
     name: ShellCheck
