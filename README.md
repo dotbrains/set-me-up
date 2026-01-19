@@ -9,6 +9,8 @@ A comprehensive dotfiles and system configuration framework.
 
 For detailed information about how set-me-up works, see the [documentation](https://github.com/dotbrains/set-me-up-docs).
 
+For information about the setup and update scripts, see [scripts/SCRIPTS.md](scripts/SCRIPTS.md).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and how to run
@@ -20,7 +22,7 @@ To clone all repositories and recreate the complete directory structure:
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/dotbrains/set-me-up/master/setup.sh |
+  https://raw.githubusercontent.com/dotbrains/set-me-up/master/scripts/setup.sh |
   bash
 ```
 
@@ -29,9 +31,22 @@ Or manually:
 ```bash
 git clone https://github.com/dotbrains/set-me-up.git
 cd set-me-up
-chmod +x setup.sh
-./setup.sh
+chmod +x scripts/setup.sh
+./scripts/setup.sh
 ```
+
+## Updating Repositories
+
+To update all repositories to their latest versions:
+
+```bash
+cd set-me-up
+./scripts/update.sh
+```
+
+The update script will automatically skip repositories with uncommitted changes.
+
+See [scripts/SCRIPTS.md](scripts/SCRIPTS.md) for detailed documentation on both scripts.
 
 ## Directory Structure
 

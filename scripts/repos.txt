@@ -1,0 +1,26 @@
+# Repository definitions for set-me-up
+# Format: repo_name|local_path|category
+# Lines starting with # are comments
+
+# Top-level repositories
+set-me-up-blueprint|blueprint|top-level
+set-me-up-docs|docs|top-level
+set-me-up-installer|installer|top-level
+utilities|utilities|top-level
+
+# Module repositories
+colorschemes|modules/colorschemes|module
+macports-module|modules/macports|module
+preferences-module|modules/preferences|module
+template-module|modules/template-module|module
+set-me-up-universal-modules|modules/universal|module
+xcode-module|modules/xcode|module
+
+# Config repositories
+alacritty|home/.config/alacritty|config
+bash|home/.config/bash|config
+fish|home/.config/fish|config
+nushell|home/.config/nushell|config
+nvim|home/.config/nvim|config
+tmux|home/.config/tmux|config
+zsh|home/.config/zsh|config

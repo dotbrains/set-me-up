@@ -5,6 +5,9 @@ set -e
 # Constants
 readonly GITHUB_ORG="https://github.com/dotbrains"
 readonly REPO_NAME="set-me-up"
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
 
 # Check if git is installed
 if ! command -v git &> /dev/null; then
@@ -19,7 +22,7 @@ echo ""
 # Ensure we're in the set-me-up root directory
 ensure_setup_root() {
     # Already in the repo?
-    if [ -f "setup.sh" ] && [ -f "README.md" ] && git rev-parse --git-dir &> /dev/null; then
+    if [ -f "README.md" ] && git rev-parse --git-dir &> /dev/null; then
         echo "✅ Detected existing $REPO_NAME repository"
         return 0
     fi
@@ -34,6 +37,7 @@ ensure_setup_root() {
     cd "$REPO_NAME"
 }
 
+cd "$REPO_ROOT"
 ensure_setup_root
 echo "📂 Working in: $(pwd)"
 echo ""
@@ -43,61 +47,57 @@ clone_repo() {
     local repo="$1"
     local path="$2"
     
-    if [ -d "$path" ]; then
+    if [ -d "$REPO_ROOT/$path" ]; then
         echo "  ✅ $path already exists, skipping..."
         return 0
     fi
     
     echo "  ⬇️  Cloning into $path..."
-    git clone --recursive "${GITHUB_ORG}/${repo}.git" "$path" 2>&1 | sed 's/^/     /'
+    git clone --recursive "${GITHUB_ORG}/${repo}.git" "$REPO_ROOT/$path" 2>&1 | sed 's/^/     /'
     echo "  ✨ Done: $path"
 }
 
-# Clone a batch of repositories
-clone_batch() {
+# Clone repositories by category
+clone_category() {
     local category="$1"
     local icon="$2"
-    shift 2
+    local count=0
     
     echo "${icon} Cloning ${category} repositories..."
     echo ""
     
-    while [ $# -gt 0 ]; do
-        clone_repo "$1" "$2"
-        shift 2
-    done
+    while IFS='|' read -r repo path cat; do
+        # Skip comments and empty lines
+        [[ "$repo" =~ ^#.*$ || -z "$repo" ]] && continue
+        
+        if [ "$cat" = "$category" ]; then
+            clone_repo "$repo" "$path"
+            ((count++))
+        fi
+    done < "$REPOS_FILE"
+    
+    if [ $count -eq 0 ]; then
+        echo "  ℹ️  No repositories to clone in this category"
+    fi
     
     echo ""
 }
 
-# Create base directories
-mkdir -p modules home/.config
-touch home/.gitkeep
-echo "home sweet ~/" > home/.gitkeep
+# Create base directories in repo root
+mkdir -p "$REPO_ROOT/modules" "$REPO_ROOT/home/.config"
+touch "$REPO_ROOT/home/.gitkeep"
+echo "home sweet ~/" > "$REPO_ROOT/home/.gitkeep"
 
-# Clone all repositories
-clone_batch "top-level" "📦" \
-    "set-me-up-blueprint" "blueprint" \
-    "set-me-up-docs" "docs" \
-    "set-me-up-installer" "installer" \
-    "utilities" "utilities"
+# Check if repos.txt exists
+if [ ! -f "$REPOS_FILE" ]; then
+    echo "❌ Error: $REPOS_FILE not found. Please ensure it exists in the current directory."
+    exit 1
+fi
 
-clone_batch "module" "🧩" \
-    "colorschemes" "modules/colorschemes" \
-    "macports-module" "modules/macports" \
-    "preferences-module" "modules/preferences" \
-    "template-module" "modules/template-module" \
-    "set-me-up-universal-modules" "modules/universal" \
-    "xcode-module" "modules/xcode"
-
-clone_batch "config" "⚙️" \
-    "alacritty" "home/.config/alacritty" \
-    "bash" "home/.config/bash" \
-    "fish" "home/.config/fish" \
-    "nushell" "home/.config/nushell" \
-    "nvim" "home/.config/nvim" \
-    "tmux" "home/.config/tmux" \
-    "zsh" "home/.config/zsh"
+# Clone all repository categories
+clone_category "top-level" "📦"
+clone_category "module" "🧩"
+clone_category "config" "⚙️"
 
 echo "🎉 Setup complete! All repositories have been cloned."
 echo ""

@@ -2,6 +2,10 @@
 
 Thank you for contributing to set-me-up!
 
+## Scripts Documentation
+
+For detailed information about `setup.sh` and `update.sh`, see [scripts/SCRIPTS.md](scripts/SCRIPTS.md).
+
 ## Development Setup
 
 ### Prerequisites
@@ -42,10 +46,10 @@ npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
   "#installer" "#modules" "#utilities"
 
 # ShellCheck
-shellcheck setup.sh
+shellcheck scripts/setup.sh scripts/update.sh
 
 # Bash syntax check
-bash -n setup.sh
+bash -n scripts/setup.sh scripts/update.sh
 ```
 
 ### Individual Checks
@@ -75,7 +79,7 @@ Common markdown rules:
 #### ShellCheck
 
 ```bash
-shellcheck setup.sh
+shellcheck scripts/setup.sh scripts/update.sh
 ```
 
 This performs static analysis on shell scripts to catch common issues.
@@ -83,7 +87,7 @@ This performs static analysis on shell scripts to catch common issues.
 #### Bash Syntax
 
 ```bash
-bash -n setup.sh
+bash -n scripts/setup.sh scripts/update.sh
 ```
 
 This checks for syntax errors without executing the script.
@@ -94,7 +98,7 @@ This checks for syntax errors without executing the script.
 
 ```bash
 # Test bash syntax
-bash -n setup.sh
+bash -n scripts/setup.sh
 
 # Test git check
 command -v git &> /dev/null && echo "✓ Git installed" || echo "✗ Git missing"
@@ -111,7 +115,10 @@ mkdir -p blueprint
 Ensure these files exist:
 
 - `README.md`
-- `setup.sh` (must be executable)
+- `scripts/SCRIPTS.md`
+- `scripts/setup.sh` (must be executable)
+- `scripts/update.sh` (must be executable)
+- `scripts/repos.txt`
 - `.gitignore`
 
 ### .gitignore Validation
@@ -143,13 +150,13 @@ if ! markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
 fi
 
 # ShellCheck
-if ! shellcheck setup.sh; then
+if ! shellcheck scripts/setup.sh scripts/update.sh; then
     echo "❌ ShellCheck failed"
     exit 1
 fi
 
 # Bash syntax
-if ! bash -n setup.sh; then
+if ! bash -n scripts/setup.sh scripts/update.sh; then
     echo "❌ Bash syntax check failed"
     exit 1
 fi
