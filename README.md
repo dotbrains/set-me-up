@@ -105,4 +105,4 @@ set-me-up/
 
 ## License
 
-This project is open source. See the repository for license details.
+The code is available under the [MIT license](LICENSE).
