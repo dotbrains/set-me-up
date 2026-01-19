@@ -174,10 +174,7 @@ All pull requests and pushes automatically run:
 - **Lint workflow**: Markdown, ShellCheck, Bash syntax checks
 - **Test workflow**: Tests on Ubuntu and macOS
 
-View workflow status at:
-
-- [Lint Workflow](https://github.com/dotbrains/set-me-up/actions/workflows/lint.yml)
-- [Test Workflow](https://github.com/dotbrains/set-me-up/actions/workflows/tests.yml)
+View workflow status in the [Actions tab](https://github.com/dotbrains/set-me-up/actions).
 
 ## Pull Request Process
 
