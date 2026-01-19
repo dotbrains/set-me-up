@@ -16,26 +16,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Test bash syntax for setup.sh
+      - name: Test bash syntax for scripts
         run: |
           echo "Testing bash syntax..."
-          if bash -n setup.sh; then
-            echo "✓ Valid syntax: setup.sh"
+          if bash -n scripts/setup.sh && bash -n scripts/update.sh; then
+            echo "✓ Valid syntax: scripts/setup.sh"
+            echo "✓ Valid syntax: scripts/update.sh"
           else
-            echo "✗ Syntax error in: setup.sh"
+            echo "✗ Syntax error in scripts"
             exit 1
           fi
 
-      - name: Test setup.sh in dry-run mode
+      - name: Test scripts in dry-run mode
         run: |
-          echo "Testing setup.sh execution in test environment..."
+          echo "Testing scripts execution in test environment..."
           
           # Create a temporary directory for testing
           TEST_DIR=$(mktemp -d)
           cd "$TEST_DIR"
           
-          # Copy setup.sh to test directory
-          cp "$GITHUB_WORKSPACE/setup.sh" .
+          # Copy scripts to test directory
+          cp -r "$GITHUB_WORKSPACE/scripts" .
           
           echo "Test directory: $TEST_DIR"
           
@@ -58,15 +59,15 @@ jobs:
           TEST_DIR=$(mktemp -d)
           cd "$TEST_DIR"
           
-          # Copy setup.sh
-          cp "$GITHUB_WORKSPACE/setup.sh" .
+          # Copy scripts
+          cp -r "$GITHUB_WORKSPACE/scripts" .
           
           # Create a mock directory to test the skip logic
           mkdir -p blueprint
           
           # Test the idempotency by checking if script detects existing directory
           # Extract the clone_repo function from setup.sh
-          sed -n '/^clone_repo()/,/^}/p' "$GITHUB_WORKSPACE/setup.sh" > clone_test.sh
+          sed -n '/^clone_repo()/,/^}/p' "$GITHUB_WORKSPACE/scripts/setup.sh" > clone_test.sh
           
           # Create a test script that sources the function
           cat > test_idempotency.sh << 'EOF'
@@ -91,9 +92,12 @@ jobs:
           
           # Check for essential files
           [ -f "README.md" ] && echo "✓ README.md found" || { echo "✗ README.md not found"; exit 1; }
-          [ -f "setup.sh" ] && echo "✓ setup.sh found" || { echo "✗ setup.sh not found"; exit 1; }
+          [ -f "scripts/setup.sh" ] && echo "✓ scripts/setup.sh found" || { echo "✗ scripts/setup.sh not found"; exit 1; }
+          [ -f "scripts/update.sh" ] && echo "✓ scripts/update.sh found" || { echo "✗ scripts/update.sh not found"; exit 1; }
+          [ -f "scripts/repos.txt" ] && echo "✓ scripts/repos.txt found" || { echo "✗ scripts/repos.txt not found"; exit 1; }
           [ -f ".gitignore" ] && echo "✓ .gitignore found" || { echo "✗ .gitignore not found"; exit 1; }
-          [ -x "setup.sh" ] && echo "✓ setup.sh is executable" || { echo "✗ setup.sh is not executable"; exit 1; }
+          [ -x "scripts/setup.sh" ] && echo "✓ scripts/setup.sh is executable" || { echo "✗ scripts/setup.sh is not executable"; exit 1; }
+          [ -x "scripts/update.sh" ] && echo "✓ scripts/update.sh is executable" || { echo "✗ scripts/update.sh is not executable"; exit 1; }
 
       - name: Verify .gitignore entries
         run: |
