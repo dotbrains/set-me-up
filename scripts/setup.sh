@@ -74,7 +74,7 @@ clone_category() {
         
         if [ "$cat" = "$category" ]; then
             clone_repo "$repo" "$path"
-            ((count++))
+            ((count++)) || true
         fi
     done < "$REPOS_FILE"
     

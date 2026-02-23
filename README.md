@@ -22,8 +22,7 @@ To clone all repositories and recreate the complete directory structure:
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/dotbrains/set-me-up/master/\
-scripts/setup.sh | bash
+  https://raw.githubusercontent.com/dotbrains/set-me-up/master/scripts/setup.sh | bash
 ```
 
 Or manually:
