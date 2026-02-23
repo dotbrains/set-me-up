@@ -21,13 +21,6 @@ lint checks locally.
 To clone all repositories and recreate the complete directory structure:
 
 ```bash
-curl -fsSL \
-  https://raw.githubusercontent.com/dotbrains/set-me-up/master/scripts/setup.sh | bash
-```
-
-Or manually:
-
-```bash
 git clone https://github.com/dotbrains/set-me-up.git
 cd set-me-up
 chmod +x scripts/setup.sh
