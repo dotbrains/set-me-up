@@ -97,4 +97,5 @@ set-me-up/
 
 ## License
 
-The code is available under the [MIT license](LICENSE).
+Licensed under [PolyForm Shield 1.0.0](https://polyformproject.org/licenses/shield/1.0.0/).
+See [LICENSE](LICENSE) for details.
