@@ -20,7 +20,10 @@ xcode-module|modules/xcode|module
 alacritty|home/.config/alacritty|config
 bash|home/.config/bash|config
 fish|home/.config/fish|config
+gh-dash|home/.config/gh-dash|config
 nushell|home/.config/nushell|config
 nvim|home/.config/nvim|config
+opencode|home/.config/opencode|config
+television|home/.config/television|config
 tmux|home/.config/tmux|config
 zsh|home/.config/zsh|config
