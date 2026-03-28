@@ -62,8 +62,11 @@ set-me-up/
     ├── alacritty/      # Alacritty terminal config
     ├── bash/           # Bash configuration
     ├── fish/           # Fish shell configuration
+    ├── gh-dash/        # GitHub dashboard configuration
     ├── nushell/        # Nushell configuration
     ├── nvim/           # Neovim configuration
+    ├── opencode/       # OpenCode configuration
+    ├── television/     # Television (tv) configuration
     ├── tmux/           # Tmux configuration
     └── zsh/            # Zsh configuration
 ```
@@ -91,8 +94,11 @@ set-me-up/
 - [alacritty](https://github.com/dotbrains/alacritty)
 - [bash](https://github.com/dotbrains/bash)
 - [fish](https://github.com/dotbrains/fish)
+- [gh-dash](https://github.com/dotbrains/gh-dash)
 - [nushell](https://github.com/dotbrains/nushell)
 - [nvim](https://github.com/dotbrains/nvim)
+- [opencode](https://github.com/dotbrains/opencode)
+- [television](https://github.com/dotbrains/television)
 - [tmux](https://github.com/dotbrains/tmux)
 - [zsh](https://github.com/dotbrains/zsh)
 
