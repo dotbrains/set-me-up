@@ -51,6 +51,8 @@ set-me-up/
 ├── docs/               # Documentation
 ├── installer/          # Installation scripts
 ├── utilities/          # Utility scripts
+├── shared/
+│   └── ai-config/      # Shared AI agent/skill definitions
 ├── modules/
 │   ├── colorschemes/   # Color scheme configurations
 │   ├── macports/       # MacPorts module
@@ -90,6 +92,10 @@ set-me-up/
 - [template-module](https://github.com/dotbrains/template-module)
 - [set-me-up-universal-modules](https://github.com/dotbrains/set-me-up-universal-modules)
 - [xcode-module](https://github.com/dotbrains/xcode-module)
+
+### Shared
+
+- [shared-ai-config](https://github.com/dotbrains/shared-ai-config)
 
 ### Config
 

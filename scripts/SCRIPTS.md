@@ -24,7 +24,7 @@ Each line follows the format: `repo_name|local_path|category`
 
 - **repo_name**: GitHub repository name (without the org prefix)
 - **local_path**: Relative path where the repo should be cloned
-- **category**: Grouping category (`top-level`, `module`, or `config`)
+- **category**: Grouping category (`top-level`, `shared`, `module`, or `config`)
 
 ### Example
 
@@ -80,8 +80,8 @@ chmod +x scripts/setup.sh
 ### Behavior
 
 - If a repository directory already exists, it's skipped
-- Creates `modules/` and `home/.config/` directories
-- Processes repositories in category order: top-level → module → config
+- Creates `modules/`, `home/.config/`, and `shared/` directories
+- Processes repositories in category order: top-level → shared → module → config
 
 ## update.sh
 

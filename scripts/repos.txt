@@ -16,6 +16,9 @@ template-module|modules/template-module|module
 set-me-up-universal-modules|modules/universal|module
 xcode-module|modules/xcode|module
 
+# Shared repositories
+shared-ai-config|shared/ai-config|shared
+
 # Config repositories
 alacritty|home/.config/alacritty|config
 bash|home/.config/bash|config

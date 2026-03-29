@@ -133,6 +133,7 @@ fi
 total_failed=0
 
 update_category "top-level" "📦" || ((total_failed+=$?))
+update_category "shared" "🔗" || ((total_failed+=$?))
 update_category "module" "🧩" || ((total_failed+=$?))
 update_category "config" "⚙️" || ((total_failed+=$?))
 

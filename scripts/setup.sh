@@ -86,7 +86,7 @@ clone_category() {
 }
 
 # Create base directories in repo root
-mkdir -p "$REPO_ROOT/modules" "$REPO_ROOT/home/.config"
+mkdir -p "$REPO_ROOT/modules" "$REPO_ROOT/home/.config" "$REPO_ROOT/shared"
 touch "$REPO_ROOT/home/.gitkeep"
 echo "home sweet ~/" > "$REPO_ROOT/home/.gitkeep"
 
@@ -98,6 +98,7 @@ fi
 
 # Clone all repository categories
 clone_category "top-level" "📦"
+clone_category "shared" "🔗"
 clone_category "module" "🧩"
 clone_category "config" "⚙️"
 
