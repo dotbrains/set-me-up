@@ -19,6 +19,7 @@ xcode-module|modules/xcode|module
 # Config repositories
 alacritty|home/.config/alacritty|config
 bash|home/.config/bash|config
+claude|home/claude|config
 fish|home/.config/fish|config
 gh-dash|home/.config/gh-dash|config
 nushell|home/.config/nushell|config

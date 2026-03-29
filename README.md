@@ -58,17 +58,19 @@ set-me-up/
 │   ├── template-module/ # Template for new modules
 │   ├── universal/      # Universal modules
 │   └── xcode/          # Xcode module
-└── home/.config/
-    ├── alacritty/      # Alacritty terminal config
-    ├── bash/           # Bash configuration
-    ├── fish/           # Fish shell configuration
-    ├── gh-dash/        # GitHub dashboard configuration
-    ├── nushell/        # Nushell configuration
-    ├── nvim/           # Neovim configuration
-    ├── opencode/       # OpenCode configuration
-    ├── television/     # Television (tv) configuration
-    ├── tmux/           # Tmux configuration
-    └── zsh/            # Zsh configuration
+└── home/
+    ├── claude/         # Claude Code configuration
+    └── .config/
+        ├── alacritty/  # Alacritty terminal config
+        ├── bash/       # Bash configuration
+        ├── fish/       # Fish shell configuration
+        ├── gh-dash/    # GitHub dashboard configuration
+        ├── nushell/    # Nushell configuration
+        ├── nvim/       # Neovim configuration
+        ├── opencode/   # OpenCode configuration
+        ├── television/ # Television (tv) configuration
+        ├── tmux/       # Tmux configuration
+        └── zsh/        # Zsh configuration
 ```
 
 ## Repositories
@@ -93,6 +95,7 @@ set-me-up/
 
 - [alacritty](https://github.com/dotbrains/alacritty)
 - [bash](https://github.com/dotbrains/bash)
+- [claude](https://github.com/dotbrains/claude)
 - [fish](https://github.com/dotbrains/fish)
 - [gh-dash](https://github.com/dotbrains/gh-dash)
 - [nushell](https://github.com/dotbrains/nushell)
