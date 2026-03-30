@@ -61,7 +61,7 @@ set-me-up/
 │   ├── universal/      # Universal modules
 │   └── xcode/          # Xcode module
 └── home/
-    ├── .codex/         # Codex CLI configuration
+    ├── codex/          # Codex CLI configuration
     ├── claude/         # Claude Code configuration
     └── .config/
         ├── alacritty/  # Alacritty terminal config
