@@ -61,6 +61,7 @@ set-me-up/
 │   ├── universal/      # Universal modules
 │   └── xcode/          # Xcode module
 └── home/
+    ├── .codex/         # Codex CLI configuration
     ├── claude/         # Claude Code configuration
     └── .config/
         ├── alacritty/  # Alacritty terminal config
@@ -102,6 +103,7 @@ set-me-up/
 - [alacritty](https://github.com/dotbrains/alacritty)
 - [bash](https://github.com/dotbrains/bash)
 - [claude](https://github.com/dotbrains/claude)
+- [codex](https://github.com/dotbrains/codex)
 - [fish](https://github.com/dotbrains/fish)
 - [gh-dash](https://github.com/dotbrains/gh-dash)
 - [nushell](https://github.com/dotbrains/nushell)
