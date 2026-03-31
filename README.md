@@ -63,6 +63,7 @@ set-me-up/
 └── home/
     ├── codex/          # Codex CLI configuration
     ├── claude/         # Claude Code configuration
+    ├── pi/             # pi coding agent configuration
     └── .config/
         ├── alacritty/  # Alacritty terminal config
         ├── bash/       # Bash configuration
@@ -109,6 +110,7 @@ set-me-up/
 - [nushell](https://github.com/dotbrains/nushell)
 - [nvim](https://github.com/dotbrains/nvim)
 - [opencode](https://github.com/dotbrains/opencode)
+- [pi](https://github.com/dotbrains/pi)
 - [television](https://github.com/dotbrains/television)
 - [tmux](https://github.com/dotbrains/tmux)
 - [zsh](https://github.com/dotbrains/zsh)
