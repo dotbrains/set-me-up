@@ -17,6 +17,7 @@ Both scripts read from a shared `repos.txt` file that defines all repositories.
 
 The `repos.txt` file is the single source of truth for all repositories in the
 set-me-up collection.
+All `local_path` values in this manifest are reserved for cloned external repositories (including `tests/`), not first-party tracked source in this repository.
 
 ### Format
 
@@ -34,6 +35,7 @@ Each line follows the format: `repo_name|local_path|category`
 
 # Top-level repositories
 set-me-up-blueprint|blueprint|top-level
+set-me-up-tests|tests|top-level
 utilities|utilities|top-level
 
 # Module repositories
@@ -73,7 +75,7 @@ chmod +x scripts/setup.sh
 - Clones repositories from the dotbrains GitHub organization
 - Skips repositories that already exist
 - Clones repositories with submodules (`--recursive`)
-- Organizes repositories by category (top-level, module, config)
+- Organizes repositories by category (top-level, shared, module, config)
 - Creates necessary directory structure
 - Clean, categorized output with emoji indicators
 

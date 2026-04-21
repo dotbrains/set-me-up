@@ -50,6 +50,7 @@ set-me-up/
 ├── blueprint/          # Blueprint configuration
 ├── docs/               # Documentation
 ├── installer/          # Installation scripts
+├── tests/              # Docker-based provisioning test scenarios
 ├── utilities/          # Utility scripts
 ├── shared/
 │   └── ai-config/      # Shared AI agent/skill definitions
@@ -85,6 +86,11 @@ set-me-up/
 - [set-me-up-docs](https://github.com/dotbrains/set-me-up-docs)
 - [set-me-up-installer](https://github.com/dotbrains/set-me-up-installer)
 - [utilities](https://github.com/dotbrains/utilities)
+
+### Testing
+
+- [set-me-up-tests](https://github.com/dotbrains/set-me-up-tests)
+  - Runs portable, scenario-driven Docker provisioning tests based on `SMU_BLUEPRINT` and `SMU_BLUEPRINT_BRANCH`
 
 ### Modules
 

@@ -117,16 +117,27 @@ jobs:
         run: |
           echo "Checking .gitignore configuration..."
           
-          REQUIRED_IGNORES=("blueprint/" "docs/" "home/" "installer/" "modules/" "utilities/")
+          REQUIRED_IGNORES=("blueprint/" "docs/" "home/" "installer/" "modules/" "shared/" "tests/" "utilities/")
           
           for entry in "${REQUIRED_IGNORES[@]}"; do
-            if grep -q "^$entry$" .gitignore; then
+            if grep -Fxq "$entry" .gitignore; then
               echo "✓ $entry is in .gitignore"
             else
               echo "✗ $entry is missing from .gitignore"
               exit 1
             fi
           done
+
+      - name: Verify repos manifest entries
+        run: |
+          echo "Checking scripts/repos.txt entries..."
+
+          if grep -Fq "set-me-up-tests|tests|top-level" scripts/repos.txt; then
+            echo "✓ set-me-up-tests manifest entry exists"
+          else
+            echo "✗ set-me-up-tests manifest entry missing"
+            exit 1
+          fi
 
       - name: Test README.md structure
         run: |

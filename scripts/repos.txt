@@ -6,6 +6,7 @@
 set-me-up-blueprint|blueprint|top-level
 set-me-up-docs|docs|top-level
 set-me-up-installer|installer|top-level
+set-me-up-tests|tests|top-level
 utilities|utilities|top-level
 
 # Module repositories

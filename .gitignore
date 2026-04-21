@@ -5,4 +5,5 @@ home/
 installer/
 modules/
 shared/
+tests/
 utilities/
