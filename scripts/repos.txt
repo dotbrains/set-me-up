@@ -11,6 +11,8 @@ utilities|utilities|top-level
 
 # Module repositories
 colorschemes|modules/colorschemes|module
+debian-modules|modules/debian|module
+macos-modules|modules/macos|module
 macports-module|modules/macports|module
 preferences-module|modules/preferences|module
 template-module|modules/template-module|module
