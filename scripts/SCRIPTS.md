@@ -17,7 +17,9 @@ Both scripts read from a shared `repos.txt` file that defines all repositories.
 
 The `repos.txt` file is the single source of truth for all repositories in the
 set-me-up collection.
-All `local_path` values in this manifest are reserved for cloned external repositories (including `tests/`), not first-party tracked source in this repository.
+All `local_path` values in this manifest are reserved for cloned external
+repositories (including `tests/`), not first-party tracked source in this
+repository.
 
 ### Format
 
