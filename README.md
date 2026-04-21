@@ -90,7 +90,6 @@ set-me-up/
 ### Testing
 
 - [set-me-up-tests](https://github.com/dotbrains/set-me-up-tests)
-  - Runs portable, scenario-driven Docker provisioning tests based on `SMU_BLUEPRINT` and `SMU_BLUEPRINT_BRANCH`
 
 ### Modules
 
