@@ -42,6 +42,8 @@ utilities|utilities|top-level
 
 # Module repositories
 colorschemes|modules/colorschemes|module
+debian-modules|modules/debian|module
+macos-modules|modules/macos|module
 
 # Config repositories
 fish|home/.config/fish|config
