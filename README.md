@@ -55,7 +55,9 @@ set-me-up/
 ├── shared/
 │   └── ai-config/      # Shared AI agent/skill definitions
 ├── modules/
-│   ├── colorschemes/   # Color scheme configurations
+│   ├── colorschemes/    # Color scheme configurations
+│   ├── debian/         # Debian/Linux modules
+│   ├── macos/          # macOS/Homebrew modules
 │   ├── macports/       # MacPorts module
 │   ├── preferences/    # Preferences module
 │   ├── template-module/ # Template for new modules
@@ -94,6 +96,8 @@ set-me-up/
 ### Modules
 
 - [colorschemes](https://github.com/dotbrains/colorschemes)
+- [debian-modules](https://github.com/dotbrains/set-me-up-debian-modules)
+- [macos-modules](https://github.com/dotbrains/set-me-up-macos-modules)
 - [macports-module](https://github.com/dotbrains/macports-module)
 - [preferences-module](https://github.com/dotbrains/preferences-module)
 - [template-module](https://github.com/dotbrains/template-module)
