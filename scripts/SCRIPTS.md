@@ -47,6 +47,7 @@ macos-modules|modules/macos|module
 
 # Config repositories
 fish|home/.config/fish|config
+zed|home/.config/zed|config
 ```
 
 Lines starting with `#` are comments and empty lines are ignored.

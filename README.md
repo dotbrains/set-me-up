@@ -77,6 +77,7 @@ set-me-up/
         ├── opencode/   # OpenCode configuration
         ├── television/ # Television (tv) configuration
         ├── tmux/       # Tmux configuration
+        ├── zed/        # Zed configuration
         └── zsh/        # Zsh configuration
 ```
 
@@ -122,6 +123,7 @@ set-me-up/
 - [pi](https://github.com/dotbrains/pi)
 - [television](https://github.com/dotbrains/television)
 - [tmux](https://github.com/dotbrains/tmux)
+- [zed](https://github.com/dotbrains/zed)
 - [zsh](https://github.com/dotbrains/zsh)
 
 ## License
