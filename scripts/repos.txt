@@ -35,4 +35,5 @@ opencode|home/.config/opencode|config
 pi|home/pi|config
 television|home/.config/television|config
 tmux|home/.config/tmux|config
+zed|home/.config/zed|config
 zsh|home/.config/zsh|config
