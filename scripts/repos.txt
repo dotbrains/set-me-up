@@ -10,7 +10,7 @@ set-me-up-tests|tests|top-level
 utilities|utilities|top-level
 
 # Module repositories
-colorschemes|modules/colorschemes|module
+colorscheme-module|modules/colorschemes|module
 debian-modules|modules/debian|module
 macos-modules|modules/macos|module
 macports-module|modules/macports|module

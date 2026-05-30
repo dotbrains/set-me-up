@@ -96,7 +96,7 @@ set-me-up/
 
 ### Modules
 
-- [colorschemes](https://github.com/dotbrains/colorschemes)
+- [colorscheme-module](https://github.com/dotbrains/colorscheme-module)
 - [debian-modules](https://github.com/dotbrains/set-me-up-debian-modules)
 - [macos-modules](https://github.com/dotbrains/set-me-up-macos-modules)
 - [macports-module](https://github.com/dotbrains/macports-module)
