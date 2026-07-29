@@ -8,6 +8,23 @@ readonly REPO_NAME="set-me-up"
 REPO_ROOT=""
 REPOS_FILE=""
 
+usage() {
+    printf "Usage: %s\n" "$0" >&2
+}
+
+case "${1:-}" in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac
+
 is_setup_root() {
     local path="$1"
 

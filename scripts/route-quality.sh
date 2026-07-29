@@ -6,6 +6,23 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 routes_file="$repo_root/scripts/agent-routes.txt"
 required_keywords=(theme prompt agent installer module ci)
 
+usage() {
+    printf "Usage: %s\n" "$0" >&2
+}
+
+case "${1:-}" in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac
+
 cd "$repo_root"
 
 missing=0

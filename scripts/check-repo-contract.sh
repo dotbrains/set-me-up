@@ -15,6 +15,7 @@ path=""
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/json.sh"
 
 usage() {
     printf "Usage: %s [--json] [--allow-diverged] [--checked-out] [--all|<managed-local-path>]\\n" "$0" >&2
@@ -62,15 +63,6 @@ check() {
     fi
 }
 
-json_escape() {
-    local value="$1"
-
-    value="${value//\\/\\\\}"
-    value="${value//\"/\\\"}"
-    value="${value//$'\n'/\\n}"
-    printf "%s" "$value"
-}
-
 record_check() {
     local label="$1"
     local failed_check="$2"
@@ -92,11 +84,11 @@ print_json() {
     local ok
 
     printf '{"path":"%s","allowDiverged":%s,"failed":%s,"checks":[' \
-        "$(json_escape "$path")" "$allow_diverged" "$failed"
+        "$(smu_json_escape "$path")" "$allow_diverged" "$failed"
     for index in "${!check_names[@]}"; do
         [ "${check_results[$index]}" -eq 0 ] && ok=true || ok=false
         printf '%s{"name":"%s","ok":%s}' \
-            "$comma" "$(json_escape "${check_names[$index]}")" "$ok"
+            "$comma" "$(smu_json_escape "${check_names[$index]}")" "$ok"
         comma=","
     done
     printf ']}\n'

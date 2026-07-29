@@ -241,6 +241,61 @@ test_freshness_report_json_lists_repositories() {
     assert_contains "$output" '"state":"fresh"'
 }
 
+test_capabilities_json_lists_routes() {
+    local work_dir="$tmp_root/capabilities-json"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+    printf "clean|clean|Clean repo|clean\n" > "$work_dir/scripts/agent-routes.txt"
+    printf "clean|custom validate\n" > "$work_dir/scripts/repo-validators.txt"
+
+    (
+        cd "$work_dir"
+        bash scripts/capabilities.sh --json > "$output"
+    )
+
+    assert_contains "$output" '"repositories":['
+    assert_contains "$output" '"repo":"clean"'
+    assert_contains "$output" '"route":"clean"'
+}
+
+test_sync_report_json_lists_repositories() {
+    local work_dir="$tmp_root/sync-json"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+    printf "clean|custom validate\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/sync-report.sh --json > "$output"
+    )
+
+    assert_contains "$output" '"repositories":['
+    assert_contains "$output" '"path":"clean"'
+    assert_contains "$output" '"validator":"custom validate"'
+}
+
+test_json_schema_validation_runs() {
+    local work_dir="$tmp_root/schema-validation"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    (
+        cd "$work_dir"
+        bash scripts/validate-json-schemas.sh > "$output"
+    )
+
+    assert_contains "$output" "JSON schema checks passed."
+}
+
 
 
 test_route_lookup_finds_keyword_matches
@@ -253,3 +308,6 @@ test_health_report_schema_docs_exist
 test_change_report_lists_recent_commits
 test_change_report_json_lists_recent_commits
 test_freshness_report_json_lists_repositories
+test_capabilities_json_lists_routes
+test_sync_report_json_lists_repositories
+test_json_schema_validation_runs

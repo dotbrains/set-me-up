@@ -4,7 +4,20 @@
   "type": "object",
   "required": ["repositories"],
   "properties": {
-    "repositories": { "type": "array" }
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "days", "date", "state"],
+        "properties": {
+          "path": { "type": "string" },
+          "days": { "type": ["integer", "string"] },
+          "date": { "type": "string" },
+          "state": { "enum": ["fresh", "stale", "missing"] }
+        },
+        "additionalProperties": false
+      }
+    }
   },
   "additionalProperties": false
 }

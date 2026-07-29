@@ -10,6 +10,23 @@ readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
 source "$SCRIPT_DIR/lib/repos.sh"
 source "$SCRIPT_DIR/lib/repo-state.sh"
 
+usage() {
+    printf "Usage: %s\n" "$0" >&2
+}
+
+case "${1:-}" in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac
+
 # Check if git is installed
 if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed. Please install git and try again."

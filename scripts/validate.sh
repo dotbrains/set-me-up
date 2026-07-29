@@ -17,7 +17,8 @@ bash_checks() {
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
-        scripts/tree-smoke-test.sh scripts/tests/test-helpers.sh \
+        scripts/tree-smoke-test.sh scripts/validate-json-schemas.sh \
+        scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
         scripts/tests/test-routes-doctor.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
@@ -36,6 +37,7 @@ shell_checks() {
         scripts/health-report.sh scripts/route-quality.sh \
         scripts/freshness-report.sh scripts/new-repo-check.sh scripts/add-repo.sh \
         scripts/change-report.sh scripts/tree-smoke-test.sh \
+        scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
@@ -192,8 +194,11 @@ coverage_checks() {
     scripts/doctor.sh --json >/dev/null
     scripts/freshness-report.sh --json >/dev/null
     scripts/change-report.sh --json >/dev/null
+    scripts/capabilities.sh --json >/dev/null
+    scripts/sync-report.sh --json >/dev/null
     scripts/ci-workflow-report.sh --checked-out --json >/dev/null
     scripts/native-workflow-template.sh --check --json >/dev/null
+    scripts/validate-json-schemas.sh >/dev/null
     scripts/tree-smoke-test.sh >/dev/null
 }
 
@@ -221,6 +226,7 @@ structure_checks() {
         scripts/change-report.sh
         scripts/tree-smoke-test.sh
         scripts/generate-command-docs.sh
+        scripts/validate-json-schemas.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -241,6 +247,8 @@ structure_checks() {
         scripts/schemas/change-report.schema.json
         scripts/schemas/ci-workflow-report.schema.json
         scripts/schemas/native-workflow-template.schema.json
+        scripts/schemas/capabilities.schema.json
+        scripts/schemas/sync-report.schema.json
         scripts/docs/SCRIPTS-DETAILS.md
         scripts/docs/COMMANDS.md
         .gitignore
@@ -337,6 +345,10 @@ structure_checks() {
     }
     [ -x scripts/generate-command-docs.sh ] || {
         printf "scripts/generate-command-docs.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/validate-json-schemas.sh ] || {
+        printf "scripts/validate-json-schemas.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/test-root-scripts.sh ] || {

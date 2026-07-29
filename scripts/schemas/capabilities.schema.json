@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "set-me-up capabilities report",
+  "type": "object",
+  "required": ["repositories"],
+  "properties": {
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repo", "path", "category", "route", "summary", "keywords", "validator"],
+        "properties": {
+          "repo": { "type": "string" },
+          "path": { "type": "string" },
+          "category": { "enum": ["top-level", "shared", "module", "config"] },
+          "route": { "type": "string" },
+          "summary": { "type": "string" },
+          "keywords": { "type": "string" },
+          "validator": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

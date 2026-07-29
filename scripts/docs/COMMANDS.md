@@ -19,7 +19,7 @@ Usage: scripts/add-repo.sh <repo> <local-path> <category> <route-id> <summary> <
 ## scripts/capabilities.sh
 
 ```text
-Usage: scripts/capabilities.sh [--declared] [query]
+Usage: scripts/capabilities.sh [--declared] [--tsv|--json] [query]
 ```
 
 ## scripts/change-report.sh
@@ -85,7 +85,7 @@ Usage: scripts/new-repo-check.sh <managed-local-path>
 ## scripts/route-quality.sh
 
 ```text
-No usage output declared.
+Usage: scripts/route-quality.sh
 ```
 
 ## scripts/route.sh
@@ -97,31 +97,37 @@ Usage: scripts/route.sh <query>
 ## scripts/setup.sh
 
 ```text
-No usage output declared.
+Usage: scripts/setup.sh
 ```
 
 ## scripts/sync-report.sh
 
 ```text
-No usage output declared.
+Usage: scripts/sync-report.sh [--tsv|--json]
 ```
 
 ## scripts/test-root-scripts.sh
 
 ```text
-No usage output declared.
+Usage: scripts/test-root-scripts.sh
 ```
 
 ## scripts/tree-smoke-test.sh
 
 ```text
-No usage output declared.
+Usage: scripts/tree-smoke-test.sh
 ```
 
 ## scripts/update.sh
 
 ```text
-No usage output declared.
+Usage: scripts/update.sh
+```
+
+## scripts/validate-json-schemas.sh
+
+```text
+Usage: scripts/validate-json-schemas.sh
 ```
 
 ## scripts/validate-repos.sh

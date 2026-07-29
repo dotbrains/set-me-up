@@ -4,8 +4,35 @@
   "type": "object",
   "required": ["repositories", "route_drift", "summary"],
   "properties": {
-    "repositories": { "type": "array" },
-    "route_drift": { "type": "array" },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repo", "path", "category", "state", "sync", "validator", "route"],
+        "properties": {
+          "repo": { "type": "string" },
+          "path": { "type": "string" },
+          "category": { "enum": ["top-level", "shared", "module", "config"] },
+          "state": { "enum": ["clean", "dirty", "changed", "detached", "missing", "not-git"] },
+          "sync": { "type": "string" },
+          "validator": { "type": "string" },
+          "route": { "enum": ["routed", "missing-route"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "route_drift": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["route", "path"],
+        "properties": {
+          "route": { "type": "string" },
+          "path": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
     "summary": { "type": "object" }
   },
   "additionalProperties": false

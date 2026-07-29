@@ -119,6 +119,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/change-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/tree-smoke-test.sh" "$target/scripts/"
     cp "$repo_root/scripts/generate-command-docs.sh" "$target/scripts/"
+    cp "$repo_root/scripts/validate-json-schemas.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"

@@ -42,6 +42,7 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/tree-smoke-test.sh`: Fresh-tree smoke test for root discovery tools.
 - `scripts/docs/COMMANDS.md`: Generated command usage reference.
 - `scripts/schemas/`: JSON schemas for machine-readable root reports.
+- `scripts/validate-json-schemas.sh`: Validates generated JSON report shape.
 - `REPOSITORIES.md`: Generated repository, route, capability, and validator
   index.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
@@ -259,8 +260,9 @@ scripts/validate-repos.sh --list
 scripts/validate-repos.sh --changed
 scripts/validate-repos.sh --missing
 scripts/sync-report.sh
+scripts/sync-report.sh --json
 scripts/validator-exceptions.sh
-scripts/capabilities.sh theme
+scripts/capabilities.sh --json theme
 scripts/ci-workflow-report.sh --checked-out
 scripts/native-workflow-template.sh --check
 scripts/doctor.sh --json
@@ -272,6 +274,7 @@ scripts/new-repo-check.sh home/.config/zsh
 scripts/add-repo.sh repo path category route-id "Summary" "keywords"
 scripts/change-report.sh --since=7.days --json
 scripts/tree-smoke-test.sh
+scripts/validate-json-schemas.sh
 scripts/check-repo-contract.sh home/.config/zsh
 scripts/check-repo-contract.sh --json home/.config/zsh
 scripts/check-repo-contract.sh --all

@@ -4,7 +4,19 @@
   "type": "object",
   "required": ["repositories"],
   "properties": {
-    "repositories": { "type": "array" }
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "state", "workflows"],
+        "properties": {
+          "path": { "type": "string" },
+          "state": { "enum": ["present", "missing"] },
+          "workflows": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
   },
   "additionalProperties": false
 }

@@ -237,7 +237,8 @@ The JSON contract is documented in
 `scripts/schemas/health-report.example.json`.
 
 Additional JSON schemas live in `scripts/schemas/` for doctor, freshness,
-change, CI workflow, and native workflow reports.
+change, capability, sync, CI workflow, and native workflow reports.
+Use `scripts/validate-json-schemas.sh` to verify generated JSON report shape.
 
 ## add-repo.sh
 

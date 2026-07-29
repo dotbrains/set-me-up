@@ -5,6 +5,23 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
 
+usage() {
+    printf "Usage: %s\n" "$0" >&2
+}
+
+case "${1:-}" in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac
+
 cleanup() {
     rm -rf "$tmp_root"
 }
@@ -28,6 +45,9 @@ cp -R scripts/docs "$tmp_root/set-me-up/scripts/"
     bash scripts/doctor.sh --json >/dev/null
     bash scripts/freshness-report.sh --json >/dev/null
     bash scripts/change-report.sh --json >/dev/null
+    bash scripts/capabilities.sh --json >/dev/null
+    bash scripts/sync-report.sh --json >/dev/null
+    bash scripts/validate-json-schemas.sh >/dev/null
     bash scripts/capabilities.sh >/dev/null
     bash scripts/change-report.sh --since=1.day >/dev/null
 )

@@ -1,19 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "set-me-up change report",
+  "title": "set-me-up sync report",
   "type": "object",
-  "required": ["commits"],
+  "required": ["repositories"],
   "properties": {
-    "commits": {
+    "repositories": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["path", "commit", "date", "subject"],
+        "required": ["path", "state", "sync", "validator"],
         "properties": {
           "path": { "type": "string" },
-          "commit": { "type": "string" },
-          "date": { "type": "string" },
-          "subject": { "type": "string" }
+          "state": { "enum": ["clean", "dirty", "changed", "detached", "missing", "not-git"] },
+          "sync": { "type": "string" },
+          "validator": { "type": "string" }
         },
         "additionalProperties": false
       }

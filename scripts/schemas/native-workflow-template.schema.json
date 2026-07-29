@@ -4,7 +4,18 @@
   "type": "object",
   "required": ["repositories"],
   "properties": {
-    "repositories": { "type": "array" }
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "state"],
+        "properties": {
+          "path": { "type": "string" },
+          "state": { "enum": ["native-workflow", "missing-native-workflow"] }
+        },
+        "additionalProperties": false
+      }
+    }
   },
   "additionalProperties": false
 }
