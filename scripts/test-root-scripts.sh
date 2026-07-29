@@ -346,6 +346,37 @@ test_route_lookup_fails_without_matches() {
     assert_contains "$output" "No routes matched"
 }
 
+test_route_lookup_covers_core_concepts() {
+    local work_dir="$tmp_root/route-coverage"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    (
+        cd "$work_dir"
+        bash scripts/route.sh smu > "$output"
+        assert_contains "$output" "installer"
+
+        bash scripts/route.sh prompt > "$output"
+        assert_contains "$output" "home/.config/bash"
+
+        bash scripts/route.sh claude > "$output"
+        assert_contains "$output" "home/claude"
+
+        bash scripts/route.sh codex > "$output"
+        assert_contains "$output" "home/codex"
+
+        bash scripts/route.sh macos > "$output"
+        assert_contains "$output" "modules/macos"
+
+        bash scripts/route.sh debian > "$output"
+        assert_contains "$output" "modules/debian"
+
+        bash scripts/route.sh nvim > "$output"
+        assert_contains "$output" "home/.config/nvim"
+    )
+}
+
 test_doctor_reports_repo_health_summary() {
     local work_dir="$tmp_root/doctor-summary"
     local bin_dir="$work_dir/bin"
@@ -413,6 +444,7 @@ test_repo_validators_reject_unknown_paths
 test_validate_repos_lists_declared_validator
 test_route_lookup_finds_keyword_matches
 test_route_lookup_fails_without_matches
+test_route_lookup_covers_core_concepts
 test_doctor_reports_repo_health_summary
 test_doctor_verbose_reports_route_drift
 

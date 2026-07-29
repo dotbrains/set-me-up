@@ -168,6 +168,8 @@ route_id|local_path|summary|keywords
 
 `local_path` must be `.` or a path listed in `scripts/repos.txt`. Keywords are
 comma-separated lowercase routing hints for agents and humans.
+Root tests expect route coverage for core concepts including `theme`, `prompt`,
+`smu`, `claude`, `codex`, `macos`, `debian`, and `nvim`.
 
 ## Repository Validator Rules
 

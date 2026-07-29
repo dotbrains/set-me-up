@@ -83,6 +83,8 @@ route_id|local_path|summary|keywords
 - **keywords**: Comma-separated routing hints
 
 Root validation rejects route paths that are not listed in `repos.txt`.
+Root tests also keep important route concepts covered, including `theme`,
+`prompt`, `smu`, `claude`, `codex`, `macos`, `debian`, and `nvim`.
 
 Query routes with:
 
