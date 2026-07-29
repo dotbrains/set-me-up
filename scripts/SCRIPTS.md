@@ -10,6 +10,8 @@ directory structure. Two scripts help manage these repositories:
 
 - **`setup.sh`**: Initial cloning of all repositories
 - **`update.sh`**: Updating existing repositories
+- **`validate-repos.sh`**: Running validators across clean child repositories
+- **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
 Both scripts read from a shared `repos.txt` file that defines all repositories.
 
@@ -199,11 +201,27 @@ scripts/validate.sh --all
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full linting guidelines.
 
+Run child repository validators from the root when work spans multiple managed
+repos:
+
+```bash
+scripts/validate-repos.sh --list
+scripts/validate-repos.sh --changed
+```
+
+`validate-repos.sh` reads `repos.txt`, skips missing or dirty repositories, and
+runs the first validator it can discover in this order:
+
+1. `scripts/validate.sh --all`
+2. `npm test`
+3. `./test.sh`
+
 ### Testing Changes
 
 When modifying the scripts:
 
-1. Test in a temporary directory
-2. Verify both fresh cloning and updates work
-3. Test with repositories that have uncommitted changes
-4. Verify the output formatting is clean and consistent
+1. Run `scripts/validate.sh --test`
+2. Test in a temporary directory when changing real clone or pull behavior
+3. Verify both fresh cloning and updates work
+4. Test with repositories that have uncommitted changes
+5. Verify the output formatting is clean and consistent

@@ -19,6 +19,10 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/setup.sh`: Clones every repo listed in `scripts/repos.txt`.
 - `scripts/update.sh`: Pulls every existing clean repo listed in
   `scripts/repos.txt`.
+- `scripts/test-root-scripts.sh`: Regression tests for root setup/update
+  behavior using mocked Git operations.
+- `scripts/validate-repos.sh`: Discovers child repo validators and runs them
+  without touching dirty worktrees.
 - `scripts/SCRIPTS.md`: User-facing behavior and maintenance docs for the
   setup/update scripts.
 - `README.md`: High-level project overview and repository inventory.
@@ -39,6 +43,8 @@ the goal before editing:
    when the user goal spans multiple managed repos.
 6. Run validation from each changed repo, plus root validation when root files
    changed.
+   Use `scripts/validate-repos.sh --changed` from the root when multiple child
+   repos may need validation.
 7. Report final status grouped by repository, including uncommitted changes and
    any checks that could not be run.
 
@@ -89,6 +95,10 @@ history:
 It is valid to edit those paths when the routed goal belongs there. Keep each
 repo's changes, validation, commits, and PRs separate unless the user
 explicitly asks for a coordinated multi-repo commit strategy.
+Some child repos contain their own nested checkouts or submodules; treat those
+as separate Git boundaries too. Never stage parent-repo changes that only
+represent nested checkout state unless the requested work is specifically to
+update that nested reference.
 
 ## Where To Add Things
 
@@ -141,6 +151,16 @@ Run the narrowest relevant checks before finishing:
 ```bash
 scripts/validate.sh --all
 ```
+
+For routed multi-repo work, list or run child repo validators from the root:
+
+```bash
+scripts/validate-repos.sh --list
+scripts/validate-repos.sh --changed
+```
+
+`scripts/validate-repos.sh` skips dirty repositories so it cannot hide or
+overwrite unrelated work-in-progress.
 
 If `shellcheck` or `npx` is unavailable, report that instead of silently
 skipping the check.

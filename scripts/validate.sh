@@ -8,12 +8,14 @@ cd "$repo_root"
 mode="${1:---all}"
 
 bash_checks() {
-    bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh
+    bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
+        scripts/test-root-scripts.sh scripts/validate-repos.sh
 }
 
 shell_checks() {
     bash_checks
-    shellcheck --severity=warning scripts/setup.sh scripts/update.sh scripts/validate.sh
+    shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
+        scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh
 }
 
 markdown_checks() {
@@ -74,6 +76,8 @@ structure_checks() {
         scripts/setup.sh
         scripts/update.sh
         scripts/repos.txt
+        scripts/test-root-scripts.sh
+        scripts/validate-repos.sh
         .gitignore
     )
     local required_ignores=(
@@ -102,6 +106,14 @@ structure_checks() {
         printf "scripts/update.sh must be executable\\n" >&2
         exit 1
     }
+    [ -x scripts/test-root-scripts.sh ] || {
+        printf "scripts/test-root-scripts.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/validate-repos.sh ] || {
+        printf "scripts/validate-repos.sh must be executable\\n" >&2
+        exit 1
+    }
 
     for entry in "${required_ignores[@]}"; do
         grep -Fxq "$entry" .gitignore || {
@@ -117,6 +129,10 @@ structure_checks() {
     grep -q "Repositories" README.md
 }
 
+test_checks() {
+    scripts/test-root-scripts.sh
+}
+
 case "$mode" in
     --bash)
         bash_checks
@@ -130,13 +146,17 @@ case "$mode" in
     --structure)
         structure_checks
         ;;
+    --test)
+        test_checks
+        ;;
     --all)
         shell_checks
         markdown_checks
         structure_checks
+        test_checks
         ;;
     *)
-        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure]\\n" "$0" >&2
+        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--test]\\n" "$0" >&2
         exit 2
         ;;
 esac

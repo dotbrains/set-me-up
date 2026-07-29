@@ -33,9 +33,7 @@ Runs comprehensive tests on both Ubuntu and macOS environments.
 
 - **test**: Runs on both `ubuntu-latest` and `macos-latest`
   - Tests bash syntax for root scripts
-  - Verifies git is installed
-  - Tests piped `setup.sh` bootstrap manifest resolution
-  - Tests idempotency logic (directory existence checks)
+  - Runs the mocked root setup/update regression harness
   - Validates file structure and required manifest entries
   - Verifies .gitignore entries
   - Validates README.md structure
@@ -64,18 +62,12 @@ scripts/validate.sh --bash
 # Test bash syntax
 scripts/validate.sh --bash
 
-# Test git availability
-command -v git
-
-# Test idempotency
-mkdir -p test_dir
-cd test_dir
-mkdir -p blueprint
-# Run setup.sh and verify it skips existing directories
+# Test root setup and update behavior with mocked Git operations
+scripts/validate.sh --test
 ```
 
-The piped setup bootstrap behavior is covered in CI with a mocked `git`
-command so the test does not clone remote repositories.
+The root script behavior is covered in CI with a mocked `git` command so tests
+do not clone or pull remote repositories.
 
 ## Badge Status
 

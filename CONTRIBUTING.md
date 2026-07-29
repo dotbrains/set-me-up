@@ -79,8 +79,12 @@ This checks for syntax errors without executing the script.
 ### Run Tests Locally
 
 ```bash
+scripts/validate.sh --test
 scripts/validate.sh --structure
 ```
+
+`--test` runs the root setup/update regression harness with mocked Git
+operations, so it does not clone or pull remote repositories.
 
 ### File Structure Validation
 
@@ -90,6 +94,8 @@ Ensure these files exist:
 - `scripts/SCRIPTS.md`
 - `scripts/setup.sh` (must be executable)
 - `scripts/update.sh` (must be executable)
+- `scripts/test-root-scripts.sh` (must be executable)
+- `scripts/validate-repos.sh` (must be executable)
 - `scripts/repos.txt`
 - `.gitignore`
 
@@ -103,6 +109,19 @@ Verify the `.gitignore` contains:
 - `installer/`
 - `modules/`
 - `utilities/`
+
+## Child Repository Validation
+
+Most directories created by `scripts/setup.sh` are separate Git repositories.
+Validate routed multi-repo work from the root with:
+
+```bash
+scripts/validate-repos.sh --list
+scripts/validate-repos.sh --changed
+```
+
+The runner reads `scripts/repos.txt`, discovers each child repo's validator,
+and skips dirty repositories so unrelated work-in-progress stays untouched.
 
 ## Pre-commit Hook (Optional)
 
