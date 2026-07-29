@@ -51,6 +51,42 @@ jobs:
           
           echo "✓ Setup script prerequisites met"
 
+      - name: Test piped setup resolves cloned manifest
+        run: |
+          TEST_DIR=$(mktemp -d)
+          mkdir -p "$TEST_DIR/bin"
+
+          cat > "$TEST_DIR/bin/git" <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          case "$1" in
+            rev-parse)
+              [ -d .git ]
+              ;;
+            clone)
+              dest="${@: -1}"
+              mkdir -p "$dest/.git"
+              if [ "$dest" = "set-me-up" ]; then
+                cp "$GITHUB_WORKSPACE/README.md" "$dest/"
+                cp -R "$GITHUB_WORKSPACE/scripts" "$dest/"
+              fi
+              ;;
+            *)
+              exit 0
+              ;;
+          esac
+          EOF
+
+          chmod +x "$TEST_DIR/bin/git"
+
+          (
+            cd "$TEST_DIR"
+            PATH="$TEST_DIR/bin:$PATH" bash < "$GITHUB_WORKSPACE/scripts/setup.sh"
+          )
+
+          [ -f "$TEST_DIR/set-me-up/scripts/repos.txt" ]
+
       - name: Test setup.sh idempotency
         run: |
           echo "Testing idempotency (checking directory existence logic)..."
