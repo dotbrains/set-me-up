@@ -34,6 +34,7 @@ Runs comprehensive tests on both Ubuntu and macOS environments.
 - **test**: Runs on both `ubuntu-latest` and `macos-latest`
   - Tests bash syntax for root scripts
   - Verifies git is installed
+  - Tests piped `setup.sh` bootstrap manifest resolution
   - Tests idempotency logic (directory existence checks)
   - Validates file structure and required manifest entries
   - Verifies .gitignore entries
@@ -72,6 +73,9 @@ cd test_dir
 mkdir -p blueprint
 # Run setup.sh and verify it skips existing directories
 ```
+
+The piped setup bootstrap behavior is covered in CI with a mocked `git`
+command so the test does not clone remote repositories.
 
 ## Badge Status
 
