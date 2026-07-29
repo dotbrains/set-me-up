@@ -69,7 +69,7 @@ This performs static analysis on shell scripts to catch common issues.
 #### Bash Syntax
 
 ```bash
-scripts/validate.sh --shell
+scripts/validate.sh --bash
 ```
 
 This checks for syntax errors without executing the script.

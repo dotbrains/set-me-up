@@ -189,12 +189,12 @@ chmod +x scripts/setup.sh scripts/update.sh
 
 ## Maintenance
 
-### Lint Checks
+### Validation
 
-Both scripts should pass shellcheck:
+Run the shared root validator before committing script changes:
 
 ```bash
-shellcheck scripts/setup.sh scripts/update.sh
+scripts/validate.sh --all
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full linting guidelines.

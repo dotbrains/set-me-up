@@ -20,6 +20,8 @@ branches.
 - **shellcheck**: Static analysis for shell scripts
 - **bash-syntax**: Validates bash syntax for all shell scripts
 
+### Tests (`tests.yml`)
+
 Runs comprehensive tests on both Ubuntu and macOS environments.
 
 **Triggers:**
@@ -30,10 +32,10 @@ Runs comprehensive tests on both Ubuntu and macOS environments.
 **Jobs:**
 
 - **test**: Runs on both `ubuntu-latest` and `macos-latest`
-  - Tests bash syntax for `setup.sh`
+  - Tests bash syntax for root scripts
   - Verifies git is installed
   - Tests idempotency logic (directory existence checks)
-  - Validates file structure (README.md, setup.sh, .gitignore)
+  - Validates file structure and required manifest entries
   - Verifies .gitignore entries
   - Validates README.md structure
 
@@ -42,21 +44,24 @@ Runs comprehensive tests on both Ubuntu and macOS environments.
 ### Lint Checks
 
 ```bash
-# Markdown lint (requires markdownlint-cli2)
-markdownlint-cli2 "**/*.md"
+# All checks
+scripts/validate.sh --all
 
-# ShellCheck (requires shellcheck)
-shellcheck setup.sh
+# Markdown lint
+scripts/validate.sh --markdown
 
-# Bash syntax check
-bash -n setup.sh
+# ShellCheck
+scripts/validate.sh --shell
+
+# Bash syntax check only
+scripts/validate.sh --bash
 ```
 
 ### Tests
 
 ```bash
 # Test bash syntax
-bash -n setup.sh
+scripts/validate.sh --bash
 
 # Test git availability
 command -v git
