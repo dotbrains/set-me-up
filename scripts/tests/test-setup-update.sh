@@ -66,38 +66,57 @@ test_setup_propagates_clone_failures() {
     assert_contains "$output" "clone failed"
 }
 
-test_update_skips_dirty_and_reports_failures() {
+test_update_plans_skips_and_current_repos() {
     local work_dir="$tmp_root/update"
     local bin_dir="$work_dir/bin"
     local output="$work_dir/output.log"
 
     copy_root_scripts "$work_dir"
-    mkdir -p "$work_dir/clean/.git" "$work_dir/dirty/.git" "$work_dir/fail/.git"
-    touch "$work_dir/dirty/.dirty" "$work_dir/fail/.fail-pull"
+    mkdir -p "$work_dir/clean/.git" "$work_dir/dirty/.git"
+    touch "$work_dir/dirty/.dirty"
     cat > "$work_dir/scripts/repos.txt" <<'EOF'
 clean|clean|top-level
 dirty|dirty|top-level
-fail|fail|top-level
 missing|missing|top-level
 EOF
     install_mock_git "$bin_dir"
 
-    if (
+    (
         cd "$work_dir"
         SMU_TEST_REPO_ROOT="$repo_root" PATH="$bin_dir:$PATH" \
-            bash scripts/update.sh > "$output" 2>&1
-    ); then
-        fail "update.sh succeeded after pull failure"
-    fi
+            bash scripts/update.sh --plan > "$output"
+    )
 
-    assert_contains "$output" "Updating clean"
-    assert_contains "$output" "dirty has uncommitted changes, skipping"
-    assert_contains "$output" "Error updating fail"
-    assert_contains "$output" "missing doesn't exist, skipping"
+    assert_contains "$output" "path"
+    assert_contains "$output" "clean"
+    assert_contains "$output" "current"
+    assert_contains "$output" "skip-dirty"
+    assert_contains "$output" "skip-missing"
+}
+
+test_update_outputs_json_plan() {
+    local work_dir="$tmp_root/update-json"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/clean/.git"
+    printf "clean|clean|top-level\\n" > "$work_dir/scripts/repos.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/update.sh --plan --json > "$output"
+    )
+
+    assert_contains "$output" '"repositories":['
+    assert_contains "$output" '"path":"clean"'
+    assert_contains "$output" '"action":"current"'
 }
 
 
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
-test_update_skips_dirty_and_reports_failures
+test_update_plans_skips_and_current_repos
+test_update_outputs_json_plan

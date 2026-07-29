@@ -40,6 +40,7 @@ checks = [
     ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"]),
     ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"]),
     ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"]),
+    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"]),
 ]
 
 

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "set-me-up update report",
+  "type": "object",
+  "required": ["repositories", "failed"],
+  "properties": {
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "state", "sync", "action", "before", "after", "validation"],
+        "properties": {
+          "path": { "type": "string" },
+          "state": { "enum": ["clean", "dirty", "changed", "detached", "missing", "not-git"] },
+          "sync": { "type": "string" },
+          "action": { "type": "string" },
+          "before": { "type": "string" },
+          "after": { "type": "string" },
+          "validation": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "failed": { "type": "integer" }
+  },
+  "additionalProperties": false
+}

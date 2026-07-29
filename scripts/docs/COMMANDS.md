@@ -121,7 +121,7 @@ Usage: scripts/tree-smoke-test.sh
 ## scripts/update.sh
 
 ```text
-Usage: scripts/update.sh
+Usage: scripts/update.sh [--plan|--apply] [--validate] [--text|--json]
 ```
 
 ## scripts/validate-json-schemas.sh

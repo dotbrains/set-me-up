@@ -2,148 +2,198 @@
 
 set -euo pipefail
 
-# Constants
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly SCRIPT_DIR
-readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(cd "$script_dir/.." && pwd)"
+repos_file="$script_dir/repos.txt"
+mode="--apply"
+validate_after=0
+format="--text"
 
-source "$SCRIPT_DIR/lib/repos.sh"
-source "$SCRIPT_DIR/lib/repo-state.sh"
+source "$script_dir/lib/repos.sh"
+source "$script_dir/lib/repo-state.sh"
+source "$script_dir/lib/validators.sh"
+source "$script_dir/lib/json.sh"
 
 usage() {
-    printf "Usage: %s\n" "$0" >&2
+    printf "Usage: %s [--plan|--apply] [--validate] [--text|--json]\n" "$0" >&2
 }
 
-case "${1:-}" in
-    -h | --help)
-        usage
-        exit 0
-        ;;
-    "")
-        ;;
-    *)
-        usage
-        exit 2
-        ;;
-esac
-
-# Check if git is installed
-if ! command -v git &> /dev/null; then
-    echo "❌ Error: git is not installed. Please install git and try again."
-    exit 1
-fi
-
-echo ""
-echo "🔄 Updating set-me-up repositories..."
-echo ""
-
-# Update a repository
-update_repo() {
-    local repo="$1"
-    local path="$2"
-    local state
-
-    state="$(smu_repo_state "$path")"
-
-    if [ "$state" = "missing" ]; then
-        echo "  ⏭️  $path doesn't exist, skipping..."
-        return 0
-    fi
-
-    if [ "$state" = "not-git" ]; then
-        echo "  ⚠️  $path is not a git repository, skipping..."
-        return 0
-    fi
-
-    if [ "$state" = "dirty" ]; then
-        echo "  ⏭️  $path has uncommitted changes, skipping..."
-        return 0
-    fi
-    
-    echo "  ⬆️  Updating $path..."
-    
-    local git_output
-    local git_exit_code
-    
-    # Pull changes
-    git_output=$(cd "$path" && git pull --rebase --recurse-submodules 2>&1)
-    git_exit_code=$?
-    
-    if [ $git_exit_code -ne 0 ]; then
-        echo "     ❌ Error updating $path:"
-        printf "%s\n" "$git_output" | sed 's/^/        /'
-        return 1
-    fi
-    printf "%s\n" "$git_output" | sed 's/^/     /'
-    
-    # Update submodules if they exist
-    if [ -f "$path/.gitmodules" ]; then
-        git_output=$(cd "$path" && git submodule update --init --recursive 2>&1)
-        git_exit_code=$?
-        
-        if [ $git_exit_code -ne 0 ]; then
-            echo "     ❌ Error updating submodules in $path:"
-            printf "%s\n" "$git_output" | sed 's/^/        /'
-            return 1
-        fi
-        printf "%s\n" "$git_output" | sed 's/^/     /'
-    fi
-    
-    echo "  ✨ Done: $path"
-    return 0
-}
-
-# Update repositories by category
-update_category() {
-    local category="$1"
-    local icon
-    local count=0
-    local failed=0
-
-    icon="$(smu_category_icon "$category")"
-    echo "${icon} Updating ${category} repositories..."
-    echo ""
-
-    update_repo_for_category() {
-        local repo="$1"
-        local path="$2"
-
-        if ! update_repo "$repo" "$path"; then
-            ((failed++))
-        fi
-        ((count++))
-    }
-
-    smu_each_repo_in_category "$REPOS_FILE" "$category" update_repo_for_category
-    
-    if [ $count -eq 0 ]; then
-        echo "  ℹ️  No repositories to update in this category"
-    elif [ $failed -gt 0 ]; then
-        echo "  ⚠️  $failed out of $count repositories failed to update"
-    fi
-    
-    echo ""
-    return $failed
-}
-
-# Check if repos.txt exists and is valid
-if ! smu_validate_repos_manifest "$REPOS_FILE"; then
-    echo "❌ Error: invalid repository manifest."
-    exit 1
-fi
-
-# Update all repository categories
-total_failed=0
-
-for category in "${SMU_REPO_CATEGORIES[@]}"; do
-    update_category "$category" || total_failed=$((total_failed + $?))
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --plan | --apply)
+            mode="$1"
+            ;;
+        --validate)
+            validate_after=1
+            ;;
+        --text | --json)
+            format="$1"
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            usage
+            exit 2
+            ;;
+    esac
+    shift
 done
 
-if [ $total_failed -gt 0 ]; then
-    echo "⚠️  Update completed with errors. $total_failed repositories failed to update."
-    echo ""
+command -v git >/dev/null 2>&1 || {
+    printf "Error: git is not installed.\n" >&2
     exit 1
-else
-    echo "🎉 Update complete! All repositories have been updated."
-    echo ""
+}
+
+repo_head() {
+    git -C "$1" rev-parse HEAD 2>/dev/null || printf "unknown"
+}
+
+repo_action() {
+    local state="$1"
+    local sync="$2"
+
+    case "$state" in
+        missing | not-git | dirty | detached)
+            printf "skip-%s" "$state"
+            ;;
+        *)
+            case "$sync" in
+                synced)
+                    printf "current"
+                    ;;
+                behind:*)
+                    printf "update"
+                    ;;
+                ahead:*)
+                    printf "skip-ahead"
+                    ;;
+                diverged:*)
+                    printf "skip-diverged"
+                    ;;
+                *)
+                    printf "skip-unknown-sync"
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+inspect_repo() {
+    local repo="$1"
+    local path="$2"
+    local category="$3"
+    local state sync before after action validation
+
+    : "$repo" "$category"
+    state="$(smu_repo_state "$path")"
+    sync="unknown"
+    before="unknown"
+    after="unknown"
+    validation="not-run"
+
+    if [ "$state" != "missing" ] && [ "$state" != "not-git" ]; then
+        before="$(repo_head "$path")"
+    fi
+    if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
+        [ "$state" != "detached" ]; then
+        git -C "$path" fetch --quiet origin 2>/dev/null || true
+        sync="$(smu_repo_sync_status "$path")"
+    fi
+
+    action="$(repo_action "$state" "$sync")"
+    if [ "$mode" = "--apply" ] && [ "$action" = "update" ]; then
+        if git -C "$path" pull --rebase --recurse-submodules; then
+            after="$(repo_head "$path")"
+            action="updated"
+            updated_paths+=("$path")
+        else
+            after="$(repo_head "$path")"
+            action="failed"
+            failed=$((failed + 1))
+        fi
+    elif [ "$mode" = "--apply" ] && [ "$action" = "current" ]; then
+        after="$before"
+    fi
+
+    rows+=("$path|$state|$sync|$action|$before|$after|$validation")
+}
+
+validate_updated_repos() {
+    local path validator index row
+
+    for path in "${updated_paths[@]}"; do
+        if validator="$(smu_validator_for_repo "$script_dir/repo-validators.txt" "$path")"; then
+            if smu_run_validator "$repo_root" "$path" "$validator"; then
+                validation="passed"
+            else
+                validation="failed"
+                failed=$((failed + 1))
+            fi
+        else
+            validation="missing"
+            failed=$((failed + 1))
+        fi
+
+        for index in "${!rows[@]}"; do
+            IFS='|' read -r row_path state sync action before after _ <<< "${rows[$index]}"
+            if [ "$row_path" = "$path" ]; then
+                rows[$index]="$row_path|$state|$sync|$action|$before|$after|$validation"
+            fi
+        done
+    done
+}
+
+print_text() {
+    local row path state sync action before after validation
+
+    printf "path\tstate\tsync\taction\tbefore\tafter\tvalidation\n"
+    for row in "${rows[@]}"; do
+        IFS='|' read -r path state sync action before after validation <<< "$row"
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+            "$path" "$state" "$sync" "$action" "$before" "$after" "$validation"
+    done
+}
+
+print_json() {
+    local row path state sync action before after validation comma=""
+
+    printf '{"repositories":['
+    for row in "${rows[@]}"; do
+        IFS='|' read -r path state sync action before after validation <<< "$row"
+        printf '%s{"path":"%s","state":"%s","sync":"%s","action":"%s","before":"%s","after":"%s","validation":"%s"}' \
+            "$comma" "$(smu_json_escape "$path")" "$(smu_json_escape "$state")" \
+            "$(smu_json_escape "$sync")" "$(smu_json_escape "$action")" \
+            "$(smu_json_escape "$before")" "$(smu_json_escape "$after")" \
+            "$(smu_json_escape "$validation")"
+        comma=","
+    done
+    printf '],"failed":%s}\n' "$failed"
+}
+
+cd "$repo_root"
+smu_validate_repos_manifest "$repos_file"
+
+rows=()
+updated_paths=()
+failed=0
+
+if [ "$format" = "--text" ]; then
+    printf "\nUpdating set-me-up repositories...\n\n"
 fi
+
+smu_each_repo "$repos_file" inspect_repo
+
+if [ "$mode" = "--apply" ] && [ "$validate_after" -eq 1 ]; then
+    validate_updated_repos
+    scripts/validate.sh --coverage >/dev/null || failed=$((failed + 1))
+fi
+
+if [ "$format" = "--json" ]; then
+    print_json
+else
+    print_text
+fi
+
+[ "$failed" -eq 0 ]

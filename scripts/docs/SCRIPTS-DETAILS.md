@@ -47,15 +47,20 @@ Update script that pulls the latest changes for all repositories.
 ```bash
 cd set-me-up
 ./scripts/update.sh
+./scripts/update.sh --plan
+./scripts/update.sh --apply --validate
+./scripts/update.sh --plan --json
 ```
 
 ### Update Features
 
 - Updates all repositories defined in `repos.txt`
+- Plans safe updates before applying them
 - Skips repositories with uncommitted changes
+- Skips detached, diverged, and ahead-only repositories
 - Uses `git pull --rebase --recurse-submodules`
 - Updates submodules if present
-- Clean, categorized output matching setup.sh style
+- Emits text or JSON output for humans and agents
 
 ### Safety Features
 

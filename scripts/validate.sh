@@ -196,6 +196,7 @@ coverage_checks() {
     scripts/change-report.sh --json >/dev/null
     scripts/capabilities.sh --json >/dev/null
     scripts/sync-report.sh --json >/dev/null
+    scripts/update.sh --plan --json >/dev/null
     scripts/ci-workflow-report.sh --checked-out --json >/dev/null
     scripts/native-workflow-template.sh --check --json >/dev/null
     scripts/validate-json-schemas.sh >/dev/null
@@ -249,6 +250,7 @@ structure_checks() {
         scripts/schemas/native-workflow-template.schema.json
         scripts/schemas/capabilities.schema.json
         scripts/schemas/sync-report.schema.json
+        scripts/schemas/update-report.schema.json
         scripts/docs/SCRIPTS-DETAILS.md
         scripts/docs/COMMANDS.md
         .gitignore

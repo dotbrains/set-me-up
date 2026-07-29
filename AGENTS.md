@@ -261,6 +261,8 @@ scripts/validate-repos.sh --changed
 scripts/validate-repos.sh --missing
 scripts/sync-report.sh
 scripts/sync-report.sh --json
+scripts/update.sh --plan --json
+scripts/update.sh --apply --validate
 scripts/validator-exceptions.sh
 scripts/capabilities.sh --json theme
 scripts/ci-workflow-report.sh --checked-out

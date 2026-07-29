@@ -81,6 +81,14 @@ case "${1:-}" in
         fi
         printf "Already up to date.\\n"
         ;;
+    fetch)
+        ;;
+    branch)
+        [ "${2:-}" = "--show-current" ] && printf "main\\n"
+        ;;
+    rev-list)
+        printf "0 0\\n"
+        ;;
     submodule)
         printf "Submodules up to date.\\n"
         ;;

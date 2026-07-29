@@ -180,7 +180,7 @@ test_change_report_lists_recent_commits() {
     git -C "$work_dir/clean" config user.email "test@example.com"
     printf "hello\n" > "$work_dir/clean/README.md"
     git -C "$work_dir/clean" add README.md
-    git -C "$work_dir/clean" commit -q -m "test commit"
+    git -C "$work_dir/clean" -c commit.gpgsign=false commit -q -m "test commit"
     printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
 
     (
@@ -204,7 +204,7 @@ test_change_report_json_lists_recent_commits() {
     git -C "$work_dir/clean" config user.email "test@example.com"
     printf "hello\n" > "$work_dir/clean/README.md"
     git -C "$work_dir/clean" add README.md
-    git -C "$work_dir/clean" commit -q -m "test commit"
+    git -C "$work_dir/clean" -c commit.gpgsign=false commit -q -m "test commit"
     printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
 
     (
@@ -228,7 +228,7 @@ test_freshness_report_json_lists_repositories() {
     git -C "$work_dir/clean" config user.email "test@example.com"
     printf "hello\n" > "$work_dir/clean/README.md"
     git -C "$work_dir/clean" add README.md
-    git -C "$work_dir/clean" commit -q -m "test commit"
+    git -C "$work_dir/clean" -c commit.gpgsign=false commit -q -m "test commit"
     printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
 
     (
