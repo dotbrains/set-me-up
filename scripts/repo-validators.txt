@@ -1,3 +1,9 @@
 # Repository validation commands for set-me-up child repositories
 # Format: local_path|command
 installer|scripts/validate.sh --all
+tests|shellcheck scripts/run-scenario.sh scripts/in-container-run.sh scripts/lib/assertions.sh
+utilities|./tests/main.sh && ./tests/integration_test.sh
+modules/colorschemes|./tests/main.sh && python3 scripts/theme_contract.py --local && python3 scripts/generate-theme-adapters.py --check
+modules/preferences|./tests/main.sh && find macos arch debian universal -type f -name '*.sh' -exec bash -n {} +
+modules/template-module|find . -type f \( -name '*.sh' -o -name '*.bash' \) -not -path '*/.*' -exec bash -n {} +
+home/.config/nvim|make test

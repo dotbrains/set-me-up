@@ -83,7 +83,7 @@ smu_run_validator() {
                 ./test.sh
                 ;;
             declared:*)
-                bash -lc "${validator#declared:}"
+                bash -c "${validator#declared:}"
                 ;;
             *)
                 printf "Unknown validator: %s\\n" "$validator" >&2
