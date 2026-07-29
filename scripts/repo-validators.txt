@@ -4,6 +4,11 @@ installer|scripts/validate.sh --all
 tests|shellcheck scripts/run-scenario.sh scripts/in-container-run.sh scripts/lib/assertions.sh
 utilities|./tests/main.sh && ./tests/integration_test.sh
 modules/colorschemes|./tests/main.sh && python3 scripts/theme_contract.py --local && python3 scripts/generate-theme-adapters.py --check
+modules/debian|find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
+modules/macos|find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
 modules/preferences|./tests/main.sh && find macos arch debian universal -type f -name '*.sh' -exec bash -n {} +
 modules/template-module|find . -type f \( -name '*.sh' -o -name '*.bash' \) -not -path '*/.*' -exec bash -n {} +
+modules/universal|find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
+home/.config/fish|find . -type f -name '*.fish' -not -path '*/.git/*' -exec fish --no-execute {} +
 home/.config/nvim|make test
+home/.config/opencode|jq empty opencode.json opencode-swarm.json tui.json
