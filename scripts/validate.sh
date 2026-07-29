@@ -7,8 +7,12 @@ cd "$repo_root"
 
 mode="${1:---all}"
 
-shell_checks() {
+bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh
+}
+
+shell_checks() {
+    bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh scripts/validate.sh
 }
 
@@ -71,6 +75,9 @@ structure_checks() {
 }
 
 case "$mode" in
+    --bash)
+        bash_checks
+        ;;
     --shell)
         shell_checks
         ;;
@@ -86,7 +93,7 @@ case "$mode" in
         structure_checks
         ;;
     *)
-        printf "Usage: %s [--all|--shell|--markdown|--structure]\\n" "$0" >&2
+        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure]\\n" "$0" >&2
         exit 2
         ;;
 esac
