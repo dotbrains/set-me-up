@@ -6,14 +6,16 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repos_file="$repo_root/scripts/repos.txt"
 routes_file="$repo_root/scripts/agent-routes.txt"
 validators_file="$repo_root/scripts/repo-validators.txt"
-path="${1:-}"
+output_json=0
+allow_diverged=0
+path=""
 
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
 
 usage() {
-    printf "Usage: %s <managed-local-path>\\n" "$0" >&2
+    printf "Usage: %s [--json] [--allow-diverged] <managed-local-path>\\n" "$0" >&2
 }
 
 manifest_has_path() {
@@ -51,11 +53,51 @@ check() {
     shift
 
     if "$@"; then
-        printf "OK\\t%s\\n" "$label"
+        record_check "$label" 0
     else
-        printf "FAIL\\t%s\\n" "$label"
+        record_check "$label" 1
         failed=$((failed + 1))
     fi
+}
+
+json_escape() {
+    local value="$1"
+
+    value="${value//\\/\\\\}"
+    value="${value//\"/\\\"}"
+    value="${value//$'\n'/\\n}"
+    printf "%s" "$value"
+}
+
+record_check() {
+    local label="$1"
+    local failed_check="$2"
+    local status="OK"
+
+    [ "$failed_check" -eq 0 ] || status="FAIL"
+
+    if [ "$output_json" -eq 1 ]; then
+        check_names+=("$label")
+        check_results+=("$failed_check")
+    else
+        printf "%s\\t%s\\n" "$status" "$label"
+    fi
+}
+
+print_json() {
+    local index
+    local comma=""
+    local ok
+
+    printf '{"path":"%s","allowDiverged":%s,"failed":%s,"checks":[' \
+        "$(json_escape "$path")" "$allow_diverged" "$failed"
+    for index in "${!check_names[@]}"; do
+        [ "${check_results[$index]}" -eq 0 ] && ok=true || ok=false
+        printf '%s{"name":"%s","ok":%s}' \
+            "$comma" "$(json_escape "${check_names[$index]}")" "$ok"
+        comma=","
+    done
+    printf ']}\n'
 }
 
 has_validator() {
@@ -74,14 +116,45 @@ has_license() {
     [ -f "$repo_root/$path/LICENSE" ] || [ -f "$repo_root/$path/LICENSE.md" ]
 }
 
-is_clean_and_synced() {
+is_acceptable_sync_state() {
     local state
     local sync
 
     state="$(smu_repo_state "$path")"
     sync="$(smu_repo_sync_status "$path")"
-    [ "$state" = "clean" ] && [ "$sync" = "synced" ]
+    if [ "$state" = "clean" ] && [ "$sync" = "synced" ]; then
+        return 0
+    fi
+    [ "$allow_diverged" -eq 1 ] && [ "$state" = "changed" ] && \
+        [[ "$sync" == diverged:* ]]
 }
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --json)
+            output_json=1
+            ;;
+        --allow-diverged)
+            allow_diverged=1
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -*)
+            usage
+            exit 2
+            ;;
+        *)
+            [ -z "$path" ] || {
+                usage
+                exit 2
+            }
+            path="$1"
+            ;;
+    esac
+    shift
+done
 
 [ -n "$path" ] || {
     usage
@@ -92,12 +165,15 @@ cd "$repo_root"
 smu_validate_repos_manifest "$repos_file"
 
 failed=0
+check_names=()
+check_results=()
 check "manifest path" manifest_has_path "$path"
 check "route entry" route_exists_for_path "$path"
 check "validator" has_validator
 check "native validator" has_native_validator
 check "README" has_readme
 check "license" has_license
-check "clean and synced" is_clean_and_synced
+check "acceptable sync state" is_acceptable_sync_state
 
+[ "$output_json" -eq 0 ] || print_json
 [ "$failed" -eq 0 ]

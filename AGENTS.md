@@ -24,6 +24,8 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/sync-report.sh`: Detailed sync and dirty-work report for managed
   repositories.
 - `scripts/check-repo-contract.sh`: Contract check for one managed child repo.
+- `scripts/validator-exceptions.sh`: Report child repos still using
+  non-native validation.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
@@ -204,13 +206,9 @@ scripts/validate.sh --all
 Root `scripts/validate-repos.sh` infers this command automatically when it
 exists and is executable, and it takes precedence over a root-declared command.
 Declared root validators are for transitional cases, third-party constraints,
-or repos whose local history cannot currently be changed safely.
-
-The current `home/pi` checkout is intentionally protected by a root fallback
-validator because its local branch diverged from a force-updated remote. Do not
-rewrite, reset, or force-push that checkout without an explicit user decision.
-The pre-rewrite local history is preserved at
-`origin/backup/local-main-before-remote-rewrite-20260729` in `dotbrains/pi`.
+or repos whose local history cannot currently be changed safely. Run
+`scripts/validator-exceptions.sh` to find the remaining repos that should move
+toward native `scripts/validate.sh --all` contracts.
 
 ## Shell Script Style
 
@@ -243,7 +241,9 @@ scripts/validate-repos.sh --list
 scripts/validate-repos.sh --changed
 scripts/validate-repos.sh --missing
 scripts/sync-report.sh
+scripts/validator-exceptions.sh
 scripts/check-repo-contract.sh home/.config/zsh
+scripts/check-repo-contract.sh --json home/.config/zsh
 ```
 
 `scripts/validate-repos.sh` skips dirty repositories so it cannot hide or

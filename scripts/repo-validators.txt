@@ -23,7 +23,7 @@ home/.config/gh-dash|scripts/validate.sh --all
 home/.config/nushell|scripts/validate.sh --all
 home/.config/nvim|make test
 home/.config/opencode|jq empty opencode.json opencode-swarm.json tui.json
-home/pi|find . -maxdepth 3 -type f -name '*.json' -not -path '*/.git/*' -exec jq empty {} + && find . -maxdepth 3 -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
+home/pi|scripts/validate.sh --all
 home/.config/television|scripts/validate.sh --all
 home/.config/tmux|scripts/validate.sh --all
 home/.config/zed|scripts/validate.sh --all

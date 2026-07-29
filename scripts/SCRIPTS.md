@@ -13,6 +13,8 @@ directory structure. These scripts help manage these repositories:
 - **`validate-repos.sh`**: Running validators across clean child repositories
 - **`sync-report.sh`**: Detailed sync and dirty-work report for child repos
 - **`check-repo-contract.sh`**: Contract check for one child repo
+- **`validator-exceptions.sh`**: Report child repos still using non-native
+  validation
 - **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
 The scripts read from a shared `repos.txt` file that defines all repositories.
@@ -141,13 +143,28 @@ the set-me-up contract:
 - has a validator
 - has a native executable `scripts/validate.sh`
 - has README and license files
-- is clean and synced
+- is in an acceptable sync state
 
 ```bash
 scripts/check-repo-contract.sh home/.config/zsh
+scripts/check-repo-contract.sh --json home/.config/zsh
+scripts/check-repo-contract.sh --allow-diverged home/.config/zsh
 ```
 
 The command exits non-zero when any contract item fails.
+
+Use `--json` when an agent or script needs machine-readable check results.
+Use `--allow-diverged` only for an intentionally parked diverged checkout.
+
+## validator-exceptions.sh
+
+The `validator-exceptions.sh` command lists managed child repositories that do
+not currently expose an executable native validator at `scripts/validate.sh`.
+Use it to prioritize the next native validator migration:
+
+```bash
+scripts/validator-exceptions.sh
+```
 
 ## repo-validators.txt
 
@@ -164,16 +181,11 @@ local_path|command
 
 Prefer adding an executable `scripts/validate.sh` to the child repository so
 validation lives with the repo that owns the behavior. Use
-`repo-validators.txt` for transitional repositories or local checkouts that
-cannot safely receive a native validator yet.
+`repo-validators.txt` for transitional repositories, third-party repositories,
+or local checkouts that cannot safely receive a native validator yet.
 
 `scripts/validate.sh --coverage` fails when route coverage drifts or validator
 coverage drops below every managed repository.
-
-`home/pi` currently uses a root-declared fallback validator because the local
-checkout diverged from a force-updated remote. The pre-rewrite local history is
-preserved at `origin/backup/local-main-before-remote-rewrite-20260729` in
-`dotbrains/pi`.
 
 ## setup.sh
 

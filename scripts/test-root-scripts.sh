@@ -100,6 +100,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/doctor.sh" "$target/scripts/"
     cp "$repo_root/scripts/sync-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/check-repo-contract.sh" "$target/scripts/"
+    cp "$repo_root/scripts/validator-exceptions.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"

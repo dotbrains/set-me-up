@@ -12,7 +12,8 @@ bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
         scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
-        scripts/lib/repos.sh scripts/lib/repo-state.sh scripts/lib/validators.sh
+        scripts/validator-exceptions.sh scripts/lib/repos.sh \
+        scripts/lib/repo-state.sh scripts/lib/validators.sh
 }
 
 shell_checks() {
@@ -20,8 +21,9 @@ shell_checks() {
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
         scripts/route.sh scripts/doctor.sh scripts/sync-report.sh \
-        scripts/check-repo-contract.sh scripts/lib/repos.sh \
-        scripts/lib/repo-state.sh scripts/lib/validators.sh
+        scripts/check-repo-contract.sh scripts/validator-exceptions.sh \
+        scripts/lib/repos.sh scripts/lib/repo-state.sh \
+        scripts/lib/validators.sh
 }
 
 markdown_checks() {
@@ -175,6 +177,7 @@ structure_checks() {
         scripts/doctor.sh
         scripts/sync-report.sh
         scripts/check-repo-contract.sh
+        scripts/validator-exceptions.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -225,6 +228,10 @@ structure_checks() {
     }
     [ -x scripts/check-repo-contract.sh ] || {
         printf "scripts/check-repo-contract.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/validator-exceptions.sh ] || {
+        printf "scripts/validator-exceptions.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/test-root-scripts.sh ] || {
