@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Lint Markdown files
         run: npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#shared" "#tests" "#utilities"
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run ShellCheck
         run: scripts/validate.sh --shell
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check Bash syntax
         run: bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh
