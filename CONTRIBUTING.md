@@ -92,6 +92,7 @@ Ensure these files exist:
 
 - `README.md`
 - `scripts/SCRIPTS.md`
+- `scripts/lib/repos.sh`
 - `scripts/setup.sh` (must be executable)
 - `scripts/update.sh` (must be executable)
 - `scripts/test-root-scripts.sh` (must be executable)

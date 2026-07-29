@@ -56,6 +56,7 @@ ensure_setup_root() {
 ensure_setup_root
 REPO_ROOT="$(pwd)"
 REPOS_FILE="$REPO_ROOT/scripts/repos.txt"
+source "$REPO_ROOT/scripts/lib/repos.sh"
 echo "📂 Working in: $(pwd)"
 echo ""
 
@@ -77,21 +78,22 @@ clone_repo() {
 # Clone repositories by category
 clone_category() {
     local category="$1"
-    local icon="$2"
+    local icon
     local count=0
-    
+
+    icon="$(smu_category_icon "$category")"
     echo "${icon} Cloning ${category} repositories..."
     echo ""
-    
-    while IFS='|' read -r repo path cat; do
-        # Skip comments and empty lines
-        [[ "$repo" =~ ^#.*$ || -z "$repo" ]] && continue
-        
-        if [ "$cat" = "$category" ]; then
-            clone_repo "$repo" "$path"
-            ((count++)) || true
-        fi
-    done < "$REPOS_FILE"
+
+    clone_repo_for_category() {
+        local repo="$1"
+        local path="$2"
+
+        clone_repo "$repo" "$path"
+        ((count++)) || true
+    }
+
+    smu_each_repo_in_category "$REPOS_FILE" "$category" clone_repo_for_category
     
     if [ $count -eq 0 ]; then
         echo "  ℹ️  No repositories to clone in this category"
@@ -105,17 +107,16 @@ mkdir -p "$REPO_ROOT/modules" "$REPO_ROOT/home/.config" "$REPO_ROOT/shared"
 touch "$REPO_ROOT/home/.gitkeep"
 echo "home sweet ~/" > "$REPO_ROOT/home/.gitkeep"
 
-# Check if repos.txt exists
-if [ ! -f "$REPOS_FILE" ]; then
-    echo "❌ Error: $REPOS_FILE not found. Please ensure it exists in the current directory."
+# Check if repos.txt exists and is valid
+if ! smu_validate_repos_manifest "$REPOS_FILE"; then
+    echo "❌ Error: invalid repository manifest."
     exit 1
 fi
 
 # Clone all repository categories
-clone_category "top-level" "📦"
-clone_category "shared" "🔗"
-clone_category "module" "🧩"
-clone_category "config" "⚙️"
+for category in "${SMU_REPO_CATEGORIES[@]}"; do
+    clone_category "$category"
+done
 
 echo "🎉 Setup complete! All repositories have been cloned."
 echo ""

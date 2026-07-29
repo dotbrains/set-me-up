@@ -6,6 +6,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repos_file="$repo_root/scripts/repos.txt"
 mode="${1:---changed}"
 
+source "$repo_root/scripts/lib/repos.sh"
+
 usage() {
     printf "Usage: %s [--changed|--clean|--all|--list]\\n" "$0" >&2
 }
@@ -108,39 +110,35 @@ selected_repo() {
 
 cd "$repo_root"
 
-ran=0
-skipped=0
+validate_manifest_repo() {
+    local repo="$1"
+    local path="$2"
+    local category="$3"
+    local status
+    local validator
 
-while IFS='|' read -r repo path category extra || [ -n "$repo" ]; do
-    [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-
-    if [ -n "${extra:-}" ] || [ -z "$path" ] || [ -z "$category" ]; then
-        printf "Invalid manifest entry: %s|%s|%s\\n" \
-            "$repo" "$path" "$category" >&2
-        exit 1
-    fi
-
+    : "$repo" "$category"
     if ! git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         printf "skip missing: %s\\n" "$path"
         skipped=$((skipped + 1))
-        continue
+        return 0
     fi
 
     if ! selected_repo "$path"; then
-        continue
+        return 0
     fi
 
     status="$(git -C "$path" status --short)"
     if [ -n "$status" ]; then
         printf "skip dirty: %s\\n" "$path"
         skipped=$((skipped + 1))
-        continue
+        return 0
     fi
 
     if ! validator="$(validator_for_repo "$path")"; then
         printf "skip no validator: %s\\n" "$path"
         skipped=$((skipped + 1))
-        continue
+        return 0
     fi
 
     if [ "$mode" = "--list" ]; then
@@ -149,6 +147,11 @@ while IFS='|' read -r repo path category extra || [ -n "$repo" ]; do
         run_validator "$path" "$validator"
     fi
     ran=$((ran + 1))
-done < "$repos_file"
+}
+
+ran=0
+skipped=0
+
+smu_each_repo "$repos_file" validate_manifest_repo
 
 printf "\\nValidated %s repo(s); skipped %s.\\n" "$ran" "$skipped"

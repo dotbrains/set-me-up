@@ -25,7 +25,7 @@ assert_contains() {
 
     grep -Fq "$pattern" "$file" || {
         printf "Expected pattern not found: %s\\n" "$pattern" >&2
-        printf "--- %s ---\\n" "$file" >&2
+        printf "%s\\n" "--- $file ---" >&2
         cat "$file" >&2
         exit 1
     }
@@ -90,11 +90,17 @@ EOF
 copy_root_scripts() {
     local target="$1"
 
-    mkdir -p "$target/scripts"
+    mkdir -p "$target/scripts/lib"
     cp "$repo_root/README.md" "$target/"
+    cp "$repo_root/.gitignore" "$target/"
+    cp "$repo_root/scripts/SCRIPTS.md" "$target/scripts/"
     cp "$repo_root/scripts/setup.sh" "$target/scripts/"
     cp "$repo_root/scripts/update.sh" "$target/scripts/"
+    cp "$repo_root/scripts/validate.sh" "$target/scripts/"
+    cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
+    cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
     cp "$repo_root/scripts/repos.txt" "$target/scripts/"
+    cp "$repo_root/scripts/lib/repos.sh" "$target/scripts/lib/"
 }
 
 test_piped_setup_resolves_cloned_manifest() {
@@ -185,9 +191,50 @@ EOF
     assert_contains "$output" "missing doesn't exist, skipping"
 }
 
+test_manifest_validation_rejects_duplicates() {
+    local work_dir="$tmp_root/manifest-duplicates"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git"
+    cat > "$work_dir/scripts/repos.txt" <<'EOF'
+one|same|top-level
+two|same|top-level
+EOF
+
+    if (
+        cd "$work_dir"
+        bash scripts/validate.sh --structure > "$output" 2>&1
+    ); then
+        fail "validate.sh accepted duplicate manifest paths"
+    fi
+
+    assert_contains "$output" "Duplicate manifest path"
+}
+
+test_validate_repos_rejects_invalid_categories() {
+    local work_dir="$tmp_root/manifest-categories"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git"
+    printf "bad|bad|invalid\\n" > "$work_dir/scripts/repos.txt"
+
+    if (
+        cd "$work_dir"
+        bash scripts/validate-repos.sh --list > "$output" 2>&1
+    ); then
+        fail "validate-repos.sh accepted invalid manifest category"
+    fi
+
+    assert_contains "$output" "Invalid manifest category"
+}
+
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
 test_update_skips_dirty_and_reports_failures
+test_manifest_validation_rejects_duplicates
+test_validate_repos_rejects_invalid_categories
 
 printf "Root script tests passed.\\n"

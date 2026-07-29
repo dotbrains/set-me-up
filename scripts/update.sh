@@ -7,6 +7,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
 readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
 
+source "$SCRIPT_DIR/lib/repos.sh"
+
 # Check if git is installed
 if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed. Please install git and try again."
@@ -94,24 +96,25 @@ update_repo() {
 # Update repositories by category
 update_category() {
     local category="$1"
-    local icon="$2"
+    local icon
     local count=0
     local failed=0
-    
+
+    icon="$(smu_category_icon "$category")"
     echo "${icon} Updating ${category} repositories..."
     echo ""
-    
-    while IFS='|' read -r repo path cat; do
-        # Skip comments and empty lines
-        [[ "$repo" =~ ^#.*$ || -z "$repo" ]] && continue
-        
-        if [ "$cat" = "$category" ]; then
-            if ! update_repo "$repo" "$path"; then
-                ((failed++))
-            fi
-            ((count++))
+
+    update_repo_for_category() {
+        local repo="$1"
+        local path="$2"
+
+        if ! update_repo "$repo" "$path"; then
+            ((failed++))
         fi
-    done < "$REPOS_FILE"
+        ((count++))
+    }
+
+    smu_each_repo_in_category "$REPOS_FILE" "$category" update_repo_for_category
     
     if [ $count -eq 0 ]; then
         echo "  ℹ️  No repositories to update in this category"
@@ -123,19 +126,18 @@ update_category() {
     return $failed
 }
 
-# Check if repos.txt exists
-if [ ! -f "$REPOS_FILE" ]; then
-    echo "❌ Error: $REPOS_FILE not found. Please ensure it exists in the current directory."
+# Check if repos.txt exists and is valid
+if ! smu_validate_repos_manifest "$REPOS_FILE"; then
+    echo "❌ Error: invalid repository manifest."
     exit 1
 fi
 
 # Update all repository categories
 total_failed=0
 
-update_category "top-level" "📦" || total_failed=$((total_failed + $?))
-update_category "shared" "🔗" || total_failed=$((total_failed + $?))
-update_category "module" "🧩" || total_failed=$((total_failed + $?))
-update_category "config" "⚙️" || total_failed=$((total_failed + $?))
+for category in "${SMU_REPO_CATEGORIES[@]}"; do
+    update_category "$category" || total_failed=$((total_failed + $?))
+done
 
 if [ $total_failed -gt 0 ]; then
     echo "⚠️  Update completed with errors. $total_failed repositories failed to update."

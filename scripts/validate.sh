@@ -4,18 +4,21 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
+source "$repo_root/scripts/lib/repos.sh"
 
 mode="${1:---all}"
 
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
-        scripts/test-root-scripts.sh scripts/validate-repos.sh
+        scripts/test-root-scripts.sh scripts/validate-repos.sh \
+        scripts/lib/repos.sh
 }
 
 shell_checks() {
     bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
-        scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh
+        scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
+        scripts/lib/repos.sh
 }
 
 markdown_checks() {
@@ -24,49 +27,7 @@ markdown_checks() {
 }
 
 manifest_checks() {
-    local line_number=0
-    local repo
-    local path
-    local category
-    local extra
-    local seen_repos=" "
-    local seen_paths=" "
-
-    while IFS='|' read -r repo path category extra || [ -n "$repo" ]; do
-        line_number=$((line_number + 1))
-
-        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-
-        if [ -n "${extra:-}" ] || [ -z "$path" ] || [ -z "$category" ]; then
-            printf "Invalid manifest line %s: expected repo|path|category\\n" \
-                "$line_number" >&2
-            exit 1
-        fi
-
-        case "$category" in
-            top-level|shared|module|config)
-                ;;
-            *)
-                printf "Invalid manifest category on line %s: %s\\n" \
-                    "$line_number" "$category" >&2
-                exit 1
-                ;;
-        esac
-
-        if [[ "$seen_repos" == *" $repo "* ]]; then
-            printf "Duplicate manifest repo on line %s: %s\\n" \
-                "$line_number" "$repo" >&2
-            exit 1
-        fi
-        if [[ "$seen_paths" == *" $path "* ]]; then
-            printf "Duplicate manifest path on line %s: %s\\n" \
-                "$line_number" "$path" >&2
-            exit 1
-        fi
-
-        seen_repos+="$repo "
-        seen_paths+="$path "
-    done < scripts/repos.txt
+    smu_validate_repos_manifest scripts/repos.txt
 }
 
 structure_checks() {
@@ -76,6 +37,7 @@ structure_checks() {
         scripts/setup.sh
         scripts/update.sh
         scripts/repos.txt
+        scripts/lib/repos.sh
         scripts/test-root-scripts.sh
         scripts/validate-repos.sh
         .gitignore

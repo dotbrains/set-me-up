@@ -6,14 +6,16 @@ set-me-up repository collection.
 ## Overview
 
 The set-me-up project consists of multiple repositories organized in a specific
-directory structure. Two scripts help manage these repositories:
+directory structure. These scripts help manage these repositories:
 
 - **`setup.sh`**: Initial cloning of all repositories
 - **`update.sh`**: Updating existing repositories
 - **`validate-repos.sh`**: Running validators across clean child repositories
 - **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
-Both scripts read from a shared `repos.txt` file that defines all repositories.
+The scripts read from a shared `repos.txt` file that defines all repositories.
+Manifest parsing, category order, and validation live in
+**`lib/repos.sh`**.
 
 ## repos.txt
 
@@ -53,6 +55,9 @@ zed|home/.config/zed|config
 ```
 
 Lines starting with `#` are comments and empty lines are ignored.
+
+`scripts/lib/repos.sh` validates this format for all root scripts. Update that
+file when changing category order or manifest rules.
 
 ## setup.sh
 

@@ -16,6 +16,8 @@ belong in those child repositories; this file explains how to route it.
 
 - `scripts/repos.txt`: Single source of truth for managed repositories,
   destination paths, and categories.
+- `scripts/lib/repos.sh`: Shared Repository Manifest module for category
+  order, manifest validation, and repository iteration.
 - `scripts/setup.sh`: Clones every repo listed in `scripts/repos.txt`.
 - `scripts/update.sh`: Pulls every existing clean repo listed in
   `scripts/repos.txt`.
@@ -103,6 +105,8 @@ update that nested reference.
 ## Where To Add Things
 
 - Add or remove managed repos in `scripts/repos.txt`.
+- Change manifest parsing, category order, or manifest validation in
+  `scripts/lib/repos.sh`.
 - Document setup/update behavior in `scripts/SCRIPTS.md`.
 - Document user-facing repo inventory or first-run commands in `README.md`.
 - Document contributor workflow, linting, and tests in `CONTRIBUTING.md`.
@@ -133,6 +137,8 @@ Valid categories are:
 
 `local_path` values are reserved for cloned external repositories. Do not add
 first-party root source files under a managed `local_path`.
+All root scripts that read `scripts/repos.txt` must use
+`scripts/lib/repos.sh`; do not add another ad hoc parser.
 
 ## Shell Script Style
 
