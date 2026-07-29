@@ -30,6 +30,67 @@ manifest_checks() {
     smu_validate_repos_manifest scripts/repos.txt
 }
 
+manifest_has_path() {
+    local wanted_path="$1"
+    local repo
+    local path
+    local category
+
+    [ "$wanted_path" = "." ] && return 0
+
+    while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
+        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
+        : "$category"
+        [ "$path" = "$wanted_path" ] && return 0
+    done < scripts/repos.txt
+
+    return 1
+}
+
+route_map_checks() {
+    local line_number=0
+    local route_id
+    local path
+    local summary
+    local keywords
+    local extra
+    local seen_routes=" "
+
+    while IFS='|' read -r route_id path summary keywords extra || \
+        [ -n "$route_id" ]; do
+        line_number=$((line_number + 1))
+
+        [[ "$route_id" =~ ^[[:space:]]*# || -z "$route_id" ]] && continue
+
+        if [ -n "${extra:-}" ] || [ -z "$path" ] || [ -z "$summary" ] || \
+            [ -z "$keywords" ]; then
+            printf "Invalid route line %s: expected route_id|local_path|summary|keywords\\n" \
+                "$line_number" >&2
+            exit 1
+        fi
+
+        if [[ ! "$route_id" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            printf "Invalid route id on line %s: %s\\n" \
+                "$line_number" "$route_id" >&2
+            exit 1
+        fi
+
+        if [[ "$seen_routes" == *" $route_id "* ]]; then
+            printf "Duplicate route id on line %s: %s\\n" \
+                "$line_number" "$route_id" >&2
+            exit 1
+        fi
+
+        if ! manifest_has_path "$path"; then
+            printf "Route path on line %s is not in scripts/repos.txt: %s\\n" \
+                "$line_number" "$path" >&2
+            exit 1
+        fi
+
+        seen_routes+="$route_id "
+    done < scripts/agent-routes.txt
+}
+
 structure_checks() {
     local required_files=(
         README.md
@@ -37,6 +98,7 @@ structure_checks() {
         scripts/setup.sh
         scripts/update.sh
         scripts/repos.txt
+        scripts/agent-routes.txt
         scripts/lib/repos.sh
         scripts/lib/repo-state.sh
         scripts/test-root-scripts.sh
@@ -86,6 +148,7 @@ structure_checks() {
     done
 
     manifest_checks
+    route_map_checks
 
     grep -q "Quick Setup" README.md
     grep -q "Directory Structure" README.md

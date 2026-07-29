@@ -1,0 +1,31 @@
+# Agent route map for set-me-up
+# Format: route_id|local_path|summary|keywords
+root-orchestration|.|Root setup orchestration, repo manifest, validation, root CI|setup,update,manifest,root,validation,ci
+installer|installer|Installer behavior and smu command implementation|installer,smu,cli,theme,prompt,catalog,profile
+tests|tests|End-to-end provisioning scenarios|test,tests,e2e,scenario,provisioning,docker
+utilities|utilities|Shared utility shell functions|utility,utilities,shell,function,helper
+blueprint|blueprint|Blueprint structure and bootstrap composition|blueprint,bootstrap,composition
+docs|docs|Published documentation site and content|docs,documentation,site,guide
+ai-config|shared/ai-config|Shared AI agent configuration and skills|agent,ai,skill,skills,shared-config
+claude|home/claude|Claude Code configuration|claude,claude-code,agent-config
+codex|home/codex|Codex configuration|codex,agent-config
+pi|home/pi|Pi coding agent configuration|pi,agent-config
+bash|home/.config/bash|Bash shell configuration|bash,shell,prompt,ps1
+fish|home/.config/fish|Fish shell configuration|fish,shell,prompt
+nushell|home/.config/nushell|Nushell configuration|nushell,nu,shell,prompt
+zsh|home/.config/zsh|Zsh shell configuration|zsh,shell,prompt,ps1
+alacritty|home/.config/alacritty|Alacritty terminal configuration|alacritty,terminal,theme
+tmux|home/.config/tmux|Tmux terminal multiplexer configuration|tmux,terminal,theme
+nvim|home/.config/nvim|Neovim configuration|nvim,neovim,editor,theme
+zed|home/.config/zed|Zed editor configuration|zed,editor,theme
+television|home/.config/television|Television picker configuration|television,tv,picker
+gh-dash|home/.config/gh-dash|GitHub dashboard configuration|gh-dash,github,dashboard
+opencode|home/.config/opencode|OpenCode configuration|opencode,agent-config
+modules-colorschemes|modules/colorschemes|Color scheme behavior and adapters|theme,themes,color,colorscheme,colorschemes
+modules-debian|modules/debian|Debian and Linux modules|debian,linux,apt,module
+modules-macos|modules/macos|macOS and Homebrew modules|macos,darwin,homebrew,brew,module
+modules-macports|modules/macports|MacPorts module|macports,ports,module
+modules-preferences|modules/preferences|Preferences module|preferences,defaults,settings,module
+modules-template|modules/template-module|Template for new modules|template,module,new-module,scaffold
+modules-universal|modules/universal|Cross-platform modules|universal,cross-platform,module
+modules-xcode|modules/xcode|Xcode module|xcode,developer-tools,module

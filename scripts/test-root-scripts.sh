@@ -100,6 +100,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
     cp "$repo_root/scripts/repos.txt" "$target/scripts/"
+    cp "$repo_root/scripts/agent-routes.txt" "$target/scripts/"
     cp "$repo_root/scripts/lib/repos.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-state.sh" "$target/scripts/lib/"
 }
@@ -253,6 +254,25 @@ test_repo_state_classifies_worktrees() {
     )
 }
 
+test_route_map_rejects_unknown_paths() {
+    local work_dir="$tmp_root/route-map"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git"
+    printf "bad|missing/path|Broken route|missing\\n" \
+        > "$work_dir/scripts/agent-routes.txt"
+
+    if (
+        cd "$work_dir"
+        bash scripts/validate.sh --structure > "$output" 2>&1
+    ); then
+        fail "validate.sh accepted route path outside manifest"
+    fi
+
+    assert_contains "$output" "is not in scripts/repos.txt"
+}
+
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
@@ -260,5 +280,6 @@ test_update_skips_dirty_and_reports_failures
 test_manifest_validation_rejects_duplicates
 test_validate_repos_rejects_invalid_categories
 test_repo_state_classifies_worktrees
+test_route_map_rejects_unknown_paths
 
 printf "Root script tests passed.\\n"

@@ -19,6 +19,8 @@ Manifest parsing, category order, and validation live in
 Repository state classification lives in **`lib/repo-state.sh`** so update and
 validation commands share the same clean, dirty, missing, and detached checkout
 rules.
+Agent routing hints live in **`agent-routes.txt`** so agents can map goals to
+owning repository paths without relying only on prose docs.
 
 ## repos.txt
 
@@ -61,6 +63,22 @@ Lines starting with `#` are comments and empty lines are ignored.
 
 `scripts/lib/repos.sh` validates this format for all root scripts. Update that
 file when changing category order or manifest rules.
+
+## agent-routes.txt
+
+The `agent-routes.txt` file maps common goal areas to owning repository paths.
+Each line follows the format:
+
+```text
+route_id|local_path|summary|keywords
+```
+
+- **route_id**: Stable kebab-case route name
+- **local_path**: `.` or a path listed in `repos.txt`
+- **summary**: Short ownership description
+- **keywords**: Comma-separated routing hints
+
+Root validation rejects route paths that are not listed in `repos.txt`.
 
 ## setup.sh
 
@@ -158,9 +176,10 @@ To add a new repository to the set-me-up collection:
    new-repo-name|path/to/clone|category
    ```
 
-3. Run `./scripts/setup.sh` to clone it (if setting up fresh) or
+3. Add or update the owning route in `agent-routes.txt`
+4. Run `./scripts/setup.sh` to clone it (if setting up fresh) or
    manually clone it
-4. Future runs of `./scripts/update.sh` will automatically include it
+5. Future runs of `./scripts/update.sh` will automatically include it
 
 ## Removing a Repository
 

@@ -92,6 +92,7 @@ Ensure these files exist:
 
 - `README.md`
 - `scripts/SCRIPTS.md`
+- `scripts/agent-routes.txt`
 - `scripts/lib/repos.sh`
 - `scripts/lib/repo-state.sh`
 - `scripts/setup.sh` (must be executable)
@@ -124,6 +125,12 @@ scripts/validate-repos.sh --changed
 
 The runner reads `scripts/repos.txt`, discovers each child repo's validator,
 and skips dirty repositories so unrelated work-in-progress stays untouched.
+
+## Agent Route Map
+
+When adding a repository or changing ownership language, update
+`scripts/agent-routes.txt`. Root structure validation confirms every route path
+is either `.` or a path from `scripts/repos.txt`.
 
 ## Pre-commit Hook (Optional)
 
