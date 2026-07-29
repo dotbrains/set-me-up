@@ -16,7 +16,10 @@ bash_checks() {
         scripts/ci-workflow-report.sh scripts/generate-docs.sh \
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
-        scripts/new-repo-check.sh \
+        scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
+        scripts/tree-smoke-test.sh scripts/tests/test-helpers.sh \
+        scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
+        scripts/tests/test-routes-doctor.sh \
         scripts/lib/repos.sh scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh
 }
@@ -30,7 +33,11 @@ shell_checks() {
         scripts/capabilities.sh scripts/ci-workflow-report.sh \
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
         scripts/health-report.sh scripts/route-quality.sh \
-        scripts/freshness-report.sh scripts/new-repo-check.sh scripts/lib/repos.sh \
+        scripts/freshness-report.sh scripts/new-repo-check.sh scripts/add-repo.sh \
+        scripts/change-report.sh scripts/tree-smoke-test.sh \
+        scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
+        scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
+        scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh
 }
@@ -181,6 +188,7 @@ coverage_checks() {
     scripts/native-workflow-template.sh --check >/dev/null
     scripts/route-quality.sh >/dev/null
     scripts/health-report.sh --json >/dev/null
+    scripts/tree-smoke-test.sh >/dev/null
 }
 
 structure_checks() {
@@ -203,6 +211,9 @@ structure_checks() {
         scripts/route-quality.sh
         scripts/freshness-report.sh
         scripts/new-repo-check.sh
+        scripts/add-repo.sh
+        scripts/change-report.sh
+        scripts/tree-smoke-test.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -211,7 +222,13 @@ structure_checks() {
         scripts/lib/routes.sh
         scripts/lib/validators.sh
         scripts/test-root-scripts.sh
+        scripts/tests/test-helpers.sh
+        scripts/tests/test-setup-update.sh
+        scripts/tests/test-manifests.sh
+        scripts/tests/test-routes-doctor.sh
         scripts/validate-repos.sh
+        scripts/schemas/health-report.schema.json
+        scripts/schemas/health-report.example.json
         .gitignore
     )
     local required_ignores=(
@@ -290,6 +307,18 @@ structure_checks() {
     }
     [ -x scripts/new-repo-check.sh ] || {
         printf "scripts/new-repo-check.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/add-repo.sh ] || {
+        printf "scripts/add-repo.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/change-report.sh ] || {
+        printf "scripts/change-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/tree-smoke-test.sh ] || {
+        printf "scripts/tree-smoke-test.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/test-root-scripts.sh ] || {

@@ -6,4 +6,5 @@ installer/
 modules/
 shared/
 tests/
+!scripts/tests/
 utilities/

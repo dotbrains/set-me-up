@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# shellcheck source=scripts/tests/test-helpers.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/test-helpers.sh"
+
+: "$repo_root" "$tmp_root"
+
+
+test_route_lookup_finds_keyword_matches() {
+    local work_dir="$tmp_root/route-lookup"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    (
+        cd "$work_dir"
+        bash scripts/route.sh theme > "$output"
+    )
+
+    assert_contains "$output" "modules-colorschemes"
+    assert_contains "$output" "modules/colorschemes"
+}
+
+test_route_lookup_fails_without_matches() {
+    local work_dir="$tmp_root/route-miss"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    if (
+        cd "$work_dir"
+        bash scripts/route.sh no-such-route > "$output" 2>&1
+    ); then
+        fail "route.sh succeeded without a matching route"
+    fi
+
+    assert_contains "$output" "No routes matched"
+}
+
+test_route_lookup_covers_core_concepts() {
+    local work_dir="$tmp_root/route-coverage"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    (
+        cd "$work_dir"
+        bash scripts/route.sh smu > "$output"
+        assert_contains "$output" "installer"
+
+        bash scripts/route.sh prompt > "$output"
+        assert_contains "$output" "home/.config/bash"
+
+        bash scripts/route.sh claude > "$output"
+        assert_contains "$output" "home/claude"
+
+        bash scripts/route.sh codex > "$output"
+        assert_contains "$output" "home/codex"
+
+        bash scripts/route.sh macos > "$output"
+        assert_contains "$output" "modules/macos"
+
+        bash scripts/route.sh debian > "$output"
+        assert_contains "$output" "modules/debian"
+
+        bash scripts/route.sh nvim > "$output"
+        assert_contains "$output" "home/.config/nvim"
+    )
+}
+
+test_doctor_reports_repo_health_summary() {
+    local work_dir="$tmp_root/doctor-summary"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git" "$work_dir/dirty/.git"
+    touch "$work_dir/dirty/.dirty"
+    cat > "$work_dir/scripts/repos.txt" <<'EOF'
+clean|clean|top-level
+dirty|dirty|top-level
+missing|missing|top-level
+EOF
+    cat > "$work_dir/scripts/agent-routes.txt" <<'EOF'
+clean|clean|Clean repo|clean
+dirty|dirty|Dirty repo|dirty
+EOF
+    printf "clean|custom validate\\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/doctor.sh > "$output"
+    )
+
+    assert_contains "$output" "set-me-up doctor"
+    assert_contains "$output" "repos: total=3"
+    assert_contains "$output" "dirty=1"
+    assert_contains "$output" "missing=1"
+    assert_contains "$output" "validators: present=1 missing=2"
+    assert_contains "$output" "routes: present=2 missing=1"
+}
+
+test_doctor_verbose_reports_route_drift() {
+    local work_dir="$tmp_root/doctor-route-drift"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\\n" > "$work_dir/scripts/repos.txt"
+    printf "bad|missing|Broken route|missing\\n" \
+        > "$work_dir/scripts/agent-routes.txt"
+    : > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/doctor.sh --verbose > "$output"
+    )
+
+    assert_contains "$output" "route-drift"
+    assert_contains "$output" "routes: present=0 missing=1 drift=1"
+}
+
+test_health_report_schema_docs_exist() {
+    local work_dir="$tmp_root/health-schema"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+    printf "clean|clean|Clean repo|clean\n" > "$work_dir/scripts/agent-routes.txt"
+    printf "clean|custom validate\n" > "$work_dir/scripts/repo-validators.txt"
+
+    (
+        cd "$work_dir"
+        bash scripts/health-report.sh --json > "$output"
+    )
+
+    assert_contains "$output" '"repositories":['
+    assert_file "$work_dir/scripts/schemas/health-report.schema.json"
+    assert_file "$work_dir/scripts/schemas/health-report.example.json"
+}
+
+test_change_report_lists_recent_commits() {
+    local work_dir="$tmp_root/change-report"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean"
+    git -C "$work_dir/clean" init -q
+    git -C "$work_dir/clean" config user.name "Test User"
+    git -C "$work_dir/clean" config user.email "test@example.com"
+    printf "hello\n" > "$work_dir/clean/README.md"
+    git -C "$work_dir/clean" add README.md
+    git -C "$work_dir/clean" commit -q -m "test commit"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+
+    (
+        cd "$work_dir"
+        bash scripts/change-report.sh --since=1.day > "$output"
+    )
+
+    assert_contains "$output" "path"
+    assert_contains "$output" "clean"
+    assert_contains "$output" "test commit"
+}
+
+
+
+test_route_lookup_finds_keyword_matches
+test_route_lookup_fails_without_matches
+test_route_lookup_covers_core_concepts
+test_doctor_reports_repo_health_summary
+test_doctor_verbose_reports_route_drift
+test_health_report_schema_docs_exist
+test_change_report_lists_recent_commits

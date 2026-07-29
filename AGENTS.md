@@ -37,6 +37,9 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/route-quality.sh`: Required route keyword quality gate.
 - `scripts/freshness-report.sh`: Last-commit freshness report.
 - `scripts/new-repo-check.sh`: Checklist validator for adding a managed repo.
+- `scripts/add-repo.sh`: Validated workflow for adding a managed repo.
+- `scripts/change-report.sh`: Recent cross-repo commit summary.
+- `scripts/tree-smoke-test.sh`: Fresh-tree smoke test for root discovery tools.
 - `REPOSITORIES.md`: Generated repository, route, capability, and validator
   index.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
@@ -262,6 +265,9 @@ scripts/health-report.sh --json
 scripts/route-quality.sh
 scripts/freshness-report.sh
 scripts/new-repo-check.sh home/.config/zsh
+scripts/add-repo.sh repo path category route-id "Summary" "keywords"
+scripts/change-report.sh --since=7.days
+scripts/tree-smoke-test.sh
 scripts/check-repo-contract.sh home/.config/zsh
 scripts/check-repo-contract.sh --json home/.config/zsh
 scripts/check-repo-contract.sh --all

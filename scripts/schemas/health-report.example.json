@@ -1,0 +1,13 @@
+{
+  "repositories": [
+    {
+      "repo": "set-me-up-installer",
+      "path": "installer",
+      "category": "top-level",
+      "state": "clean",
+      "sync": "synced",
+      "route": "installer",
+      "validator": "scripts/validate.sh --all"
+    }
+  ]
+}

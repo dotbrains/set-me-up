@@ -25,6 +25,9 @@ directory structure. These scripts help manage these repositories:
 - **`route-quality.sh`**: Enforce required route capability keywords
 - **`freshness-report.sh`**: Report last commit age for managed repos
 - **`new-repo-check.sh`**: Validate the checklist for adding a managed repo
+- **`add-repo.sh`**: Add a managed repo and validate the generated metadata
+- **`change-report.sh`**: Summarize recent commits across checked-out repos
+- **`tree-smoke-test.sh`**: Smoke-test the root scripts in a copied tree
 - **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
 The scripts read from a shared `repos.txt` file that defines all repositories.
@@ -221,6 +224,40 @@ agents:
 
 ```bash
 scripts/health-report.sh --json
+```
+
+The JSON contract is documented in
+`scripts/schemas/health-report.schema.json`, with a compact example in
+`scripts/schemas/health-report.example.json`.
+
+## add-repo.sh
+
+The `add-repo.sh` command appends a managed repository to the root manifests,
+regenerates `REPOSITORIES.md`, and runs the new-repo checklist plus structure
+validation:
+
+```bash
+scripts/add-repo.sh repo-name local/path category route-id "Summary" \
+  "keyword,aliases" "scripts/validate.sh --all"
+```
+
+## change-report.sh
+
+The `change-report.sh` command summarizes recent commits across checked-out
+managed repositories:
+
+```bash
+scripts/change-report.sh --since=14.days
+```
+
+## tree-smoke-test.sh
+
+The `tree-smoke-test.sh` command copies the root metadata/scripts into a
+temporary tree and verifies that agent-facing discovery commands run without
+hidden local state:
+
+```bash
+scripts/tree-smoke-test.sh
 ```
 
 ## route-quality.sh
