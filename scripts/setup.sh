@@ -8,6 +8,14 @@ readonly REPO_NAME="set-me-up"
 REPO_ROOT=""
 REPOS_FILE=""
 
+is_setup_root() {
+    local path="$1"
+
+    [ -f "$path/README.md" ] && \
+        [ -f "$path/scripts/repos.txt" ] && \
+        git -C "$path" rev-parse --git-dir &> /dev/null
+}
+
 # Check if git is installed
 if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed. Please install git and try again."
@@ -22,8 +30,7 @@ if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
     script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     script_repo_root="$(cd "$script_dir/.." && pwd)"
 
-    if [ -f "$script_repo_root/README.md" ] && \
-       git -C "$script_repo_root" rev-parse --git-dir &> /dev/null; then
+    if is_setup_root "$script_repo_root"; then
         cd "$script_repo_root"
     fi
 fi
@@ -31,7 +38,7 @@ fi
 # Ensure we're in the set-me-up root directory
 ensure_setup_root() {
     # Already in the repo?
-    if [ -f "README.md" ] && git rev-parse --git-dir &> /dev/null; then
+    if is_setup_root "."; then
         echo "✅ Detected existing $REPO_NAME repository"
         return 0
     fi
