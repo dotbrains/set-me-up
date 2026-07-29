@@ -21,6 +21,52 @@ markdown_checks() {
         "#installer" "#modules" "#shared" "#tests" "#utilities"
 }
 
+manifest_checks() {
+    local line_number=0
+    local repo
+    local path
+    local category
+    local extra
+    local seen_repos=" "
+    local seen_paths=" "
+
+    while IFS='|' read -r repo path category extra || [ -n "$repo" ]; do
+        line_number=$((line_number + 1))
+
+        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
+
+        if [ -n "${extra:-}" ] || [ -z "$path" ] || [ -z "$category" ]; then
+            printf "Invalid manifest line %s: expected repo|path|category\\n" \
+                "$line_number" >&2
+            exit 1
+        fi
+
+        case "$category" in
+            top-level|shared|module|config)
+                ;;
+            *)
+                printf "Invalid manifest category on line %s: %s\\n" \
+                    "$line_number" "$category" >&2
+                exit 1
+                ;;
+        esac
+
+        if [[ "$seen_repos" == *" $repo "* ]]; then
+            printf "Duplicate manifest repo on line %s: %s\\n" \
+                "$line_number" "$repo" >&2
+            exit 1
+        fi
+        if [[ "$seen_paths" == *" $path "* ]]; then
+            printf "Duplicate manifest path on line %s: %s\\n" \
+                "$line_number" "$path" >&2
+            exit 1
+        fi
+
+        seen_repos+="$repo "
+        seen_paths+="$path "
+    done < scripts/repos.txt
+}
+
 structure_checks() {
     local required_files=(
         README.md
@@ -64,10 +110,7 @@ structure_checks() {
         }
     done
 
-    grep -Fq "set-me-up-tests|tests|top-level" scripts/repos.txt || {
-        printf "Missing set-me-up-tests manifest entry\\n" >&2
-        exit 1
-    }
+    manifest_checks
 
     grep -q "Quick Setup" README.md
     grep -q "Directory Structure" README.md
