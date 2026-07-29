@@ -128,7 +128,7 @@ first-party root source files under a managed `local_path`.
 
 - Use Bash for root scripts.
 - Keep scripts executable.
-- Preserve explicit failure handling with `set -e`.
+- Preserve strict failure handling with `set -euo pipefail`.
 - Prefer small focused functions for repeated behavior.
 - Quote variables unless pattern matching or Bash syntax requires otherwise.
 - Keep output style consistent with the existing categorized setup/update
