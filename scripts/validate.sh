@@ -178,7 +178,7 @@ coverage_checks() {
     scripts/validator-exceptions.sh --checked-out --strict
     scripts/check-repo-contract.sh --all --checked-out >/dev/null
     scripts/ci-workflow-report.sh --checked-out --strict >/dev/null
-    scripts/native-workflow-template.sh --report >/dev/null
+    scripts/native-workflow-template.sh --check >/dev/null
     scripts/route-quality.sh >/dev/null
     scripts/health-report.sh --json >/dev/null
 }
