@@ -9,6 +9,7 @@ on:
       - '**.bash'
       - 'scripts/repos.txt'
       - '.github/workflows/lint.yml'
+      - '.github/workflows/tests.yml'
   push:
     branches:
       - master
@@ -19,6 +20,7 @@ on:
       - '**.bash'
       - 'scripts/repos.txt'
       - '.github/workflows/lint.yml'
+      - '.github/workflows/tests.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
