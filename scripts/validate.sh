@@ -172,6 +172,7 @@ coverage_checks() {
 
     scripts/validator-exceptions.sh --checked-out --strict
     scripts/check-repo-contract.sh --all --checked-out >/dev/null
+    scripts/ci-workflow-report.sh --checked-out --strict >/dev/null
 }
 
 structure_checks() {
