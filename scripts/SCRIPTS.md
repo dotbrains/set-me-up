@@ -19,6 +19,12 @@ directory structure. These scripts help manage these repositories:
   index
 - **`ci-workflow-report.sh`**: Report child repo workflow presence
 - **`generate-docs.sh`**: Regenerate `REPOSITORIES.md` from manifests
+- **`native-workflow-template.sh`**: Check child CI workflows run native
+  validators
+- **`health-report.sh`**: Emit machine-readable repo health JSON
+- **`route-quality.sh`**: Enforce required route capability keywords
+- **`freshness-report.sh`**: Report last commit age for managed repos
+- **`new-repo-check.sh`**: Validate the checklist for adding a managed repo
 - **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
 The scripts read from a shared `repos.txt` file that defines all repositories.
@@ -197,6 +203,51 @@ scripts/ci-workflow-report.sh --checked-out
 ```
 
 Use `--strict` when missing workflow files should fail the command.
+
+## native-workflow-template.sh
+
+The `native-workflow-template.sh` command checks that checked-out child repos
+with native validators also have a CI workflow that runs
+`scripts/validate.sh --all`:
+
+```bash
+scripts/native-workflow-template.sh --check
+```
+
+## health-report.sh
+
+The `health-report.sh` command emits machine-readable repository state for
+agents:
+
+```bash
+scripts/health-report.sh --json
+```
+
+## route-quality.sh
+
+The `route-quality.sh` command enforces route coverage for common capability
+domains:
+
+```bash
+scripts/route-quality.sh
+```
+
+## freshness-report.sh
+
+The `freshness-report.sh` command reports last commit age for managed repos:
+
+```bash
+scripts/freshness-report.sh
+SMU_STALE_DAYS=90 scripts/freshness-report.sh
+```
+
+## new-repo-check.sh
+
+The `new-repo-check.sh` command validates the checklist for one managed repo:
+
+```bash
+scripts/new-repo-check.sh home/.config/zsh
+```
 
 ## generate-docs.sh
 
@@ -385,6 +436,10 @@ scripts/validate-repos.sh --list
 scripts/validate-repos.sh --changed
 scripts/capabilities.sh theme
 scripts/ci-workflow-report.sh --checked-out
+scripts/native-workflow-template.sh --check
+scripts/health-report.sh --json
+scripts/route-quality.sh
+scripts/freshness-report.sh
 ```
 
 `validate-repos.sh` reads `repos.txt`, skips missing or dirty repositories, and

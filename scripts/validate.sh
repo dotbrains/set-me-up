@@ -14,6 +14,9 @@ bash_checks() {
         scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
         scripts/validator-exceptions.sh scripts/capabilities.sh \
         scripts/ci-workflow-report.sh scripts/generate-docs.sh \
+        scripts/native-workflow-template.sh scripts/health-report.sh \
+        scripts/route-quality.sh scripts/freshness-report.sh \
+        scripts/new-repo-check.sh \
         scripts/lib/repos.sh scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh
 }
@@ -25,7 +28,9 @@ shell_checks() {
         scripts/route.sh scripts/doctor.sh scripts/sync-report.sh \
         scripts/check-repo-contract.sh scripts/validator-exceptions.sh \
         scripts/capabilities.sh scripts/ci-workflow-report.sh \
-        scripts/generate-docs.sh scripts/lib/repos.sh \
+        scripts/generate-docs.sh scripts/native-workflow-template.sh \
+        scripts/health-report.sh scripts/route-quality.sh \
+        scripts/freshness-report.sh scripts/new-repo-check.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh
 }
@@ -173,6 +178,9 @@ coverage_checks() {
     scripts/validator-exceptions.sh --checked-out --strict
     scripts/check-repo-contract.sh --all --checked-out >/dev/null
     scripts/ci-workflow-report.sh --checked-out --strict >/dev/null
+    scripts/native-workflow-template.sh --report >/dev/null
+    scripts/route-quality.sh >/dev/null
+    scripts/health-report.sh --json >/dev/null
 }
 
 structure_checks() {
@@ -190,6 +198,11 @@ structure_checks() {
         scripts/capabilities.sh
         scripts/ci-workflow-report.sh
         scripts/generate-docs.sh
+        scripts/native-workflow-template.sh
+        scripts/health-report.sh
+        scripts/route-quality.sh
+        scripts/freshness-report.sh
+        scripts/new-repo-check.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -257,6 +270,26 @@ structure_checks() {
     }
     [ -x scripts/generate-docs.sh ] || {
         printf "scripts/generate-docs.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/native-workflow-template.sh ] || {
+        printf "scripts/native-workflow-template.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/health-report.sh ] || {
+        printf "scripts/health-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/route-quality.sh ] || {
+        printf "scripts/route-quality.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/freshness-report.sh ] || {
+        printf "scripts/freshness-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/new-repo-check.sh ] || {
+        printf "scripts/new-repo-check.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/test-root-scripts.sh ] || {

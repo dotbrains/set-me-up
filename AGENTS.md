@@ -31,6 +31,12 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/ci-workflow-report.sh`: Report checked-out child repos without
   GitHub Actions workflows.
 - `scripts/generate-docs.sh`: Regenerates `REPOSITORIES.md` from manifests.
+- `scripts/native-workflow-template.sh`: Checks child workflows run native
+  repo validation.
+- `scripts/health-report.sh`: Machine-readable JSON health report.
+- `scripts/route-quality.sh`: Required route keyword quality gate.
+- `scripts/freshness-report.sh`: Last-commit freshness report.
+- `scripts/new-repo-check.sh`: Checklist validator for adding a managed repo.
 - `REPOSITORIES.md`: Generated repository, route, capability, and validator
   index.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
@@ -251,6 +257,11 @@ scripts/sync-report.sh
 scripts/validator-exceptions.sh
 scripts/capabilities.sh theme
 scripts/ci-workflow-report.sh --checked-out
+scripts/native-workflow-template.sh --check
+scripts/health-report.sh --json
+scripts/route-quality.sh
+scripts/freshness-report.sh
+scripts/new-repo-check.sh home/.config/zsh
 scripts/check-repo-contract.sh home/.config/zsh
 scripts/check-repo-contract.sh --json home/.config/zsh
 scripts/check-repo-contract.sh --all
