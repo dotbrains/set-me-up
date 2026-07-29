@@ -101,6 +101,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
     cp "$repo_root/scripts/repos.txt" "$target/scripts/"
     cp "$repo_root/scripts/lib/repos.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/repo-state.sh" "$target/scripts/lib/"
 }
 
 test_piped_setup_resolves_cloned_manifest() {
@@ -230,11 +231,34 @@ test_validate_repos_rejects_invalid_categories() {
     assert_contains "$output" "Invalid manifest category"
 }
 
+test_repo_state_classifies_worktrees() {
+    local work_dir="$tmp_root/repo-state"
+    local bin_dir="$work_dir/bin"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/clean/.git" "$work_dir/dirty/.git" "$work_dir/not-git"
+    touch "$work_dir/dirty/.dirty"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH"
+        source scripts/lib/repo-state.sh
+        [ "$(smu_repo_state missing)" = "missing" ] || \
+            fail "missing repo state was not detected"
+        [ "$(smu_repo_state not-git)" = "not-git" ] || \
+            fail "not-git repo state was not detected"
+        [ "$(smu_repo_state dirty)" = "dirty" ] || \
+            fail "dirty repo state was not detected"
+    )
+}
+
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
 test_update_skips_dirty_and_reports_failures
 test_manifest_validation_rejects_duplicates
 test_validate_repos_rejects_invalid_categories
+test_repo_state_classifies_worktrees
 
 printf "Root script tests passed.\\n"

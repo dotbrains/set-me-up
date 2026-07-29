@@ -11,14 +11,14 @@ mode="${1:---all}"
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh \
-        scripts/lib/repos.sh
+        scripts/lib/repos.sh scripts/lib/repo-state.sh
 }
 
 shell_checks() {
     bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
-        scripts/lib/repos.sh
+        scripts/lib/repos.sh scripts/lib/repo-state.sh
 }
 
 markdown_checks() {
@@ -38,6 +38,7 @@ structure_checks() {
         scripts/update.sh
         scripts/repos.txt
         scripts/lib/repos.sh
+        scripts/lib/repo-state.sh
         scripts/test-root-scripts.sh
         scripts/validate-repos.sh
         .gitignore

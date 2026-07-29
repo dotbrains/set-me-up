@@ -7,28 +7,10 @@ repos_file="$repo_root/scripts/repos.txt"
 mode="${1:---changed}"
 
 source "$repo_root/scripts/lib/repos.sh"
+source "$repo_root/scripts/lib/repo-state.sh"
 
 usage() {
     printf "Usage: %s [--changed|--clean|--all|--list]\\n" "$0" >&2
-}
-
-repo_has_changes() {
-    local path="$1"
-
-    [ -n "$(git -C "$path" status --short)" ]
-}
-
-repo_head_changed_from_origin() {
-    local path="$1"
-    local branch
-
-    branch="$(git -C "$path" branch --show-current)"
-    [ -n "$branch" ] || return 1
-
-    git -C "$path" rev-parse --verify "origin/$branch" >/dev/null 2>&1 || \
-        return 1
-    [ "$(git -C "$path" rev-parse HEAD)" != \
-        "$(git -C "$path" rev-parse "origin/$branch")" ]
 }
 
 validator_for_repo() {
@@ -89,17 +71,17 @@ validator_label() {
 }
 
 selected_repo() {
-    local path="$1"
+    local state="$1"
 
     case "$mode" in
         --all|--list)
             return 0
             ;;
         --clean)
-            ! repo_has_changes "$path"
+            [ "$state" = "clean" ]
             ;;
         --changed)
-            repo_has_changes "$path" || repo_head_changed_from_origin "$path"
+            [ "$state" = "dirty" ] || [ "$state" = "changed" ]
             ;;
         *)
             usage
@@ -114,22 +96,29 @@ validate_manifest_repo() {
     local repo="$1"
     local path="$2"
     local category="$3"
-    local status
+    local state
     local validator
 
     : "$repo" "$category"
-    if ! git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    state="$(smu_repo_state "$path")"
+
+    if [ "$state" = "missing" ]; then
         printf "skip missing: %s\\n" "$path"
         skipped=$((skipped + 1))
         return 0
     fi
 
-    if ! selected_repo "$path"; then
+    if [ "$state" = "not-git" ]; then
+        printf "skip not-git: %s\\n" "$path"
+        skipped=$((skipped + 1))
         return 0
     fi
 
-    status="$(git -C "$path" status --short)"
-    if [ -n "$status" ]; then
+    if ! selected_repo "$state"; then
+        return 0
+    fi
+
+    if [ "$state" = "dirty" ]; then
         printf "skip dirty: %s\\n" "$path"
         skipped=$((skipped + 1))
         return 0

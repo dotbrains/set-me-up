@@ -16,6 +16,9 @@ directory structure. These scripts help manage these repositories:
 The scripts read from a shared `repos.txt` file that defines all repositories.
 Manifest parsing, category order, and validation live in
 **`lib/repos.sh`**.
+Repository state classification lives in **`lib/repo-state.sh`** so update and
+validation commands share the same clean, dirty, missing, and detached checkout
+rules.
 
 ## repos.txt
 

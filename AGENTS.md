@@ -18,6 +18,8 @@ belong in those child repositories; this file explains how to route it.
   destination paths, and categories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
   order, manifest validation, and repository iteration.
+- `scripts/lib/repo-state.sh`: Shared Repository State module for missing,
+  not-git, dirty, detached, changed, and clean checkout classification.
 - `scripts/setup.sh`: Clones every repo listed in `scripts/repos.txt`.
 - `scripts/update.sh`: Pulls every existing clean repo listed in
   `scripts/repos.txt`.
@@ -107,6 +109,8 @@ update that nested reference.
 - Add or remove managed repos in `scripts/repos.txt`.
 - Change manifest parsing, category order, or manifest validation in
   `scripts/lib/repos.sh`.
+- Change repository cleanliness, detached-head, or origin-drift detection in
+  `scripts/lib/repo-state.sh`.
 - Document setup/update behavior in `scripts/SCRIPTS.md`.
 - Document user-facing repo inventory or first-run commands in `README.md`.
 - Document contributor workflow, linting, and tests in `CONTRIBUTING.md`.

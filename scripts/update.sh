@@ -8,6 +8,7 @@ readonly SCRIPT_DIR
 readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
 
 source "$SCRIPT_DIR/lib/repos.sh"
+source "$SCRIPT_DIR/lib/repo-state.sh"
 
 # Check if git is installed
 if ! command -v git &> /dev/null; then
@@ -19,43 +20,25 @@ echo ""
 echo "🔄 Updating set-me-up repositories..."
 echo ""
 
-# Check if repo has uncommitted changes
-has_changes() {
-    local path="$1"
-    
-    if [ ! -d "$path/.git" ]; then
-        return 1
-    fi
-    
-    cd "$path"
-    
-    # Check for uncommitted changes (modified, staged, untracked)
-    if ! git diff-index --quiet HEAD -- 2>/dev/null || \
-       [ -n "$(git ls-files --others --exclude-standard 2>/dev/null)" ]; then
-        cd - > /dev/null
-        return 0
-    fi
-    
-    cd - > /dev/null
-    return 1
-}
-
 # Update a repository
 update_repo() {
     local repo="$1"
     local path="$2"
-    
-    if [ ! -d "$path" ]; then
+    local state
+
+    state="$(smu_repo_state "$path")"
+
+    if [ "$state" = "missing" ]; then
         echo "  ⏭️  $path doesn't exist, skipping..."
         return 0
     fi
-    
-    if ! [ -d "$path/.git" ]; then
+
+    if [ "$state" = "not-git" ]; then
         echo "  ⚠️  $path is not a git repository, skipping..."
         return 0
     fi
-    
-    if has_changes "$path"; then
+
+    if [ "$state" = "dirty" ]; then
         echo "  ⏭️  $path has uncommitted changes, skipping..."
         return 0
     fi
