@@ -11,15 +11,16 @@ mode="${1:---all}"
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
-        scripts/doctor.sh scripts/lib/repos.sh scripts/lib/repo-state.sh \
-        scripts/lib/validators.sh
+        scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
+        scripts/lib/repos.sh scripts/lib/repo-state.sh scripts/lib/validators.sh
 }
 
 shell_checks() {
     bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
-        scripts/route.sh scripts/doctor.sh scripts/lib/repos.sh \
+        scripts/route.sh scripts/doctor.sh scripts/sync-report.sh \
+        scripts/check-repo-contract.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/validators.sh
 }
 
@@ -172,6 +173,8 @@ structure_checks() {
         scripts/update.sh
         scripts/route.sh
         scripts/doctor.sh
+        scripts/sync-report.sh
+        scripts/check-repo-contract.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -214,6 +217,14 @@ structure_checks() {
     }
     [ -x scripts/doctor.sh ] || {
         printf "scripts/doctor.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/sync-report.sh ] || {
+        printf "scripts/sync-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/check-repo-contract.sh ] || {
+        printf "scripts/check-repo-contract.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/test-root-scripts.sh ] || {

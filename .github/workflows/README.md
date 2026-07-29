@@ -68,6 +68,12 @@ scripts/validate.sh --test
 
 # Enforce route and validator coverage
 scripts/validate.sh --coverage
+
+# Report child repo sync state
+scripts/sync-report.sh
+
+# Check one child repo contract
+scripts/check-repo-contract.sh home/.config/zsh
 ```
 
 The root script behavior is covered in CI with a mocked `git` command so tests

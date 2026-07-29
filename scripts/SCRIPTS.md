@@ -11,6 +11,8 @@ directory structure. These scripts help manage these repositories:
 - **`setup.sh`**: Initial cloning of all repositories
 - **`update.sh`**: Updating existing repositories
 - **`validate-repos.sh`**: Running validators across clean child repositories
+- **`sync-report.sh`**: Detailed sync and dirty-work report for child repos
+- **`check-repo-contract.sh`**: Contract check for one child repo
 - **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
 The scripts read from a shared `repos.txt` file that defines all repositories.
@@ -116,6 +118,37 @@ Summary output includes:
 Verbose output adds per-repository sync status such as `ahead:1`,
 `behind:2`, or `diverged:21:7`.
 
+## sync-report.sh
+
+The `sync-report.sh` command is read-only. It prints one row per managed repo,
+then expands dirty repositories with their `git status --short` details and
+out-of-sync submodule pointers.
+
+```bash
+scripts/sync-report.sh
+```
+
+Use it before broad multi-repo work to understand which checkouts are safe to
+edit and which need a human history decision.
+
+## check-repo-contract.sh
+
+The `check-repo-contract.sh` command validates one managed child repo against
+the set-me-up contract:
+
+- listed in `repos.txt`
+- has a route in `agent-routes.txt`
+- has a validator
+- has a native executable `scripts/validate.sh`
+- has README and license files
+- is clean and synced
+
+```bash
+scripts/check-repo-contract.sh home/.config/zsh
+```
+
+The command exits non-zero when any contract item fails.
+
 ## repo-validators.txt
 
 The `repo-validators.txt` file declares validation commands for child
@@ -136,6 +169,11 @@ cannot safely receive a native validator yet.
 
 `scripts/validate.sh --coverage` fails when route coverage drifts or validator
 coverage drops below every managed repository.
+
+`home/pi` currently uses a root-declared fallback validator because the local
+checkout diverged from a force-updated remote. The pre-rewrite local history is
+preserved at `origin/backup/local-main-before-remote-rewrite-20260729` in
+`dotbrains/pi`.
 
 ## setup.sh
 

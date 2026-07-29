@@ -21,6 +21,9 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/route.sh`: Query helper for `scripts/agent-routes.txt`.
 - `scripts/doctor.sh`: Read-only health report for managed repo state, route
   coverage, validator coverage, and origin sync state.
+- `scripts/sync-report.sh`: Detailed sync and dirty-work report for managed
+  repositories.
+- `scripts/check-repo-contract.sh`: Contract check for one managed child repo.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
@@ -51,6 +54,8 @@ the goal before editing:
 4. Run `scripts/doctor.sh --summary` when you need a quick health overview.
    Use `scripts/doctor.sh --verbose` when ahead, behind, or diverged checkout
    state matters for the requested work.
+   Use `scripts/sync-report.sh` when dirty files or nested submodule state
+   matter.
 5. Check whether those paths exist locally. If a required checkout is missing,
    run `./scripts/setup.sh` or clone only the needed repo, depending on scope.
 6. Enter each target repo and read its local `AGENTS.md`, `CLAUDE.md`,
@@ -122,6 +127,8 @@ update that nested reference.
 - Add or change goal-to-repo routing in `scripts/agent-routes.txt`.
 - Change route lookup behavior in `scripts/route.sh`.
 - Change repo health reporting in `scripts/doctor.sh`.
+- Change detailed sync reporting in `scripts/sync-report.sh`.
+- Change child repo contract checks in `scripts/check-repo-contract.sh`.
 - Add or change child repo validation commands in `scripts/repo-validators.txt`.
   Prefer adding `scripts/validate.sh --all` inside the child repo first; use a
   root manifest command only when the child repo cannot safely own the
@@ -202,6 +209,8 @@ or repos whose local history cannot currently be changed safely.
 The current `home/pi` checkout is intentionally protected by a root fallback
 validator because its local branch diverged from a force-updated remote. Do not
 rewrite, reset, or force-push that checkout without an explicit user decision.
+The pre-rewrite local history is preserved at
+`origin/backup/local-main-before-remote-rewrite-20260729` in `dotbrains/pi`.
 
 ## Shell Script Style
 
@@ -233,6 +242,8 @@ For routed multi-repo work, list or run child repo validators from the root:
 scripts/validate-repos.sh --list
 scripts/validate-repos.sh --changed
 scripts/validate-repos.sh --missing
+scripts/sync-report.sh
+scripts/check-repo-contract.sh home/.config/zsh
 ```
 
 `scripts/validate-repos.sh` skips dirty repositories so it cannot hide or
