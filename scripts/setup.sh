@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 # Constants
 readonly GITHUB_ORG="https://github.com/dotbrains"

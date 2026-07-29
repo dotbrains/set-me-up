@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 # Constants
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -132,10 +132,10 @@ fi
 # Update all repository categories
 total_failed=0
 
-update_category "top-level" "📦" || ((total_failed+=$?))
-update_category "shared" "🔗" || ((total_failed+=$?))
-update_category "module" "🧩" || ((total_failed+=$?))
-update_category "config" "⚙️" || ((total_failed+=$?))
+update_category "top-level" "📦" || total_failed=$((total_failed + $?))
+update_category "shared" "🔗" || total_failed=$((total_failed + $?))
+update_category "module" "🧩" || total_failed=$((total_failed + $?))
+update_category "config" "⚙️" || total_failed=$((total_failed + $?))
 
 if [ $total_failed -gt 0 ]; then
     echo "⚠️  Update completed with errors. $total_failed repositories failed to update."
