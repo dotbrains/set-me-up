@@ -21,6 +21,7 @@ validation commands share the same clean, dirty, missing, and detached checkout
 rules.
 Agent routing hints live in **`agent-routes.txt`** so agents can map goals to
 owning repository paths without relying only on prose docs.
+Declared child repository validators live in **`repo-validators.txt`**.
 
 ## repos.txt
 
@@ -79,6 +80,19 @@ route_id|local_path|summary|keywords
 - **keywords**: Comma-separated routing hints
 
 Root validation rejects route paths that are not listed in `repos.txt`.
+
+## repo-validators.txt
+
+The `repo-validators.txt` file declares validation commands for child
+repositories. Each line follows the format:
+
+```text
+local_path|command
+```
+
+`validate-repos.sh` runs declared commands from inside the matching child
+repository before using inferred fallbacks such as `scripts/validate.sh --all`,
+`npm test`, or `./test.sh`.
 
 ## setup.sh
 
@@ -177,9 +191,10 @@ To add a new repository to the set-me-up collection:
    ```
 
 3. Add or update the owning route in `agent-routes.txt`
-4. Run `./scripts/setup.sh` to clone it (if setting up fresh) or
+4. Add a validation command to `repo-validators.txt` if the repo has one
+5. Run `./scripts/setup.sh` to clone it (if setting up fresh) or
    manually clone it
-5. Future runs of `./scripts/update.sh` will automatically include it
+6. Future runs of `./scripts/update.sh` will automatically include it
 
 ## Removing a Repository
 

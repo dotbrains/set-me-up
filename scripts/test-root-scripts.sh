@@ -101,6 +101,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
     cp "$repo_root/scripts/repos.txt" "$target/scripts/"
     cp "$repo_root/scripts/agent-routes.txt" "$target/scripts/"
+    cp "$repo_root/scripts/repo-validators.txt" "$target/scripts/"
     cp "$repo_root/scripts/lib/repos.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-state.sh" "$target/scripts/lib/"
 }
@@ -273,6 +274,44 @@ test_route_map_rejects_unknown_paths() {
     assert_contains "$output" "is not in scripts/repos.txt"
 }
 
+test_repo_validators_reject_unknown_paths() {
+    local work_dir="$tmp_root/repo-validators"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git"
+    printf "missing/path|scripts/validate.sh --all\\n" \
+        > "$work_dir/scripts/repo-validators.txt"
+
+    if (
+        cd "$work_dir"
+        bash scripts/validate.sh --structure > "$output" 2>&1
+    ); then
+        fail "validate.sh accepted validator path outside manifest"
+    fi
+
+    assert_contains "$output" "Validator path"
+}
+
+test_validate_repos_lists_declared_validator() {
+    local work_dir="$tmp_root/declared-validator"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\\n" > "$work_dir/scripts/repos.txt"
+    printf "clean|custom validate\\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/validate-repos.sh --list > "$output"
+    )
+
+    assert_contains "$output" "clean: custom validate"
+}
+
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
@@ -281,5 +320,7 @@ test_manifest_validation_rejects_duplicates
 test_validate_repos_rejects_invalid_categories
 test_repo_state_classifies_worktrees
 test_route_map_rejects_unknown_paths
+test_repo_validators_reject_unknown_paths
+test_validate_repos_lists_declared_validator
 
 printf "Root script tests passed.\\n"

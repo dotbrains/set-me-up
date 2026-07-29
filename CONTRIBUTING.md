@@ -93,6 +93,7 @@ Ensure these files exist:
 - `README.md`
 - `scripts/SCRIPTS.md`
 - `scripts/agent-routes.txt`
+- `scripts/repo-validators.txt`
 - `scripts/lib/repos.sh`
 - `scripts/lib/repo-state.sh`
 - `scripts/setup.sh` (must be executable)
@@ -131,6 +132,12 @@ and skips dirty repositories so unrelated work-in-progress stays untouched.
 When adding a repository or changing ownership language, update
 `scripts/agent-routes.txt`. Root structure validation confirms every route path
 is either `.` or a path from `scripts/repos.txt`.
+
+## Repository Validators
+
+When a child repository has a preferred validation command, declare it in
+`scripts/repo-validators.txt`. Root structure validation confirms every
+validator path is listed in `scripts/repos.txt`.
 
 ## Pre-commit Hook (Optional)
 

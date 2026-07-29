@@ -91,6 +91,40 @@ route_map_checks() {
     done < scripts/agent-routes.txt
 }
 
+repo_validator_checks() {
+    local line_number=0
+    local path
+    local command
+    local extra
+    local seen_paths=" "
+
+    while IFS='|' read -r path command extra || [ -n "$path" ]; do
+        line_number=$((line_number + 1))
+
+        [[ "$path" =~ ^[[:space:]]*# || -z "$path" ]] && continue
+
+        if [ -n "${extra:-}" ] || [ -z "$command" ]; then
+            printf "Invalid validator line %s: expected local_path|command\\n" \
+                "$line_number" >&2
+            exit 1
+        fi
+
+        if [[ "$seen_paths" == *" $path "* ]]; then
+            printf "Duplicate validator path on line %s: %s\\n" \
+                "$line_number" "$path" >&2
+            exit 1
+        fi
+
+        if ! manifest_has_path "$path"; then
+            printf "Validator path on line %s is not in scripts/repos.txt: %s\\n" \
+                "$line_number" "$path" >&2
+            exit 1
+        fi
+
+        seen_paths+="$path "
+    done < scripts/repo-validators.txt
+}
+
 structure_checks() {
     local required_files=(
         README.md
@@ -99,6 +133,7 @@ structure_checks() {
         scripts/update.sh
         scripts/repos.txt
         scripts/agent-routes.txt
+        scripts/repo-validators.txt
         scripts/lib/repos.sh
         scripts/lib/repo-state.sh
         scripts/test-root-scripts.sh
@@ -149,6 +184,7 @@ structure_checks() {
 
     manifest_checks
     route_map_checks
+    repo_validator_checks
 
     grep -q "Quick Setup" README.md
     grep -q "Directory Structure" README.md

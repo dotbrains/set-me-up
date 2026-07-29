@@ -4,6 +4,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repos_file="$repo_root/scripts/repos.txt"
+validators_file="$repo_root/scripts/repo-validators.txt"
 mode="${1:---changed}"
 
 source "$repo_root/scripts/lib/repos.sh"
@@ -15,6 +16,12 @@ usage() {
 
 validator_for_repo() {
     local path="$1"
+    local declared
+
+    if declared="$(declared_validator_for_repo "$path")"; then
+        printf "%s" "$declared"
+        return 0
+    fi
 
     if [ -x "$path/scripts/validate.sh" ]; then
         printf "root-validator"
@@ -25,6 +32,25 @@ validator_for_repo() {
     else
         return 1
     fi
+}
+
+declared_validator_for_repo() {
+    local wanted_path="$1"
+    local path
+    local command
+
+    [ -f "$validators_file" ] || return 1
+
+    while IFS='|' read -r path command extra || [ -n "$path" ]; do
+        [[ "$path" =~ ^[[:space:]]*# || -z "$path" ]] && continue
+        [ "$path" = "$wanted_path" ] || continue
+        [ -z "${extra:-}" ] || return 1
+        [ -n "$command" ] || return 1
+        printf "declared:%s" "$command"
+        return 0
+    done < "$validators_file"
+
+    return 1
 }
 
 run_validator() {
@@ -45,6 +71,9 @@ run_validator() {
             test-script)
                 ./test.sh
                 ;;
+            declared:*)
+                bash -lc "${validator#declared:}"
+                ;;
             *)
                 printf "Unknown validator: %s\\n" "$validator" >&2
                 exit 2
@@ -63,6 +92,9 @@ validator_label() {
             ;;
         test-script)
             printf "./test.sh"
+            ;;
+        declared:*)
+            printf "%s" "${1#declared:}"
             ;;
         *)
             printf "%s" "$1"

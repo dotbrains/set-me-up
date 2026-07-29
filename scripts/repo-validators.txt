@@ -1,0 +1,3 @@
+# Repository validation commands for set-me-up child repositories
+# Format: local_path|command
+installer|scripts/validate.sh --all

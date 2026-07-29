@@ -18,6 +18,8 @@ belong in those child repositories; this file explains how to route it.
   destination paths, and categories.
 - `scripts/agent-routes.txt`: Machine-readable route map from goals and
   keywords to owning repository paths.
+- `scripts/repo-validators.txt`: Machine-readable validation command map for
+  child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
   order, manifest validation, and repository iteration.
 - `scripts/lib/repo-state.sh`: Shared Repository State module for missing,
@@ -112,6 +114,7 @@ update that nested reference.
 
 - Add or remove managed repos in `scripts/repos.txt`.
 - Add or change goal-to-repo routing in `scripts/agent-routes.txt`.
+- Add or change child repo validation commands in `scripts/repo-validators.txt`.
 - Change manifest parsing, category order, or manifest validation in
   `scripts/lib/repos.sh`.
 - Change repository cleanliness, detached-head, or origin-drift detection in
@@ -159,6 +162,18 @@ route_id|local_path|summary|keywords
 
 `local_path` must be `.` or a path listed in `scripts/repos.txt`. Keywords are
 comma-separated lowercase routing hints for agents and humans.
+
+## Repository Validator Rules
+
+Each non-comment line in `scripts/repo-validators.txt` uses:
+
+```text
+local_path|command
+```
+
+`local_path` must be a path listed in `scripts/repos.txt`. Commands run from
+inside that child repository. `scripts/validate-repos.sh` prefers declared
+commands before falling back to inferred validators.
 
 ## Shell Script Style
 
