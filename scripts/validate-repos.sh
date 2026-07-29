@@ -12,7 +12,7 @@ source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
 
 usage() {
-    printf "Usage: %s [--changed|--clean|--all|--list]\\n" "$0" >&2
+    printf "Usage: %s [--changed|--clean|--all|--list|--missing]\\n" "$0" >&2
 }
 
 run_validator() {
@@ -28,7 +28,7 @@ selected_repo() {
     local state="$1"
 
     case "$mode" in
-        --all|--list)
+        --all|--list|--missing)
             return 0
             ;;
         --clean)
@@ -72,6 +72,14 @@ validate_manifest_repo() {
         return 0
     fi
 
+    if [ "$mode" = "--missing" ]; then
+        if ! smu_validator_for_repo "$validators_file" "$path" >/dev/null; then
+            printf "%s\\t%s\\n" "$path" "$state"
+            ran=$((ran + 1))
+        fi
+        return 0
+    fi
+
     if [ "$state" = "dirty" ]; then
         printf "skip dirty: %s\\n" "$path"
         skipped=$((skipped + 1))
@@ -95,6 +103,14 @@ validate_manifest_repo() {
 ran=0
 skipped=0
 
+if [ "$mode" = "--missing" ]; then
+    printf "path\\tstate\\n"
+fi
+
 smu_each_repo "$repos_file" validate_manifest_repo
 
-printf "\\nValidated %s repo(s); skipped %s.\\n" "$ran" "$skipped"
+if [ "$mode" = "--missing" ]; then
+    printf "\\nMissing validators for %s repo(s).\\n" "$ran"
+else
+    printf "\\nValidated %s repo(s); skipped %s.\\n" "$ran" "$skipped"
+fi

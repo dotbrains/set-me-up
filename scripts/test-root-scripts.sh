@@ -315,6 +315,28 @@ test_validate_repos_lists_declared_validator() {
     assert_contains "$output" "clean: custom validate"
 }
 
+test_validate_repos_reports_missing_validators() {
+    local work_dir="$tmp_root/missing-validators"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/covered/.git" "$work_dir/uncovered/.git"
+    printf "covered|covered|top-level\\nuncovered|uncovered|top-level\\n" \
+        > "$work_dir/scripts/repos.txt"
+    printf "covered|custom validate\\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/validate-repos.sh --missing > "$output"
+    )
+
+    assert_contains "$output" "path"
+    assert_contains "$output" "uncovered"
+    assert_contains "$output" "Missing validators for 1 repo(s)."
+}
+
 test_route_lookup_finds_keyword_matches() {
     local work_dir="$tmp_root/route-lookup"
     local output="$work_dir/output.log"
@@ -442,6 +464,7 @@ test_repo_state_classifies_worktrees
 test_route_map_rejects_unknown_paths
 test_repo_validators_reject_unknown_paths
 test_validate_repos_lists_declared_validator
+test_validate_repos_reports_missing_validators
 test_route_lookup_finds_keyword_matches
 test_route_lookup_fails_without_matches
 test_route_lookup_covers_core_concepts
