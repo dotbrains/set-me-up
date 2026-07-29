@@ -21,6 +21,7 @@ validation commands share the same clean, dirty, missing, and detached checkout
 rules.
 Agent routing hints live in **`agent-routes.txt`** so agents can map goals to
 owning repository paths without relying only on prose docs.
+Use **`route.sh`** to query those routing hints.
 Declared child repository validators live in **`repo-validators.txt`**.
 
 ## repos.txt
@@ -80,6 +81,14 @@ route_id|local_path|summary|keywords
 - **keywords**: Comma-separated routing hints
 
 Root validation rejects route paths that are not listed in `repos.txt`.
+
+Query routes with:
+
+```bash
+scripts/route.sh theme
+scripts/route.sh prompt
+scripts/route.sh installer
+```
 
 ## repo-validators.txt
 

@@ -10,7 +10,7 @@ mode="${1:---all}"
 
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
-        scripts/test-root-scripts.sh scripts/validate-repos.sh \
+        scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
         scripts/lib/repos.sh scripts/lib/repo-state.sh
 }
 
@@ -18,7 +18,7 @@ shell_checks() {
     bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
-        scripts/lib/repos.sh scripts/lib/repo-state.sh
+        scripts/route.sh scripts/lib/repos.sh scripts/lib/repo-state.sh
 }
 
 markdown_checks() {
@@ -131,6 +131,7 @@ structure_checks() {
         scripts/SCRIPTS.md
         scripts/setup.sh
         scripts/update.sh
+        scripts/route.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -164,6 +165,10 @@ structure_checks() {
     }
     [ -x scripts/update.sh ] || {
         printf "scripts/update.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/route.sh ] || {
+        printf "scripts/route.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/test-root-scripts.sh ] || {

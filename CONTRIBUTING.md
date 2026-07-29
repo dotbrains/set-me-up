@@ -96,6 +96,7 @@ Ensure these files exist:
 - `scripts/repo-validators.txt`
 - `scripts/lib/repos.sh`
 - `scripts/lib/repo-state.sh`
+- `scripts/route.sh` (must be executable)
 - `scripts/setup.sh` (must be executable)
 - `scripts/update.sh` (must be executable)
 - `scripts/test-root-scripts.sh` (must be executable)

@@ -96,6 +96,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/SCRIPTS.md" "$target/scripts/"
     cp "$repo_root/scripts/setup.sh" "$target/scripts/"
     cp "$repo_root/scripts/update.sh" "$target/scripts/"
+    cp "$repo_root/scripts/route.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
@@ -312,6 +313,37 @@ test_validate_repos_lists_declared_validator() {
     assert_contains "$output" "clean: custom validate"
 }
 
+test_route_lookup_finds_keyword_matches() {
+    local work_dir="$tmp_root/route-lookup"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    (
+        cd "$work_dir"
+        bash scripts/route.sh theme > "$output"
+    )
+
+    assert_contains "$output" "modules-colorschemes"
+    assert_contains "$output" "modules/colorschemes"
+}
+
+test_route_lookup_fails_without_matches() {
+    local work_dir="$tmp_root/route-miss"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+
+    if (
+        cd "$work_dir"
+        bash scripts/route.sh no-such-route > "$output" 2>&1
+    ); then
+        fail "route.sh succeeded without a matching route"
+    fi
+
+    assert_contains "$output" "No routes matched"
+}
+
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
@@ -322,5 +354,7 @@ test_repo_state_classifies_worktrees
 test_route_map_rejects_unknown_paths
 test_repo_validators_reject_unknown_paths
 test_validate_repos_lists_declared_validator
+test_route_lookup_finds_keyword_matches
+test_route_lookup_fails_without_matches
 
 printf "Root script tests passed.\\n"

@@ -18,6 +18,7 @@ belong in those child repositories; this file explains how to route it.
   destination paths, and categories.
 - `scripts/agent-routes.txt`: Machine-readable route map from goals and
   keywords to owning repository paths.
+- `scripts/route.sh`: Query helper for `scripts/agent-routes.txt`.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
@@ -41,8 +42,8 @@ belong in those child repositories; this file explains how to route it.
 When the user asks for work on "set-me-up", start in this root repo and route
 the goal before editing:
 
-1. Read `scripts/agent-routes.txt` to map goal keywords to likely owning
-   repository paths.
+1. Run `scripts/route.sh <query>` or read `scripts/agent-routes.txt` to map
+   goal keywords to likely owning repository paths.
 2. Read `scripts/repos.txt` to confirm managed repositories and local paths.
 3. Map the goal to the most likely repo or repos using the routing guide below.
 4. Check whether those paths exist locally. If a required checkout is missing,
@@ -114,6 +115,7 @@ update that nested reference.
 
 - Add or remove managed repos in `scripts/repos.txt`.
 - Add or change goal-to-repo routing in `scripts/agent-routes.txt`.
+- Change route lookup behavior in `scripts/route.sh`.
 - Add or change child repo validation commands in `scripts/repo-validators.txt`.
 - Change manifest parsing, category order, or manifest validation in
   `scripts/lib/repos.sh`.
