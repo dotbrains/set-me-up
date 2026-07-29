@@ -35,7 +35,26 @@ trap 'rm -f "$tmp_file"' EXIT
     printf "scripts/generate-docs.sh\n"
     printf '```\n\n'
     printf "## Capabilities\n\n"
-    scripts/capabilities.sh | awk -F '\t' 'NR > 1 {
+    scripts/capabilities.sh --declared | awk -F '\t' '
+    function print_command(command,    remaining, chunk, cut) {
+        remaining = command
+        while (length(remaining) > 68) {
+            cut = 68
+            while (cut > 1 && substr(remaining, cut, 1) != " ") {
+                cut--
+            }
+            if (cut == 1) {
+                cut = 68
+            }
+            chunk = substr(remaining, 1, cut)
+            sub(/[[:space:]]+$/, "", chunk)
+            printf "  %s \\\n", chunk
+            remaining = substr(remaining, cut + 1)
+            sub(/^[[:space:]]+/, "", remaining)
+        }
+        printf "  %s\n", remaining
+    }
+    NR > 1 {
         printf "### %s\n\n", $1
         printf "- URL: <https://github.com/dotbrains/%s>\n", $1
         printf "- Path: `%s`\n", $2
@@ -45,7 +64,7 @@ trap 'rm -f "$tmp_file"' EXIT
         printf "- Keywords: `%s`\n", $6
         printf "- Validator:\n\n"
         printf "  ```bash\n"
-        printf "  %s\n", $7
+        print_command($7)
         printf "  ```\n"
         if (NR < 29) {
             printf "\n"

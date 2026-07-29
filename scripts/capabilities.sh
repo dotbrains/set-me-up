@@ -6,20 +6,40 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repos_file="$repo_root/scripts/repos.txt"
 routes_file="$repo_root/scripts/agent-routes.txt"
 validators_file="$repo_root/scripts/repo-validators.txt"
-query="${1:-}"
+declared_only=0
+query=""
 
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
 
 usage() {
-    printf "Usage: %s [query]\\n" "$0" >&2
+    printf "Usage: %s [--declared] [query]\\n" "$0" >&2
 }
 
-[ "$#" -le 1 ] || {
-    usage
-    exit 2
-}
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --declared)
+            declared_only=1
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -*)
+            usage
+            exit 2
+            ;;
+        *)
+            [ -z "$query" ] || {
+                usage
+                exit 2
+            }
+            query="$1"
+            ;;
+    esac
+    shift
+done
 
 matches_query() {
     local haystack="$1"
@@ -47,7 +67,13 @@ while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
     fi
     validator="none"
     resolved=""
-    if resolved="$(smu_validator_for_repo "$validators_file" "$path")"; then
+    if [ "$declared_only" -eq 1 ] && \
+        resolved="$(smu_declared_validator_for_repo "$validators_file" "$path")"
+    then
+        validator="$(smu_validator_label "$resolved")"
+    elif [ "$declared_only" -eq 0 ] && \
+        resolved="$(smu_validator_for_repo "$validators_file" "$path")"
+    then
         validator="$(smu_validator_label "$resolved")"
     fi
     haystack="$repo $path $category $route_id $summary $keywords $validator"

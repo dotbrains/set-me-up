@@ -63,7 +63,8 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  shellcheck scripts/run-scenario.sh scripts/in-container-run.sh \
+  scripts/lib/assertions.sh
   ```
 
 ### utilities
@@ -77,7 +78,7 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  ./tests/main.sh && ./tests/integration_test.sh
   ```
 
 ### colorscheme-module
@@ -91,7 +92,8 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  ./tests/main.sh && python3 scripts/theme_contract.py --local && \
+  python3 scripts/generate-theme-adapters.py --check
   ```
 
 ### set-me-up-debian-modules
@@ -105,7 +107,7 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
   ```
 
 ### set-me-up-macos-modules
@@ -119,7 +121,7 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
   ```
 
 ### macports-module
@@ -147,7 +149,8 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  ./tests/main.sh && find macos arch debian universal -type f -name \
+  '*.sh' -exec bash -n {} +
   ```
 
 ### template-module
@@ -161,7 +164,8 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  find . -type f \( -name '*.sh' -o -name '*.bash' \) -not -path \
+  '*/.*' -exec bash -n {} +
   ```
 
 ### set-me-up-universal-modules
@@ -175,7 +179,7 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
   ```
 
 ### xcode-module
@@ -273,7 +277,8 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  find . -type f -name '*.fish' -not -path '*/.git/*' -exec fish \
+  --no-execute {} +
   ```
 
 ### gh-dash
@@ -315,7 +320,7 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  make test
   ```
 
 ### opencode
@@ -329,7 +334,7 @@ scripts/generate-docs.sh
 - Validator:
 
   ```bash
-  scripts/validate.sh --all
+  jq empty opencode.json opencode-swarm.json tui.json
   ```
 
 ### pi
