@@ -5,11 +5,8 @@ set -euo pipefail
 # Constants
 readonly GITHUB_ORG="https://github.com/dotbrains"
 readonly REPO_NAME="set-me-up"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly SCRIPT_DIR
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-readonly REPO_ROOT
-readonly REPOS_FILE="$SCRIPT_DIR/repos.txt"
+REPO_ROOT=""
+REPOS_FILE=""
 
 # Check if git is installed
 if ! command -v git &> /dev/null; then
@@ -20,6 +17,16 @@ fi
 echo ""
 echo "🚀 Setting up set-me-up directory structure..."
 echo ""
+
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    script_repo_root="$(cd "$script_dir/.." && pwd)"
+
+    if [ -f "$script_repo_root/README.md" ] && \
+       git -C "$script_repo_root" rev-parse --git-dir &> /dev/null; then
+        cd "$script_repo_root"
+    fi
+fi
 
 # Ensure we're in the set-me-up root directory
 ensure_setup_root() {
@@ -39,8 +46,9 @@ ensure_setup_root() {
     cd "$REPO_NAME"
 }
 
-cd "$REPO_ROOT"
 ensure_setup_root
+REPO_ROOT="$(pwd)"
+REPOS_FILE="$REPO_ROOT/scripts/repos.txt"
 echo "📂 Working in: $(pwd)"
 echo ""
 
