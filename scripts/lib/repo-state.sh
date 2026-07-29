@@ -34,6 +34,42 @@ smu_repo_is_ahead_or_behind_origin() {
         "$(git -C "$path" rev-parse "origin/$branch")" ]
 }
 
+smu_repo_sync_counts() {
+    local path="$1"
+    local branch
+
+    branch="$(smu_repo_branch "$path")"
+    [ -n "$branch" ] || return 1
+
+    git -C "$path" rev-parse --verify "origin/$branch" >/dev/null 2>&1 || \
+        return 1
+    git -C "$path" rev-list --left-right --count "HEAD...origin/$branch"
+}
+
+smu_repo_sync_status() {
+    local path="$1"
+    local counts
+    local ahead
+    local behind
+
+    counts="$(smu_repo_sync_counts "$path")" || {
+        printf "unknown"
+        return 0
+    }
+    ahead="${counts%%[[:space:]]*}"
+    behind="${counts##*[[:space:]]}"
+
+    if [ "$ahead" -gt 0 ] && [ "$behind" -gt 0 ]; then
+        printf "diverged:%s:%s" "$ahead" "$behind"
+    elif [ "$ahead" -gt 0 ]; then
+        printf "ahead:%s" "$ahead"
+    elif [ "$behind" -gt 0 ]; then
+        printf "behind:%s" "$behind"
+    else
+        printf "synced"
+    fi
+}
+
 smu_repo_state() {
     local path="$1"
 

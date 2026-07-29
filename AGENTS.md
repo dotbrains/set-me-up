@@ -20,7 +20,7 @@ belong in those child repositories; this file explains how to route it.
   keywords to owning repository paths.
 - `scripts/route.sh`: Query helper for `scripts/agent-routes.txt`.
 - `scripts/doctor.sh`: Read-only health report for managed repo state, route
-  coverage, and validator coverage.
+  coverage, validator coverage, and origin sync state.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
@@ -49,6 +49,8 @@ the goal before editing:
 2. Read `scripts/repos.txt` to confirm managed repositories and local paths.
 3. Map the goal to the most likely repo or repos using the routing guide below.
 4. Run `scripts/doctor.sh --summary` when you need a quick health overview.
+   Use `scripts/doctor.sh --verbose` when ahead, behind, or diverged checkout
+   state matters for the requested work.
 5. Check whether those paths exist locally. If a required checkout is missing,
    run `./scripts/setup.sh` or clone only the needed repo, depending on scope.
 6. Enter each target repo and read its local `AGENTS.md`, `CLAUDE.md`,
@@ -121,6 +123,9 @@ update that nested reference.
 - Change route lookup behavior in `scripts/route.sh`.
 - Change repo health reporting in `scripts/doctor.sh`.
 - Add or change child repo validation commands in `scripts/repo-validators.txt`.
+  Prefer adding `scripts/validate.sh --all` inside the child repo first; use a
+  root manifest command only when the child repo cannot safely own the
+  validation contract yet.
 - Change manifest parsing, category order, or manifest validation in
   `scripts/lib/repos.sh`.
 - Change repository cleanliness, detached-head, or origin-drift detection in
@@ -180,8 +185,23 @@ local_path|command
 ```
 
 `local_path` must be a path listed in `scripts/repos.txt`. Commands run from
-inside that child repository. `scripts/validate-repos.sh` prefers declared
-commands before falling back to inferred validators.
+inside that child repository. `scripts/validate-repos.sh` prefers native child
+repo validators before falling back to declared commands.
+
+Prefer a native child repo contract:
+
+```bash
+scripts/validate.sh --all
+```
+
+Root `scripts/validate-repos.sh` infers this command automatically when it
+exists and is executable, and it takes precedence over a root-declared command.
+Declared root validators are for transitional cases, third-party constraints,
+or repos whose local history cannot currently be changed safely.
+
+The current `home/pi` checkout is intentionally protected by a root fallback
+validator because its local branch diverged from a force-updated remote. Do not
+rewrite, reset, or force-push that checkout without an explicit user decision.
 
 ## Shell Script Style
 
@@ -201,11 +221,18 @@ Run the narrowest relevant checks before finishing:
 scripts/validate.sh --all
 ```
 
+To enforce route and validator coverage without running every child repo test:
+
+```bash
+scripts/validate.sh --coverage
+```
+
 For routed multi-repo work, list or run child repo validators from the root:
 
 ```bash
 scripts/validate-repos.sh --list
 scripts/validate-repos.sh --changed
+scripts/validate-repos.sh --missing
 ```
 
 `scripts/validate-repos.sh` skips dirty repositories so it cannot hide or

@@ -1,15 +1,30 @@
 # Repository validation commands for set-me-up child repositories
 # Format: local_path|command
+blueprint|scripts/validate.sh --all
+docs|scripts/validate.sh --all
 installer|scripts/validate.sh --all
 tests|shellcheck scripts/run-scenario.sh scripts/in-container-run.sh scripts/lib/assertions.sh
 utilities|./tests/main.sh && ./tests/integration_test.sh
 modules/colorschemes|./tests/main.sh && python3 scripts/theme_contract.py --local && python3 scripts/generate-theme-adapters.py --check
 modules/debian|find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
 modules/macos|find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
+modules/macports|scripts/validate.sh --all
 modules/preferences|./tests/main.sh && find macos arch debian universal -type f -name '*.sh' -exec bash -n {} +
 modules/template-module|find . -type f \( -name '*.sh' -o -name '*.bash' \) -not -path '*/.*' -exec bash -n {} +
 modules/universal|find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
+modules/xcode|scripts/validate.sh --all
+shared/ai-config|scripts/validate.sh --all
+home/.config/alacritty|scripts/validate.sh --all
+home/.config/bash|scripts/validate.sh --all
+home/claude|scripts/validate.sh --all
+home/codex|scripts/validate.sh --all
 home/.config/fish|find . -type f -name '*.fish' -not -path '*/.git/*' -exec fish --no-execute {} +
+home/.config/gh-dash|scripts/validate.sh --all
+home/.config/nushell|scripts/validate.sh --all
 home/.config/nvim|make test
 home/.config/opencode|jq empty opencode.json opencode-swarm.json tui.json
 home/pi|find . -maxdepth 3 -type f -name '*.json' -not -path '*/.git/*' -exec jq empty {} + && find . -maxdepth 3 -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
+home/.config/television|scripts/validate.sh --all
+home/.config/tmux|scripts/validate.sh --all
+home/.config/zed|scripts/validate.sh --all
+home/.config/zsh|scripts/validate.sh --all

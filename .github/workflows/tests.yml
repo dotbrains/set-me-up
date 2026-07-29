@@ -33,6 +33,9 @@ jobs:
       - name: Verify file structure
         run: scripts/validate.sh --structure
 
+      - name: Verify route and validator coverage
+        run: scripts/validate.sh --coverage
+
       - name: Generate test report
         if: always()
         run: |

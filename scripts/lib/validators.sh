@@ -28,14 +28,12 @@ smu_validator_for_repo() {
     local path="$2"
     local declared
 
-    if declared="$(smu_declared_validator_for_repo "$validators_file" "$path")"
+    if [ -x "$path/scripts/validate.sh" ]; then
+        printf "root-validator"
+    elif declared="$(smu_declared_validator_for_repo "$validators_file" "$path")"
     then
         printf "%s" "$declared"
         return 0
-    fi
-
-    if [ -x "$path/scripts/validate.sh" ]; then
-        printf "root-validator"
     elif [ -f "$path/package.json" ]; then
         printf "npm-test"
     elif [ -x "$path/test.sh" ]; then

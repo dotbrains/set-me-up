@@ -23,8 +23,8 @@ Agent routing hints live in **`agent-routes.txt`** so agents can map goals to
 owning repository paths without relying only on prose docs.
 Use **`route.sh`** to query those routing hints.
 Declared child repository validators live in **`repo-validators.txt`**.
-Use **`doctor.sh`** to summarize managed repo health, validator coverage, and
-route coverage.
+Use **`doctor.sh`** to summarize managed repo health, validator coverage, route
+coverage, and origin sync state.
 
 ## repos.txt
 
@@ -97,12 +97,24 @@ scripts/route.sh installer
 ## doctor.sh
 
 The `doctor.sh` command is read-only. It reports checkout state, route
-coverage, and validator coverage across managed repositories.
+coverage, validator coverage, and origin sync state across managed
+repositories.
 
 ```bash
 scripts/doctor.sh
 scripts/doctor.sh --verbose
 ```
+
+Summary output includes:
+
+- repository state counts (`clean`, `dirty`, `changed`, `detached`, and
+  missing/not-git states)
+- validator coverage
+- route coverage and route drift
+- sync state counts (`synced`, `ahead`, `behind`, `diverged`, and `unknown`)
+
+Verbose output adds per-repository sync status such as `ahead:1`,
+`behind:2`, or `diverged:21:7`.
 
 ## repo-validators.txt
 
@@ -113,9 +125,17 @@ repositories. Each line follows the format:
 local_path|command
 ```
 
-`validate-repos.sh` runs declared commands from inside the matching child
-repository before using inferred fallbacks such as `scripts/validate.sh --all`,
-`npm test`, or `./test.sh`.
+`validate-repos.sh` first uses a child repository's executable
+`scripts/validate.sh`, then falls back to declared commands, `npm test`, or
+`./test.sh`.
+
+Prefer adding an executable `scripts/validate.sh` to the child repository so
+validation lives with the repo that owns the behavior. Use
+`repo-validators.txt` for transitional repositories or local checkouts that
+cannot safely receive a native validator yet.
+
+`scripts/validate.sh --coverage` fails when route coverage drifts or validator
+coverage drops below every managed repository.
 
 ## setup.sh
 

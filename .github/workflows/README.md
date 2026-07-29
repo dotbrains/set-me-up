@@ -37,6 +37,7 @@ Runs comprehensive tests on both Ubuntu and macOS environments.
   - Validates file structure and required manifest entries
   - Verifies .gitignore entries
   - Validates README.md structure
+  - Enforces route and child-repo validator coverage
 
 ## Running Locally
 
@@ -64,6 +65,9 @@ scripts/validate.sh --bash
 
 # Test root setup and update behavior with mocked Git operations
 scripts/validate.sh --test
+
+# Enforce route and validator coverage
+scripts/validate.sh --coverage
 ```
 
 The root script behavior is covered in CI with a mocked `git` command so tests

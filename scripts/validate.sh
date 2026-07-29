@@ -127,6 +127,43 @@ repo_validator_checks() {
     done < scripts/repo-validators.txt
 }
 
+coverage_checks() {
+    local doctor_output
+    local missing_validators
+
+    doctor_output="$(scripts/doctor.sh --summary)"
+    printf "%s\\n" "$doctor_output"
+
+    case "$doctor_output" in
+        *"validators: present="*" missing=0"*)
+            ;;
+        *)
+            printf "Validator coverage is incomplete.\\n" >&2
+            return 1
+            ;;
+    esac
+
+    case "$doctor_output" in
+        *"routes: present="*" missing=0 drift=0"*)
+            ;;
+        *)
+            printf "Route coverage is incomplete or drifting.\\n" >&2
+            return 1
+            ;;
+    esac
+
+    missing_validators="$(scripts/validate-repos.sh --missing)"
+    printf "%s\\n" "$missing_validators"
+    case "$missing_validators" in
+        *"Missing validators for 0 repo(s)."*)
+            ;;
+        *)
+            printf "Missing repository validators remain.\\n" >&2
+            return 1
+            ;;
+    esac
+}
+
 structure_checks() {
     local required_files=(
         README.md
@@ -221,6 +258,9 @@ case "$mode" in
     --structure)
         structure_checks
         ;;
+    --coverage)
+        coverage_checks
+        ;;
     --test)
         test_checks
         ;;
@@ -228,10 +268,11 @@ case "$mode" in
         shell_checks
         markdown_checks
         structure_checks
+        coverage_checks
         test_checks
         ;;
     *)
-        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--test]\\n" "$0" >&2
+        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--coverage|--test]\\n" "$0" >&2
         exit 2
         ;;
 esac

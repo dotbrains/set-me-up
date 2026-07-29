@@ -90,6 +90,26 @@ count_state() {
     esac
 }
 
+count_sync() {
+    case "$1" in
+        synced)
+            synced=$((synced + 1))
+            ;;
+        ahead:*)
+            ahead=$((ahead + 1))
+            ;;
+        behind:*)
+            behind=$((behind + 1))
+            ;;
+        diverged:*)
+            diverged=$((diverged + 1))
+            ;;
+        unknown)
+            unknown_sync=$((unknown_sync + 1))
+            ;;
+    esac
+}
+
 inspect_repo() {
     local repo="$1"
     local path="$2"
@@ -98,11 +118,17 @@ inspect_repo() {
     local validator
     local validator_label="none"
     local route_status="missing-route"
+    local sync_status="unknown"
 
     : "$repo" "$category"
     total=$((total + 1))
     state="$(smu_repo_state "$path")"
     count_state "$state"
+    if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
+        [ "$state" != "detached" ]; then
+        sync_status="$(smu_repo_sync_status "$path")"
+    fi
+    count_sync "$sync_status"
 
     if smu_validator_for_repo "$validators_file" "$path" >/dev/null; then
         validator="$(smu_validator_for_repo "$validators_file" "$path")"
@@ -120,8 +146,8 @@ inspect_repo() {
     fi
 
     if [ "$mode" = "--verbose" ]; then
-        printf "%s\\t%s\\t%s\\t%s\\n" \
-            "$path" "$state" "$validator_label" "$route_status"
+        printf "%s\\t%s\\t%s\\t%s\\t%s\\n" \
+            "$path" "$state" "$sync_status" "$validator_label" "$route_status"
     fi
 }
 
@@ -157,9 +183,14 @@ no_validator=0
 routed=0
 unrouted=0
 route_drift=0
+synced=0
+ahead=0
+behind=0
+diverged=0
+unknown_sync=0
 
 if [ "$mode" = "--verbose" ]; then
-    printf "path\\tstate\\tvalidator\\troute\\n"
+    printf "path\\tstate\\tsync\\tvalidator\\troute\\n"
 fi
 
 smu_each_repo "$repos_file" inspect_repo
@@ -171,3 +202,5 @@ printf "repos: total=%s clean=%s changed=%s dirty=%s detached=%s missing=%s not-
 printf "validators: present=%s missing=%s\\n" "$has_validator" "$no_validator"
 printf "routes: present=%s missing=%s drift=%s\\n" \
     "$routed" "$unrouted" "$route_drift"
+printf "sync: synced=%s ahead=%s behind=%s diverged=%s unknown=%s\\n" \
+    "$synced" "$ahead" "$behind" "$diverged" "$unknown_sync"

@@ -8,6 +8,8 @@ on:
       - '**.sh'
       - '**.bash'
       - 'scripts/repos.txt'
+      - 'scripts/agent-routes.txt'
+      - 'scripts/repo-validators.txt'
       - '.github/workflows/lint.yml'
       - '.github/workflows/tests.yml'
   push:
@@ -19,6 +21,8 @@ on:
       - '**.sh'
       - '**.bash'
       - 'scripts/repos.txt'
+      - 'scripts/agent-routes.txt'
+      - 'scripts/repo-validators.txt'
       - '.github/workflows/lint.yml'
       - '.github/workflows/tests.yml'
 
