@@ -15,7 +15,7 @@ For information about the setup and update scripts, see [scripts/SCRIPTS.md](scr
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and how to run
-lint checks locally.
+validation locally.
 
 ## Quick Setup
 

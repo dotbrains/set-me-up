@@ -25,15 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Test bash syntax for scripts
-        run: |
-          echo "Testing bash syntax..."
-          if bash -n scripts/setup.sh && bash -n scripts/update.sh; then
-            echo "✓ Valid syntax: scripts/setup.sh"
-            echo "✓ Valid syntax: scripts/update.sh"
-          else
-            echo "✗ Syntax error in scripts"
-            exit 1
-          fi
+        run: scripts/validate.sh --shell
 
       - name: Test scripts in dry-run mode
         run: |
@@ -106,52 +98,7 @@ jobs:
           fi
 
       - name: Verify file structure
-        run: |
-          echo "Checking repository structure..."
-          
-          # Check for essential files
-          [ -f "README.md" ] && echo "✓ README.md found" || { echo "✗ README.md not found"; exit 1; }
-          [ -f "scripts/setup.sh" ] && echo "✓ scripts/setup.sh found" || { echo "✗ scripts/setup.sh not found"; exit 1; }
-          [ -f "scripts/update.sh" ] && echo "✓ scripts/update.sh found" || { echo "✗ scripts/update.sh not found"; exit 1; }
-          [ -f "scripts/repos.txt" ] && echo "✓ scripts/repos.txt found" || { echo "✗ scripts/repos.txt not found"; exit 1; }
-          [ -f ".gitignore" ] && echo "✓ .gitignore found" || { echo "✗ .gitignore not found"; exit 1; }
-          [ -x "scripts/setup.sh" ] && echo "✓ scripts/setup.sh is executable" || { echo "✗ scripts/setup.sh is not executable"; exit 1; }
-          [ -x "scripts/update.sh" ] && echo "✓ scripts/update.sh is executable" || { echo "✗ scripts/update.sh is not executable"; exit 1; }
-
-      - name: Verify .gitignore entries
-        run: |
-          echo "Checking .gitignore configuration..."
-          
-          REQUIRED_IGNORES=("blueprint/" "docs/" "home/" "installer/" "modules/" "shared/" "tests/" "utilities/")
-          
-          for entry in "${REQUIRED_IGNORES[@]}"; do
-            if grep -Fxq "$entry" .gitignore; then
-              echo "✓ $entry is in .gitignore"
-            else
-              echo "✗ $entry is missing from .gitignore"
-              exit 1
-            fi
-          done
-
-      - name: Verify repos manifest entries
-        run: |
-          echo "Checking scripts/repos.txt entries..."
-
-          if grep -Fq "set-me-up-tests|tests|top-level" scripts/repos.txt; then
-            echo "✓ set-me-up-tests manifest entry exists"
-          else
-            echo "✗ set-me-up-tests manifest entry missing"
-            exit 1
-          fi
-
-      - name: Test README.md structure
-        run: |
-          echo "Validating README.md content..."
-          
-          # Check for key sections
-          grep -q "Quick Setup" README.md && echo "✓ Quick Setup section exists" || { echo "✗ Quick Setup section missing"; exit 1; }
-          grep -q "Directory Structure" README.md && echo "✓ Directory Structure section exists" || { echo "✗ Directory Structure section missing"; exit 1; }
-          grep -q "Repositories" README.md && echo "✓ Repositories section exists" || { echo "✗ Repositories section missing"; exit 1; }
+        run: scripts/validate.sh --structure
 
       - name: Generate test report
         if: always()

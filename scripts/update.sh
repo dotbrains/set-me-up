@@ -69,10 +69,10 @@ update_repo() {
     
     if [ $git_exit_code -ne 0 ]; then
         echo "     ❌ Error updating $path:"
-        echo "$git_output" | sed 's/^/        /'
+        printf "%s\n" "$git_output" | sed 's/^/        /'
         return 1
     fi
-    echo "$git_output" | sed 's/^/     /'
+    printf "%s\n" "$git_output" | sed 's/^/     /'
     
     # Update submodules if they exist
     if [ -f "$path/.gitmodules" ]; then
@@ -81,10 +81,10 @@ update_repo() {
         
         if [ $git_exit_code -ne 0 ]; then
             echo "     ❌ Error updating submodules in $path:"
-            echo "$git_output" | sed 's/^/        /'
+            printf "%s\n" "$git_output" | sed 's/^/        /'
             return 1
         fi
-        echo "$git_output" | sed 's/^/     /'
+        printf "%s\n" "$git_output" | sed 's/^/     /'
     fi
     
     echo "  ✨ Done: $path"

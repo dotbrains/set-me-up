@@ -32,24 +32,12 @@ sudo apt-get install shellcheck
 
 Before pushing changes, run these checks locally to catch issues early:
 
-### All Lint Checks
+### All Checks
 
-Run all linting checks at once:
+Run all root checks at once:
 
 ```bash
-# Markdown linting (installed globally)
-markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
-  "#installer" "#modules" "#utilities"
-
-# Or with npx (no installation needed)
-npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
-  "#installer" "#modules" "#utilities"
-
-# ShellCheck
-shellcheck scripts/setup.sh scripts/update.sh
-
-# Bash syntax check
-bash -n scripts/setup.sh scripts/update.sh
+scripts/validate.sh --all
 ```
 
 ### Individual Checks
@@ -57,13 +45,7 @@ bash -n scripts/setup.sh scripts/update.sh
 #### Markdown Linting
 
 ```bash
-# With global installation
-markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
-  "#installer" "#modules" "#utilities"
-
-# Or with npx (no installation needed)
-npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
-  "#installer" "#modules" "#utilities"
+scripts/validate.sh --markdown
 ```
 
 Glob patterns starting with `#` exclude those directories from linting,
@@ -79,7 +61,7 @@ Common markdown rules:
 #### ShellCheck
 
 ```bash
-shellcheck scripts/setup.sh scripts/update.sh
+scripts/validate.sh --shell
 ```
 
 This performs static analysis on shell scripts to catch common issues.
@@ -87,7 +69,7 @@ This performs static analysis on shell scripts to catch common issues.
 #### Bash Syntax
 
 ```bash
-bash -n scripts/setup.sh scripts/update.sh
+scripts/validate.sh --shell
 ```
 
 This checks for syntax errors without executing the script.
@@ -97,17 +79,7 @@ This checks for syntax errors without executing the script.
 ### Run Tests Locally
 
 ```bash
-# Test bash syntax
-bash -n scripts/setup.sh
-
-# Test git check
-command -v git &> /dev/null && echo "✓ Git installed" || echo "✗ Git missing"
-
-# Test idempotency (create test directory)
-TEST_DIR=$(mktemp -d)
-cd "$TEST_DIR"
-mkdir -p blueprint
-# Copy and run setup.sh to verify it skips existing directories
+scripts/validate.sh --structure
 ```
 
 ### File Structure Validation
@@ -143,21 +115,8 @@ cat > .git/hooks/pre-commit << 'EOF'
 echo "Running pre-commit checks..."
 
 # Markdown lint
-if ! markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
-    "#installer" "#modules" "#utilities"; then
-    echo "❌ Markdown linting failed"
-    exit 1
-fi
-
-# ShellCheck
-if ! shellcheck scripts/setup.sh scripts/update.sh; then
-    echo "❌ ShellCheck failed"
-    exit 1
-fi
-
-# Bash syntax
-if ! bash -n scripts/setup.sh scripts/update.sh; then
-    echo "❌ Bash syntax check failed"
+if ! scripts/validate.sh --all; then
+    echo "❌ Validation failed"
     exit 1
 fi
 

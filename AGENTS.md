@@ -139,10 +139,7 @@ first-party root source files under a managed `local_path`.
 Run the narrowest relevant checks before finishing:
 
 ```bash
-bash -n scripts/setup.sh scripts/update.sh
-shellcheck scripts/setup.sh scripts/update.sh
-npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" \
-  "#installer" "#modules" "#shared" "#tests" "#utilities"
+scripts/validate.sh --all
 ```
 
 If `shellcheck` or `npx` is unavailable, report that instead of silently

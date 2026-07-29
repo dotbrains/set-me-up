@@ -33,11 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Lint Markdown files
-        uses: DavidAnson/markdownlint-cli2-action@v14
-        with:
-          globs: |
-            **/*.md
-            !node_modules/**
+        run: npx markdownlint-cli2 "**/*.md" "#blueprint" "#docs" "#home" "#installer" "#modules" "#shared" "#tests" "#utilities"
 
   shellcheck:
     name: ShellCheck
@@ -49,13 +45,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
-        with:
-          scandir: '.'
-          severity: warning
-          ignore_paths: |
-            node_modules
-            .git
+        run: scripts/validate.sh --shell
 
   bash-syntax:
     name: Bash Syntax Check
@@ -67,9 +57,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check Bash syntax
-        run: |
-          # Check all .sh and .bash files for syntax errors
-          find . -type f \( -name "*.sh" -o -name "*.bash" \) -not -path "*/.*" | while read -r file; do
-            echo "Checking $file"
-            bash -n "$file" || exit 1
-          done
+        run: bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh
