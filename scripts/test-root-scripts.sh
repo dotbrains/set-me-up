@@ -97,6 +97,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/setup.sh" "$target/scripts/"
     cp "$repo_root/scripts/update.sh" "$target/scripts/"
     cp "$repo_root/scripts/route.sh" "$target/scripts/"
+    cp "$repo_root/scripts/doctor.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
@@ -105,6 +106,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/repo-validators.txt" "$target/scripts/"
     cp "$repo_root/scripts/lib/repos.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-state.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/validators.sh" "$target/scripts/lib/"
 }
 
 test_piped_setup_resolves_cloned_manifest() {
@@ -344,6 +346,61 @@ test_route_lookup_fails_without_matches() {
     assert_contains "$output" "No routes matched"
 }
 
+test_doctor_reports_repo_health_summary() {
+    local work_dir="$tmp_root/doctor-summary"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git" "$work_dir/dirty/.git"
+    touch "$work_dir/dirty/.dirty"
+    cat > "$work_dir/scripts/repos.txt" <<'EOF'
+clean|clean|top-level
+dirty|dirty|top-level
+missing|missing|top-level
+EOF
+    cat > "$work_dir/scripts/agent-routes.txt" <<'EOF'
+clean|clean|Clean repo|clean
+dirty|dirty|Dirty repo|dirty
+EOF
+    printf "clean|custom validate\\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/doctor.sh > "$output"
+    )
+
+    assert_contains "$output" "set-me-up doctor"
+    assert_contains "$output" "repos: total=3"
+    assert_contains "$output" "dirty=1"
+    assert_contains "$output" "missing=1"
+    assert_contains "$output" "validators: present=1 missing=2"
+    assert_contains "$output" "routes: present=2 missing=1"
+}
+
+test_doctor_verbose_reports_route_drift() {
+    local work_dir="$tmp_root/doctor-route-drift"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\\n" > "$work_dir/scripts/repos.txt"
+    printf "bad|missing|Broken route|missing\\n" \
+        > "$work_dir/scripts/agent-routes.txt"
+    : > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/doctor.sh --verbose > "$output"
+    )
+
+    assert_contains "$output" "route-drift"
+    assert_contains "$output" "routes: present=0 missing=1 drift=1"
+}
+
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
 test_setup_propagates_clone_failures
@@ -356,5 +413,7 @@ test_repo_validators_reject_unknown_paths
 test_validate_repos_lists_declared_validator
 test_route_lookup_finds_keyword_matches
 test_route_lookup_fails_without_matches
+test_doctor_reports_repo_health_summary
+test_doctor_verbose_reports_route_drift
 
 printf "Root script tests passed.\\n"

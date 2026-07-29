@@ -97,6 +97,7 @@ Ensure these files exist:
 - `scripts/lib/repos.sh`
 - `scripts/lib/repo-state.sh`
 - `scripts/route.sh` (must be executable)
+- `scripts/doctor.sh` (must be executable)
 - `scripts/setup.sh` (must be executable)
 - `scripts/update.sh` (must be executable)
 - `scripts/test-root-scripts.sh` (must be executable)
@@ -127,6 +128,13 @@ scripts/validate-repos.sh --changed
 
 The runner reads `scripts/repos.txt`, discovers each child repo's validator,
 and skips dirty repositories so unrelated work-in-progress stays untouched.
+
+Use the read-only health report for a quick overview:
+
+```bash
+scripts/doctor.sh --summary
+scripts/doctor.sh --verbose
+```
 
 ## Agent Route Map
 

@@ -23,6 +23,8 @@ Agent routing hints live in **`agent-routes.txt`** so agents can map goals to
 owning repository paths without relying only on prose docs.
 Use **`route.sh`** to query those routing hints.
 Declared child repository validators live in **`repo-validators.txt`**.
+Use **`doctor.sh`** to summarize managed repo health, validator coverage, and
+route coverage.
 
 ## repos.txt
 
@@ -88,6 +90,16 @@ Query routes with:
 scripts/route.sh theme
 scripts/route.sh prompt
 scripts/route.sh installer
+```
+
+## doctor.sh
+
+The `doctor.sh` command is read-only. It reports checkout state, route
+coverage, and validator coverage across managed repositories.
+
+```bash
+scripts/doctor.sh
+scripts/doctor.sh --verbose
 ```
 
 ## repo-validators.txt

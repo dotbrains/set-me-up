@@ -19,6 +19,8 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/agent-routes.txt`: Machine-readable route map from goals and
   keywords to owning repository paths.
 - `scripts/route.sh`: Query helper for `scripts/agent-routes.txt`.
+- `scripts/doctor.sh`: Read-only health report for managed repo state, route
+  coverage, and validator coverage.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
@@ -46,17 +48,18 @@ the goal before editing:
    goal keywords to likely owning repository paths.
 2. Read `scripts/repos.txt` to confirm managed repositories and local paths.
 3. Map the goal to the most likely repo or repos using the routing guide below.
-4. Check whether those paths exist locally. If a required checkout is missing,
+4. Run `scripts/doctor.sh --summary` when you need a quick health overview.
+5. Check whether those paths exist locally. If a required checkout is missing,
    run `./scripts/setup.sh` or clone only the needed repo, depending on scope.
-5. Enter each target repo and read its local `AGENTS.md`, `CLAUDE.md`,
+6. Enter each target repo and read its local `AGENTS.md`, `CLAUDE.md`,
    `README.md`, or contribution docs before making changes there.
-6. Make changes in the repo that owns the behavior. Cross-repo work is allowed
+7. Make changes in the repo that owns the behavior. Cross-repo work is allowed
    when the user goal spans multiple managed repos.
-7. Run validation from each changed repo, plus root validation when root files
+8. Run validation from each changed repo, plus root validation when root files
    changed.
    Use `scripts/validate-repos.sh --changed` from the root when multiple child
    repos may need validation.
-8. Report final status grouped by repository, including uncommitted changes and
+9. Report final status grouped by repository, including uncommitted changes and
    any checks that could not be run.
 
 Do not assume the root repo owns a file just because it is visible under this
@@ -116,6 +119,7 @@ update that nested reference.
 - Add or remove managed repos in `scripts/repos.txt`.
 - Add or change goal-to-repo routing in `scripts/agent-routes.txt`.
 - Change route lookup behavior in `scripts/route.sh`.
+- Change repo health reporting in `scripts/doctor.sh`.
 - Add or change child repo validation commands in `scripts/repo-validators.txt`.
 - Change manifest parsing, category order, or manifest validation in
   `scripts/lib/repos.sh`.

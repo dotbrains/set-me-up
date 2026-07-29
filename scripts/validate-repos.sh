@@ -9,48 +9,10 @@ mode="${1:---changed}"
 
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
+source "$repo_root/scripts/lib/validators.sh"
 
 usage() {
     printf "Usage: %s [--changed|--clean|--all|--list]\\n" "$0" >&2
-}
-
-validator_for_repo() {
-    local path="$1"
-    local declared
-
-    if declared="$(declared_validator_for_repo "$path")"; then
-        printf "%s" "$declared"
-        return 0
-    fi
-
-    if [ -x "$path/scripts/validate.sh" ]; then
-        printf "root-validator"
-    elif [ -f "$path/package.json" ]; then
-        printf "npm-test"
-    elif [ -x "$path/test.sh" ]; then
-        printf "test-script"
-    else
-        return 1
-    fi
-}
-
-declared_validator_for_repo() {
-    local wanted_path="$1"
-    local path
-    local command
-
-    [ -f "$validators_file" ] || return 1
-
-    while IFS='|' read -r path command extra || [ -n "$path" ]; do
-        [[ "$path" =~ ^[[:space:]]*# || -z "$path" ]] && continue
-        [ "$path" = "$wanted_path" ] || continue
-        [ -z "${extra:-}" ] || return 1
-        [ -n "$command" ] || return 1
-        printf "declared:%s" "$command"
-        return 0
-    done < "$validators_file"
-
-    return 1
 }
 
 run_validator() {
@@ -58,48 +20,8 @@ run_validator() {
     local validator="$2"
 
     printf "\\n== %s ==\\n" "$path"
-    printf "Running: %s\\n" "$(validator_label "$validator")"
-    (
-        cd "$repo_root/$path"
-        case "$validator" in
-            root-validator)
-                scripts/validate.sh --all
-                ;;
-            npm-test)
-                npm test
-                ;;
-            test-script)
-                ./test.sh
-                ;;
-            declared:*)
-                bash -lc "${validator#declared:}"
-                ;;
-            *)
-                printf "Unknown validator: %s\\n" "$validator" >&2
-                exit 2
-                ;;
-        esac
-    )
-}
-
-validator_label() {
-    case "$1" in
-        root-validator)
-            printf "scripts/validate.sh --all"
-            ;;
-        npm-test)
-            printf "npm test"
-            ;;
-        test-script)
-            printf "./test.sh"
-            ;;
-        declared:*)
-            printf "%s" "${1#declared:}"
-            ;;
-        *)
-            printf "%s" "$1"
-            ;;
-    esac
+    printf "Running: %s\\n" "$(smu_validator_label "$validator")"
+    smu_run_validator "$repo_root" "$path" "$validator"
 }
 
 selected_repo() {
@@ -156,14 +78,14 @@ validate_manifest_repo() {
         return 0
     fi
 
-    if ! validator="$(validator_for_repo "$path")"; then
+    if ! validator="$(smu_validator_for_repo "$validators_file" "$path")"; then
         printf "skip no validator: %s\\n" "$path"
         skipped=$((skipped + 1))
         return 0
     fi
 
     if [ "$mode" = "--list" ]; then
-        printf "%s: %s\\n" "$path" "$(validator_label "$validator")"
+        printf "%s: %s\\n" "$path" "$(smu_validator_label "$validator")"
     else
         run_validator "$path" "$validator"
     fi
