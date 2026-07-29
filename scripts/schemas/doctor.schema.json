@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "set-me-up doctor report",
+  "type": "object",
+  "required": ["repositories", "route_drift", "summary"],
+  "properties": {
+    "repositories": { "type": "array" },
+    "route_drift": { "type": "array" },
+    "summary": { "type": "object" }
+  },
+  "additionalProperties": false
+}

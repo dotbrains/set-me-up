@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "set-me-up CI workflow report",
+  "type": "object",
+  "required": ["repositories"],
+  "properties": {
+    "repositories": { "type": "array" }
+  },
+  "additionalProperties": false
+}

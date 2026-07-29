@@ -1,6 +1,7 @@
 # Ignore all cloned repository directories
 blueprint/
 docs/
+!scripts/docs/
 home/
 installer/
 modules/

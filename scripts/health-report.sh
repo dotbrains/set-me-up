@@ -12,18 +12,10 @@ source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/json.sh"
 
 usage() {
     printf "Usage: %s [--json]\\n" "$0" >&2
-}
-
-json_escape() {
-    local value="$1"
-
-    value="${value//\\/\\\\}"
-    value="${value//\"/\\\"}"
-    value="${value//$'\n'/\\n}"
-    printf "%s" "$value"
 }
 
 case "$mode" in
@@ -61,10 +53,10 @@ while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
         validator="$(smu_validator_label "$resolved")"
     fi
     printf '%s{"repo":"%s","path":"%s","category":"%s","state":"%s","sync":"%s","route":"%s","validator":"%s"}' \
-        "$comma" "$(json_escape "$repo")" "$(json_escape "$path")" \
-        "$(json_escape "$category")" "$(json_escape "$state")" \
-        "$(json_escape "$sync")" "$(json_escape "$route_id")" \
-        "$(json_escape "$validator")"
+        "$comma" "$(smu_json_escape "$repo")" "$(smu_json_escape "$path")" \
+        "$(smu_json_escape "$category")" "$(smu_json_escape "$state")" \
+        "$(smu_json_escape "$sync")" "$(smu_json_escape "$route_id")" \
+        "$(smu_json_escape "$validator")"
     comma=","
 done < "$repos_file"
 printf ']}\n'

@@ -20,8 +20,9 @@ bash_checks() {
         scripts/tree-smoke-test.sh scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
         scripts/tests/test-routes-doctor.sh \
-        scripts/lib/repos.sh scripts/lib/repo-state.sh scripts/lib/routes.sh \
-        scripts/lib/validators.sh
+        scripts/generate-command-docs.sh scripts/lib/repos.sh \
+        scripts/lib/repo-state.sh scripts/lib/routes.sh \
+        scripts/lib/validators.sh scripts/lib/json.sh
 }
 
 shell_checks() {
@@ -37,9 +38,9 @@ shell_checks() {
         scripts/change-report.sh scripts/tree-smoke-test.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
-        scripts/lib/repos.sh \
+        scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
-        scripts/lib/validators.sh
+        scripts/lib/validators.sh scripts/lib/json.sh
 }
 
 markdown_checks() {
@@ -188,6 +189,11 @@ coverage_checks() {
     scripts/native-workflow-template.sh --check >/dev/null
     scripts/route-quality.sh >/dev/null
     scripts/health-report.sh --json >/dev/null
+    scripts/doctor.sh --json >/dev/null
+    scripts/freshness-report.sh --json >/dev/null
+    scripts/change-report.sh --json >/dev/null
+    scripts/ci-workflow-report.sh --checked-out --json >/dev/null
+    scripts/native-workflow-template.sh --check --json >/dev/null
     scripts/tree-smoke-test.sh >/dev/null
 }
 
@@ -214,6 +220,7 @@ structure_checks() {
         scripts/add-repo.sh
         scripts/change-report.sh
         scripts/tree-smoke-test.sh
+        scripts/generate-command-docs.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
@@ -229,6 +236,13 @@ structure_checks() {
         scripts/validate-repos.sh
         scripts/schemas/health-report.schema.json
         scripts/schemas/health-report.example.json
+        scripts/schemas/doctor.schema.json
+        scripts/schemas/freshness-report.schema.json
+        scripts/schemas/change-report.schema.json
+        scripts/schemas/ci-workflow-report.schema.json
+        scripts/schemas/native-workflow-template.schema.json
+        scripts/docs/SCRIPTS-DETAILS.md
+        scripts/docs/COMMANDS.md
         .gitignore
     )
     local required_ignores=(
@@ -321,6 +335,10 @@ structure_checks() {
         printf "scripts/tree-smoke-test.sh must be executable\\n" >&2
         exit 1
     }
+    [ -x scripts/generate-command-docs.sh ] || {
+        printf "scripts/generate-command-docs.sh must be executable\\n" >&2
+        exit 1
+    }
     [ -x scripts/test-root-scripts.sh ] || {
         printf "scripts/test-root-scripts.sh must be executable\\n" >&2
         exit 1
@@ -346,6 +364,7 @@ structure_checks() {
     grep -q "Repositories" README.md
 
     scripts/generate-docs.sh --check
+    scripts/generate-command-docs.sh --check
 }
 
 test_checks() {

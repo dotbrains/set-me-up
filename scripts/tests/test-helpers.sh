@@ -95,7 +95,7 @@ EOF
 copy_root_scripts() {
     local target="$1"
 
-    mkdir -p "$target/scripts/lib" "$target/scripts/schemas"
+    mkdir -p "$target/scripts/lib" "$target/scripts/schemas" "$target/scripts/docs"
     cp "$repo_root/README.md" "$target/"
     cp "$repo_root/REPOSITORIES.md" "$target/"
     cp "$repo_root/.gitignore" "$target/"
@@ -118,6 +118,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/add-repo.sh" "$target/scripts/"
     cp "$repo_root/scripts/change-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/tree-smoke-test.sh" "$target/scripts/"
+    cp "$repo_root/scripts/generate-command-docs.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
@@ -129,6 +130,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/lib/repo-state.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/routes.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/validators.sh" "$target/scripts/lib/"
-    cp "$repo_root/scripts/schemas/health-report.schema.json" "$target/scripts/schemas/"
-    cp "$repo_root/scripts/schemas/health-report.example.json" "$target/scripts/schemas/"
+    cp "$repo_root/scripts/lib/json.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/schemas/"*.json "$target/scripts/schemas/"
+    cp "$repo_root/scripts/docs/"*.md "$target/scripts/docs/"
 }

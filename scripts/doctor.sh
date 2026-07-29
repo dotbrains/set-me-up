@@ -10,15 +10,16 @@ validators_file="$repo_root/scripts/repo-validators.txt"
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/json.sh"
 
 usage() {
-    printf "Usage: %s [--summary|--verbose]\\n" "$0" >&2
+    printf "Usage: %s [--summary|--verbose|--json]\\n" "$0" >&2
 }
 
 mode="${1:---summary}"
 
 case "$mode" in
-    --summary|--verbose)
+    --summary|--verbose|--json)
         ;;
     *)
         usage
@@ -148,6 +149,13 @@ inspect_repo() {
     if [ "$mode" = "--verbose" ]; then
         printf "%s\\t%s\\t%s\\t%s\\t%s\\n" \
             "$path" "$state" "$sync_status" "$validator_label" "$route_status"
+    elif [ "$mode" = "--json" ]; then
+        printf '%s{"repo":"%s","path":"%s","category":"%s","state":"%s","sync":"%s","validator":"%s","route":"%s"}' \
+            "$repo_comma" "$(smu_json_escape "$repo")" \
+            "$(smu_json_escape "$path")" "$(smu_json_escape "$category")" \
+            "$(smu_json_escape "$state")" "$(smu_json_escape "$sync_status")" \
+            "$(smu_json_escape "$validator_label")" "$(smu_json_escape "$route_status")"
+        repo_comma=","
     fi
 }
 
@@ -164,6 +172,12 @@ check_route_drift() {
             route_drift=$((route_drift + 1))
             [ "$mode" = "--verbose" ] && \
                 printf "route-drift\\t%s\\t%s\\n" "$route_id" "$path"
+            if [ "$mode" = "--json" ]; then
+                printf '%s{"route":"%s","path":"%s"}' \
+                    "$drift_comma" "$(smu_json_escape "$route_id")" \
+                    "$(smu_json_escape "$path")"
+                drift_comma=","
+            fi
         fi
     done < "$routes_file"
 }
@@ -188,19 +202,33 @@ ahead=0
 behind=0
 diverged=0
 unknown_sync=0
+repo_comma=""
+drift_comma=""
 
 if [ "$mode" = "--verbose" ]; then
     printf "path\\tstate\\tsync\\tvalidator\\troute\\n"
+elif [ "$mode" = "--json" ]; then
+    printf '{"repositories":['
 fi
 
 smu_each_repo "$repos_file" inspect_repo
+if [ "$mode" = "--json" ]; then
+    printf '],"route_drift":['
+fi
 check_route_drift
 
-printf "set-me-up doctor\\n"
-printf "repos: total=%s clean=%s changed=%s dirty=%s detached=%s missing=%s not-git=%s\\n" \
-    "$total" "$clean" "$changed" "$dirty" "$detached" "$missing" "$not_git"
-printf "validators: present=%s missing=%s\\n" "$has_validator" "$no_validator"
-printf "routes: present=%s missing=%s drift=%s\\n" \
-    "$routed" "$unrouted" "$route_drift"
-printf "sync: synced=%s ahead=%s behind=%s diverged=%s unknown=%s\\n" \
-    "$synced" "$ahead" "$behind" "$diverged" "$unknown_sync"
+if [ "$mode" = "--json" ]; then
+    printf '],"summary":{"repos":{"total":%s,"clean":%s,"changed":%s,"dirty":%s,"detached":%s,"missing":%s,"not_git":%s},"validators":{"present":%s,"missing":%s},"routes":{"present":%s,"missing":%s,"drift":%s},"sync":{"synced":%s,"ahead":%s,"behind":%s,"diverged":%s,"unknown":%s}}}\n' \
+        "$total" "$clean" "$changed" "$dirty" "$detached" "$missing" "$not_git" \
+        "$has_validator" "$no_validator" "$routed" "$unrouted" "$route_drift" \
+        "$synced" "$ahead" "$behind" "$diverged" "$unknown_sync"
+else
+    printf "set-me-up doctor\\n"
+    printf "repos: total=%s clean=%s changed=%s dirty=%s detached=%s missing=%s not-git=%s\\n" \
+        "$total" "$clean" "$changed" "$dirty" "$detached" "$missing" "$not_git"
+    printf "validators: present=%s missing=%s\\n" "$has_validator" "$no_validator"
+    printf "routes: present=%s missing=%s drift=%s\\n" \
+        "$routed" "$unrouted" "$route_drift"
+    printf "sync: synced=%s ahead=%s behind=%s diverged=%s unknown=%s\\n" \
+        "$synced" "$ahead" "$behind" "$diverged" "$unknown_sync"
+fi

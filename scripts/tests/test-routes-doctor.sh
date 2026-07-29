@@ -125,6 +125,28 @@ test_doctor_verbose_reports_route_drift() {
     assert_contains "$output" "routes: present=0 missing=1 drift=1"
 }
 
+test_doctor_json_reports_structured_summary() {
+    local work_dir="$tmp_root/doctor-json"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+    printf "clean|clean|Clean repo|clean\n" > "$work_dir/scripts/agent-routes.txt"
+    printf "clean|custom validate\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/doctor.sh --json > "$output"
+    )
+
+    assert_contains "$output" '"repositories":['
+    assert_contains "$output" '"summary":'
+    assert_contains "$output" '"total":1'
+}
+
 test_health_report_schema_docs_exist() {
     local work_dir="$tmp_root/health-schema"
     local output="$work_dir/output.json"
@@ -143,6 +165,8 @@ test_health_report_schema_docs_exist() {
     assert_contains "$output" '"repositories":['
     assert_file "$work_dir/scripts/schemas/health-report.schema.json"
     assert_file "$work_dir/scripts/schemas/health-report.example.json"
+    assert_file "$work_dir/scripts/schemas/doctor.schema.json"
+    assert_file "$work_dir/scripts/schemas/change-report.schema.json"
 }
 
 test_change_report_lists_recent_commits() {
@@ -169,6 +193,54 @@ test_change_report_lists_recent_commits() {
     assert_contains "$output" "test commit"
 }
 
+test_change_report_json_lists_recent_commits() {
+    local work_dir="$tmp_root/change-report-json"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean"
+    git -C "$work_dir/clean" init -q
+    git -C "$work_dir/clean" config user.name "Test User"
+    git -C "$work_dir/clean" config user.email "test@example.com"
+    printf "hello\n" > "$work_dir/clean/README.md"
+    git -C "$work_dir/clean" add README.md
+    git -C "$work_dir/clean" commit -q -m "test commit"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+
+    (
+        cd "$work_dir"
+        bash scripts/change-report.sh --since=1.day --json > "$output"
+    )
+
+    assert_contains "$output" '"commits":['
+    assert_contains "$output" '"path":"clean"'
+    assert_contains "$output" '"subject":"test commit"'
+}
+
+test_freshness_report_json_lists_repositories() {
+    local work_dir="$tmp_root/freshness-json"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean"
+    git -C "$work_dir/clean" init -q
+    git -C "$work_dir/clean" config user.name "Test User"
+    git -C "$work_dir/clean" config user.email "test@example.com"
+    printf "hello\n" > "$work_dir/clean/README.md"
+    git -C "$work_dir/clean" add README.md
+    git -C "$work_dir/clean" commit -q -m "test commit"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+
+    (
+        cd "$work_dir"
+        bash scripts/freshness-report.sh --json > "$output"
+    )
+
+    assert_contains "$output" '"repositories":['
+    assert_contains "$output" '"path":"clean"'
+    assert_contains "$output" '"state":"fresh"'
+}
+
 
 
 test_route_lookup_finds_keyword_matches
@@ -176,5 +248,8 @@ test_route_lookup_fails_without_matches
 test_route_lookup_covers_core_concepts
 test_doctor_reports_repo_health_summary
 test_doctor_verbose_reports_route_drift
+test_doctor_json_reports_structured_summary
 test_health_report_schema_docs_exist
 test_change_report_lists_recent_commits
+test_change_report_json_lists_recent_commits
+test_freshness_report_json_lists_repositories

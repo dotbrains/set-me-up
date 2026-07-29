@@ -18,12 +18,16 @@ cp scripts/*.sh scripts/*.txt scripts/SCRIPTS.md "$tmp_root/set-me-up/scripts/"
 cp scripts/lib/*.sh "$tmp_root/set-me-up/scripts/lib/"
 cp -R scripts/tests "$tmp_root/set-me-up/scripts/"
 cp -R scripts/schemas "$tmp_root/set-me-up/scripts/"
+cp -R scripts/docs "$tmp_root/set-me-up/scripts/"
 
 (
     cd "$tmp_root/set-me-up"
     bash scripts/validate.sh --bash
     bash scripts/validate.sh --structure
     bash scripts/health-report.sh --json >/dev/null
+    bash scripts/doctor.sh --json >/dev/null
+    bash scripts/freshness-report.sh --json >/dev/null
+    bash scripts/change-report.sh --json >/dev/null
     bash scripts/capabilities.sh >/dev/null
     bash scripts/change-report.sh --since=1.day >/dev/null
 )
