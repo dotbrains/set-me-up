@@ -15,6 +15,10 @@ directory structure. These scripts help manage these repositories:
 - **`check-repo-contract.sh`**: Contract check for one child repo
 - **`validator-exceptions.sh`**: Report child repos still using non-native
   validation
+- **`capabilities.sh`**: Tab-separated repo capability, route, and validator
+  index
+- **`ci-workflow-report.sh`**: Report child repo workflow presence
+- **`generate-docs.sh`**: Regenerate `REPOSITORIES.md` from manifests
 - **`test-root-scripts.sh`**: Regression testing root setup/update behavior
 
 The scripts read from a shared `repos.txt` file that defines all repositories.
@@ -149,6 +153,8 @@ the set-me-up contract:
 scripts/check-repo-contract.sh home/.config/zsh
 scripts/check-repo-contract.sh --json home/.config/zsh
 scripts/check-repo-contract.sh --allow-diverged home/.config/zsh
+scripts/check-repo-contract.sh --all
+scripts/check-repo-contract.sh --all --checked-out
 ```
 
 The command exits non-zero when any contract item fails.
@@ -164,6 +170,41 @@ Use it to prioritize the next native validator migration:
 
 ```bash
 scripts/validator-exceptions.sh
+scripts/validator-exceptions.sh --checked-out --strict
+```
+
+`--checked-out --strict` is used by root validation to enforce native
+validators for local child checkouts while preserving root-only CI fallback
+coverage.
+
+## capabilities.sh
+
+The `capabilities.sh` command joins `repos.txt`, `agent-routes.txt`, and
+`repo-validators.txt` into one tab-separated index for agents and scripts:
+
+```bash
+scripts/capabilities.sh
+scripts/capabilities.sh theme
+```
+
+## ci-workflow-report.sh
+
+The `ci-workflow-report.sh` command reports whether checked-out child
+repositories have GitHub Actions workflow files:
+
+```bash
+scripts/ci-workflow-report.sh --checked-out
+```
+
+Use `--strict` when missing workflow files should fail the command.
+
+## generate-docs.sh
+
+The `generate-docs.sh` command regenerates `REPOSITORIES.md` from the root
+manifests:
+
+```bash
+scripts/generate-docs.sh
 ```
 
 ## repo-validators.txt
@@ -342,6 +383,8 @@ repos:
 ```bash
 scripts/validate-repos.sh --list
 scripts/validate-repos.sh --changed
+scripts/capabilities.sh theme
+scripts/ci-workflow-report.sh --checked-out
 ```
 
 `validate-repos.sh` reads `repos.txt`, skips missing or dirty repositories, and

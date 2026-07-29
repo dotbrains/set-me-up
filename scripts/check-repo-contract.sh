@@ -8,6 +8,8 @@ routes_file="$repo_root/scripts/agent-routes.txt"
 validators_file="$repo_root/scripts/repo-validators.txt"
 output_json=0
 allow_diverged=0
+check_all=0
+checked_out_only=0
 path=""
 
 source "$repo_root/scripts/lib/repos.sh"
@@ -15,7 +17,7 @@ source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
 
 usage() {
-    printf "Usage: %s [--json] [--allow-diverged] <managed-local-path>\\n" "$0" >&2
+    printf "Usage: %s [--json] [--allow-diverged] [--checked-out] [--all|<managed-local-path>]\\n" "$0" >&2
 }
 
 manifest_has_path() {
@@ -100,6 +102,52 @@ print_json() {
     printf ']}\n'
 }
 
+reset_checks() {
+    failed=0
+    check_names=()
+    check_results=()
+}
+
+run_contract_checks() {
+    reset_checks
+    check "manifest path" manifest_has_path "$path"
+    check "route entry" route_exists_for_path "$path"
+    check "validator" has_validator
+    check "native validator" has_native_validator
+    check "README" has_readme
+    check "license" has_license
+    check "acceptable sync state" is_acceptable_sync_state
+
+    [ "$output_json" -eq 0 ] || print_json
+    return "$failed"
+}
+
+check_all_repos() {
+    local repo
+    local repo_path
+    local category
+    local total=0
+    local failed_repos=0
+
+    while IFS='|' read -r repo repo_path category _ || [ -n "$repo" ]; do
+        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
+        : "$category"
+        [ "$repo_path" != "." ] || continue
+        [ "$checked_out_only" -eq 0 ] || [ -d "$repo_path" ] || continue
+        path="$repo_path"
+        total=$((total + 1))
+        if [ "$output_json" -eq 0 ]; then
+            printf "== %s ==\\n" "$path"
+        fi
+        run_contract_checks || failed_repos=$((failed_repos + 1))
+    done < "$repos_file"
+
+    if [ "$output_json" -eq 0 ]; then
+        printf "contracts: total=%s failed=%s\\n" "$total" "$failed_repos"
+    fi
+    [ "$failed_repos" -eq 0 ]
+}
+
 has_validator() {
     smu_validator_for_repo "$validators_file" "$path" >/dev/null
 }
@@ -137,6 +185,12 @@ while [ "$#" -gt 0 ]; do
         --allow-diverged)
             allow_diverged=1
             ;;
+        --all)
+            check_all=1
+            ;;
+        --checked-out)
+            checked_out_only=1
+            ;;
         -h | --help)
             usage
             exit 0
@@ -156,24 +210,19 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-[ -n "$path" ] || {
-    usage
-    exit 2
-}
-
 cd "$repo_root"
 smu_validate_repos_manifest "$repos_file"
 
-failed=0
-check_names=()
-check_results=()
-check "manifest path" manifest_has_path "$path"
-check "route entry" route_exists_for_path "$path"
-check "validator" has_validator
-check "native validator" has_native_validator
-check "README" has_readme
-check "license" has_license
-check "acceptable sync state" is_acceptable_sync_state
-
-[ "$output_json" -eq 0 ] || print_json
-[ "$failed" -eq 0 ]
+if [ "$check_all" -eq 1 ]; then
+    [ -z "$path" ] || {
+        usage
+        exit 2
+    }
+    check_all_repos
+else
+    [ -n "$path" ] || {
+        usage
+        exit 2
+    }
+    run_contract_checks
+fi

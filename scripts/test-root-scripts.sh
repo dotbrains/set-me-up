@@ -92,6 +92,7 @@ copy_root_scripts() {
 
     mkdir -p "$target/scripts/lib"
     cp "$repo_root/README.md" "$target/"
+    cp "$repo_root/REPOSITORIES.md" "$target/"
     cp "$repo_root/.gitignore" "$target/"
     cp "$repo_root/scripts/SCRIPTS.md" "$target/scripts/"
     cp "$repo_root/scripts/setup.sh" "$target/scripts/"
@@ -101,6 +102,9 @@ copy_root_scripts() {
     cp "$repo_root/scripts/sync-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/check-repo-contract.sh" "$target/scripts/"
     cp "$repo_root/scripts/validator-exceptions.sh" "$target/scripts/"
+    cp "$repo_root/scripts/capabilities.sh" "$target/scripts/"
+    cp "$repo_root/scripts/ci-workflow-report.sh" "$target/scripts/"
+    cp "$repo_root/scripts/generate-docs.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-repos.sh" "$target/scripts/"
     cp "$repo_root/scripts/test-root-scripts.sh" "$target/scripts/"
@@ -109,6 +113,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/repo-validators.txt" "$target/scripts/"
     cp "$repo_root/scripts/lib/repos.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-state.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/routes.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/validators.sh" "$target/scripts/lib/"
 }
 

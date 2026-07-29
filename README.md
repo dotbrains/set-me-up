@@ -11,6 +11,8 @@ A comprehensive dotfiles and system configuration framework.
 For detailed information about how set-me-up works, see the [documentation](https://github.com/dotbrains/set-me-up-docs).
 
 For information about the setup and update scripts, see [scripts/SCRIPTS.md](scripts/SCRIPTS.md).
+For the generated repository, route, capability, and validator index, see
+[REPOSITORIES.md](REPOSITORIES.md).
 
 ## Contributing
 

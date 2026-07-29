@@ -75,7 +75,10 @@ scripts/sync-report.sh
 # Check one child repo contract
 scripts/check-repo-contract.sh home/.config/zsh
 scripts/check-repo-contract.sh --json home/.config/zsh
+scripts/check-repo-contract.sh --all
 scripts/validator-exceptions.sh
+scripts/capabilities.sh theme
+scripts/ci-workflow-report.sh --checked-out
 ```
 
 The root script behavior is covered in CI with a mocked `git` command so tests

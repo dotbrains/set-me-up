@@ -26,6 +26,13 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/check-repo-contract.sh`: Contract check for one managed child repo.
 - `scripts/validator-exceptions.sh`: Report child repos still using
   non-native validation.
+- `scripts/capabilities.sh`: Tab-separated repository capability index for
+  routing, keywords, and validators.
+- `scripts/ci-workflow-report.sh`: Report checked-out child repos without
+  GitHub Actions workflows.
+- `scripts/generate-docs.sh`: Regenerates `REPOSITORIES.md` from manifests.
+- `REPOSITORIES.md`: Generated repository, route, capability, and validator
+  index.
 - `scripts/repo-validators.txt`: Machine-readable validation command map for
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
@@ -242,8 +249,11 @@ scripts/validate-repos.sh --changed
 scripts/validate-repos.sh --missing
 scripts/sync-report.sh
 scripts/validator-exceptions.sh
+scripts/capabilities.sh theme
+scripts/ci-workflow-report.sh --checked-out
 scripts/check-repo-contract.sh home/.config/zsh
 scripts/check-repo-contract.sh --json home/.config/zsh
+scripts/check-repo-contract.sh --all
 ```
 
 `scripts/validate-repos.sh` skips dirty repositories so it cannot hide or

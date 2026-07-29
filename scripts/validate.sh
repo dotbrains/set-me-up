@@ -12,8 +12,10 @@ bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
         scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
-        scripts/validator-exceptions.sh scripts/lib/repos.sh \
-        scripts/lib/repo-state.sh scripts/lib/validators.sh
+        scripts/validator-exceptions.sh scripts/capabilities.sh \
+        scripts/ci-workflow-report.sh scripts/generate-docs.sh \
+        scripts/lib/repos.sh scripts/lib/repo-state.sh scripts/lib/routes.sh \
+        scripts/lib/validators.sh
 }
 
 shell_checks() {
@@ -22,7 +24,9 @@ shell_checks() {
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
         scripts/route.sh scripts/doctor.sh scripts/sync-report.sh \
         scripts/check-repo-contract.sh scripts/validator-exceptions.sh \
-        scripts/lib/repos.sh scripts/lib/repo-state.sh \
+        scripts/capabilities.sh scripts/ci-workflow-report.sh \
+        scripts/generate-docs.sh scripts/lib/repos.sh \
+        scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh
 }
 
@@ -165,11 +169,15 @@ coverage_checks() {
             return 1
             ;;
     esac
+
+    scripts/validator-exceptions.sh --checked-out --strict
+    scripts/check-repo-contract.sh --all --checked-out >/dev/null
 }
 
 structure_checks() {
     local required_files=(
         README.md
+        REPOSITORIES.md
         scripts/SCRIPTS.md
         scripts/setup.sh
         scripts/update.sh
@@ -178,11 +186,15 @@ structure_checks() {
         scripts/sync-report.sh
         scripts/check-repo-contract.sh
         scripts/validator-exceptions.sh
+        scripts/capabilities.sh
+        scripts/ci-workflow-report.sh
+        scripts/generate-docs.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/repo-validators.txt
         scripts/lib/repos.sh
         scripts/lib/repo-state.sh
+        scripts/lib/routes.sh
         scripts/lib/validators.sh
         scripts/test-root-scripts.sh
         scripts/validate-repos.sh
@@ -234,6 +246,18 @@ structure_checks() {
         printf "scripts/validator-exceptions.sh must be executable\\n" >&2
         exit 1
     }
+    [ -x scripts/capabilities.sh ] || {
+        printf "scripts/capabilities.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/ci-workflow-report.sh ] || {
+        printf "scripts/ci-workflow-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/generate-docs.sh ] || {
+        printf "scripts/generate-docs.sh must be executable\\n" >&2
+        exit 1
+    }
     [ -x scripts/test-root-scripts.sh ] || {
         printf "scripts/test-root-scripts.sh must be executable\\n" >&2
         exit 1
@@ -257,6 +281,8 @@ structure_checks() {
     grep -q "Quick Setup" README.md
     grep -q "Directory Structure" README.md
     grep -q "Repositories" README.md
+
+    scripts/generate-docs.sh --check
 }
 
 test_checks() {
