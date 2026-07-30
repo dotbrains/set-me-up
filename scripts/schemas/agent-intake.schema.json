@@ -19,6 +19,7 @@
           "role",
           "confidence",
           "score",
+          "risk",
           "source",
           "explanation",
           "repo",
@@ -29,7 +30,8 @@
           "sync",
           "validator",
           "docs",
-          "warnings"
+          "warnings",
+          "risks"
         ],
         "additionalProperties": false,
         "properties": {
@@ -37,6 +39,7 @@
           "role": { "type": "string", "enum": ["primary", "related"] },
           "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
           "score": { "type": "integer" },
+          "risk": { "type": "string", "enum": ["high", "medium", "low"] },
           "source": { "type": "string" },
           "explanation": { "type": "string" },
           "repo": { "type": "string" },
@@ -51,6 +54,10 @@
             "items": { "type": "string" }
           },
           "warnings": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "risks": {
             "type": "array",
             "items": { "type": "string" }
           }

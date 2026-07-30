@@ -1,0 +1,18 @@
+{
+  "query": "new repo",
+  "matchedIntents": ["add-managed-repo"],
+  "firstRepository": {
+    "path": ".",
+    "role": "primary",
+    "confidence": "medium",
+    "score": 40,
+    "source": "add-managed-repo"
+  },
+  "nextCommands": [
+    "scripts/validate-repos.sh --changed",
+    "scripts/new-repo-check.sh <path>",
+    "scripts/generate-docs.sh --check",
+    "scripts/validate.sh --structure",
+    "scripts/validate.sh --coverage"
+  ]
+}

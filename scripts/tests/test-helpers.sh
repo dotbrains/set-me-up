@@ -103,7 +103,8 @@ EOF
 copy_root_scripts() {
     local target="$1"
 
-    mkdir -p "$target/scripts/lib" "$target/scripts/schemas" "$target/scripts/docs"
+    mkdir -p "$target/scripts/lib" "$target/scripts/schemas" \
+        "$target/scripts/docs" "$target/scripts/tests/fixtures"
     cp "$repo_root/README.md" "$target/"
     cp "$repo_root/REPOSITORIES.md" "$target/"
     cp "$repo_root/.gitignore" "$target/"
@@ -142,6 +143,8 @@ copy_root_scripts() {
     cp "$repo_root/scripts/lib/routes.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/validators.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/json.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/agent-intake.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/schemas/"*.json "$target/scripts/schemas/"
     cp "$repo_root/scripts/docs/"*.md "$target/scripts/docs/"
+    cp -R "$repo_root/scripts/tests/fixtures/"* "$target/scripts/tests/fixtures/" 2>/dev/null || true
 }

@@ -5,7 +5,8 @@ set-me-up repository collection.
 
 Detailed setup, update, troubleshooting, and maintenance notes live in
 [SCRIPTS-DETAILS.md](docs/SCRIPTS-DETAILS.md). Generated command usage lives in
-[COMMANDS.md](docs/COMMANDS.md).
+[COMMANDS.md](docs/COMMANDS.md). Install/update release ordering lives in
+[INSTALL-UPDATE-RELEASE.md](docs/INSTALL-UPDATE-RELEASE.md).
 
 ## Overview
 
@@ -150,6 +151,8 @@ when no intent matches.
 ```bash
 scripts/agent-intake.sh theme
 scripts/agent-intake.sh --explain theme
+scripts/agent-intake.sh --plan theme
+scripts/agent-intake.sh --strict theme
 scripts/agent-intake.sh --json "change smu command"
 ```
 
@@ -157,13 +160,18 @@ Output includes:
 
 - primary and related repository paths
 - match confidence, numeric score, source, and explanation
+- risk level and risk flags for blocking checkout or contract states
 - matching route summaries
 - current checkout state and origin sync state
 - validator command for each repository
 - local docs an agent should read before editing, with missing-doc warnings
 - intent-specific next validation commands
 
-Use `--json` for machine-readable task intake.
+Use `--json` for machine-readable task intake. Use `--plan` for an ordered
+human-readable checklist. Use `--strict` when automation should fail on dirty,
+detached, missing, not-git, behind, diverged, or missing-validator selected
+repositories. Low-score matches are filtered unless they are the best available
+match.
 
 ## doctor.sh
 

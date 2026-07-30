@@ -1,0 +1,15 @@
+{
+  "query": "prompt",
+  "matchedIntents": ["add-prompt", "shell-config"],
+  "firstRepository": {
+    "path": "installer",
+    "role": "primary",
+    "confidence": "high",
+    "score": 200,
+    "source": "add-prompt"
+  },
+  "nextCommands": [
+    "scripts/validate-repos.sh --changed",
+    "scripts/validate.sh --coverage"
+  ]
+}

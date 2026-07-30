@@ -78,6 +78,9 @@ the goal before editing:
    task. It joins intent matches, route matches, checkout state, validators,
    docs to read, missing-doc warnings, match confidence, explanations, and next
    validation commands into one agent task plan.
+   Use `scripts/agent-intake.sh --plan <query>` when you need a human-readable
+   checklist and `scripts/agent-intake.sh --strict <query>` when blocking repo
+   risks should fail fast.
 3. Read `scripts/repos.txt` to confirm managed repositories and local paths.
 4. Map the goal to the most likely repo or repos using the routing guide below.
 5. Run `scripts/doctor.sh --summary` when you need a quick health overview.

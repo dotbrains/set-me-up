@@ -19,7 +19,7 @@ Usage: scripts/add-repo.sh <repo> <local-path> <category> <route-id> <summary> <
 ## scripts/agent-intake.sh
 
 ```text
-Usage: scripts/agent-intake.sh [--tsv|--json] [--explain] <query>
+Usage: scripts/agent-intake.sh [--tsv|--json|--plan] [--explain] [--strict] <query>
 ```
 
 ## scripts/capabilities.sh

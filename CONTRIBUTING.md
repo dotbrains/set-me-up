@@ -136,6 +136,10 @@ scripts/doctor.sh --summary
 scripts/doctor.sh --verbose
 ```
 
+When changing installer bootstrap or update behavior across `installer/`,
+`blueprint/`, and `tests/`, follow the release order in
+[scripts/docs/INSTALL-UPDATE-RELEASE.md](scripts/docs/INSTALL-UPDATE-RELEASE.md).
+
 ## Agent Route Map
 
 When adding a repository or changing ownership language, update

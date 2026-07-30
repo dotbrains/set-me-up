@@ -191,6 +191,50 @@ test_agent_intake_examples_keep_core_queries_stable() {
     )
 }
 
+test_agent_intake_fixtures_match_normalized_output() {
+    local work_dir="$tmp_root/agent-intake-fixtures"
+    local bin_dir="$work_dir/bin"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/modules/colorschemes/.git" \
+        "$work_dir/installer/.git"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" python3 - <<'PY'
+import json
+import subprocess
+from pathlib import Path
+
+fixtures = {
+    "theme": Path("scripts/tests/fixtures/agent-intake-theme.json"),
+    "prompt": Path("scripts/tests/fixtures/agent-intake-prompt.json"),
+    "new repo": Path("scripts/tests/fixtures/agent-intake-new-repo.json"),
+}
+
+for query, fixture_path in fixtures.items():
+    actual = json.loads(subprocess.check_output(
+        ["bash", "scripts/agent-intake.sh", "--json", query], text=True
+    ))
+    expected = json.loads(fixture_path.read_text())
+    normalized = {
+        "query": actual["query"],
+        "matchedIntents": actual["matchedIntents"],
+        "firstRepository": {
+            key: actual["repositories"][0][key]
+            for key in ["path", "role", "confidence", "score", "source"]
+        },
+        "nextCommands": actual["nextCommands"],
+    }
+    if normalized != expected:
+        raise SystemExit(
+            f"{fixture_path} mismatch\nexpected={expected}\nactual={normalized}"
+        )
+PY
+    )
+}
+
 test_doctor_reports_repo_health_summary() {
     local work_dir="$tmp_root/doctor-summary"
     local bin_dir="$work_dir/bin"
@@ -427,6 +471,7 @@ test_agent_intake_json_reports_structured_plan
 test_agent_intake_falls_back_to_routes
 test_agent_intake_explain_outputs_reasons
 test_agent_intake_examples_keep_core_queries_stable
+test_agent_intake_fixtures_match_normalized_output
 test_doctor_reports_repo_health_summary
 test_doctor_verbose_reports_route_drift
 test_doctor_json_reports_structured_summary

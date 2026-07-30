@@ -1,0 +1,15 @@
+{
+  "query": "theme",
+  "matchedIntents": ["add-theme", "shell-config", "editor-config"],
+  "firstRepository": {
+    "path": "modules/colorschemes",
+    "role": "primary",
+    "confidence": "high",
+    "score": 180,
+    "source": "add-theme"
+  },
+  "nextCommands": [
+    "scripts/validate-repos.sh --changed",
+    "scripts/validate.sh --coverage"
+  ]
+}

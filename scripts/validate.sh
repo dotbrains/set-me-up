@@ -23,7 +23,8 @@ bash_checks() {
         scripts/tests/test-routes-doctor.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
-        scripts/lib/validators.sh scripts/lib/json.sh
+        scripts/lib/validators.sh scripts/lib/json.sh \
+        scripts/lib/agent-intake.sh
 }
 
 shell_checks() {
@@ -42,7 +43,8 @@ shell_checks() {
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
-        scripts/lib/validators.sh scripts/lib/json.sh
+        scripts/lib/validators.sh scripts/lib/json.sh \
+        scripts/lib/agent-intake.sh
 }
 
 markdown_checks() {
@@ -298,6 +300,7 @@ structure_checks() {
         scripts/lib/repo-state.sh
         scripts/lib/routes.sh
         scripts/lib/validators.sh
+        scripts/lib/agent-intake.sh
         scripts/test-root-scripts.sh
         scripts/tests/test-helpers.sh
         scripts/tests/test-setup-update.sh
