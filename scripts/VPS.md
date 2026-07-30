@@ -28,10 +28,10 @@ sudo apt-get update
 sudo apt-get install -y bash curl git ca-certificates
 
 INSTALL_URL="https://raw.githubusercontent.com/<YOUR-USERNAME>/<YOUR-BLUEPRINT-REPO>/<BRANCH>/dotfiles/modules/install.sh"
-bash <(curl -s -L "$INSTALL_URL") --plan
-bash <(curl -s -L "$INSTALL_URL")
+SMU_SUBMODULE_SCOPE=platform bash <(curl -s -L "$INSTALL_URL") --plan
+SMU_SUBMODULE_SCOPE=platform bash <(curl -s -L "$INSTALL_URL")
 
-smu --provision --modules server/headless --no-base
+smu --setup-profile vps
 ```
 
 Use a forked/private blueprint for personal SSH, shell, and deployment
@@ -57,3 +57,21 @@ cd tests
 The `vps` scenario provisions the `server/headless` Debian module in an Ubuntu
 container so the DigitalOcean path stays covered without requiring a live
 Droplet.
+
+## Agent Examples
+
+When the user says "set this up on a DigitalOcean Droplet", route with:
+
+```bash
+scripts/agent-intake.sh --strict vps
+```
+
+Then check these repos first:
+
+- `installer/` for `smu --setup-profile vps` and platform submodule behavior.
+- `blueprint/` for bootstrap guidance and submodule composition.
+- `modules/debian/` for `server/headless` and optional server module slices.
+- `tests/` for the `vps` scenario, smoke checks, and scenario metadata.
+
+For a security-focused server follow-up, prefer a separate targeted module
+such as `server/security` over expanding the headless baseline.

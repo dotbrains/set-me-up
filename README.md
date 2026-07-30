@@ -59,9 +59,9 @@ Agents and maintainers can route VPS or DigitalOcean work through the
 scripts/agent-intake.sh --plan vps
 ```
 
-The supported headless path installs a blueprint, then provisions the
-Debian-only `server/headless` module instead of the workstation-oriented Debian
-module set.
+The supported headless path installs a blueprint with platform-scoped
+submodules, then runs `smu --setup-profile vps` instead of the
+workstation-oriented Debian module set.
 
 ## Updating Repositories
 
