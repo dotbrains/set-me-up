@@ -70,6 +70,70 @@ test_route_lookup_covers_core_concepts() {
     )
 }
 
+test_agent_intake_lists_intent_repositories() {
+    local work_dir="$tmp_root/agent-intake-theme"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/modules/colorschemes/.git" \
+        "$work_dir/installer/.git" "$work_dir/home/.config/alacritty/.git"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh theme > "$output"
+    )
+
+    assert_contains "$output" "path"
+    assert_contains "$output" "modules/colorschemes"
+    assert_contains "$output" "primary"
+    assert_contains "$output" "installer"
+    assert_contains "$output" "related"
+    assert_contains "$output" "scripts/validate-repos.sh --changed"
+}
+
+test_agent_intake_json_reports_structured_plan() {
+    local work_dir="$tmp_root/agent-intake-json"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/modules/colorschemes/.git" \
+        "$work_dir/installer/.git"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json theme > "$output"
+    )
+
+    assert_contains "$output" '"query":"theme"'
+    assert_contains "$output" '"matchedIntents":["add-theme"'
+    assert_contains "$output" '"repositories":['
+    assert_contains "$output" '"path":"modules/colorschemes"'
+    assert_contains "$output" '"role":"primary"'
+    assert_contains "$output" '"nextCommands":['
+}
+
+test_agent_intake_falls_back_to_routes() {
+    local work_dir="$tmp_root/agent-intake-route-fallback"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/modules/debian/.git"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh debian > "$output"
+    )
+
+    assert_contains "$output" "modules/debian"
+    assert_contains "$output" "primary"
+}
+
 test_doctor_reports_repo_health_summary() {
     local work_dir="$tmp_root/doctor-summary"
     local bin_dir="$work_dir/bin"
@@ -301,6 +365,9 @@ test_json_schema_validation_runs() {
 test_route_lookup_finds_keyword_matches
 test_route_lookup_fails_without_matches
 test_route_lookup_covers_core_concepts
+test_agent_intake_lists_intent_repositories
+test_agent_intake_json_reports_structured_plan
+test_agent_intake_falls_back_to_routes
 test_doctor_reports_repo_health_summary
 test_doctor_verbose_reports_route_drift
 test_doctor_json_reports_structured_summary

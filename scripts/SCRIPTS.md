@@ -15,6 +15,9 @@ directory structure. These scripts help manage these repositories:
 - **`setup.sh`**: Initial cloning of all repositories
 - **`update.sh`**: Updating existing repositories
 - **`validate-repos.sh`**: Running validators across clean child repositories
+- **`agent-intake.sh`**: Agent task intake that joins intents, routes, repo
+  state, validators, and next validation commands for a goal
+- **`agent-intents.txt`**: Intent map for common multi-repo agent tasks
 - **`sync-report.sh`**: Detailed sync and dirty-work report for child repos
 - **`check-repo-contract.sh`**: Contract check for one child repo
 - **`validator-exceptions.sh`**: Report child repos still using non-native
@@ -43,6 +46,10 @@ rules.
 Agent routing hints live in **`agent-routes.txt`** so agents can map goals to
 owning repository paths without relying only on prose docs.
 Use **`route.sh`** to query those routing hints.
+Agent task intents live in **`agent-intents.txt`** so agents can map common
+goals to primary and related repositories. Use **`agent-intake.sh`** first when
+starting a goal because it joins intents, routes, state, validators, and next
+commands into one task plan.
 Declared child repository validators live in **`repo-validators.txt`**.
 Use **`doctor.sh`** to summarize managed repo health, validator coverage, route
 coverage, and origin sync state.
@@ -114,6 +121,46 @@ scripts/route.sh theme
 scripts/route.sh prompt
 scripts/route.sh installer
 ```
+
+## agent-intents.txt
+
+The `agent-intents.txt` file maps common agent task types to the repositories
+usually involved in the change. Each line follows the format:
+
+```text
+intent_id|primary_paths|related_paths|summary|keywords
+```
+
+- **intent_id**: Stable kebab-case task intent name
+- **primary_paths**: Comma-separated primary repo paths
+- **related_paths**: Comma-separated related repo paths
+- **summary**: Short task description
+- **keywords**: Comma-separated matching hints
+
+Paths must be `.` or listed in `repos.txt`. Root validation rejects unknown
+intent paths.
+
+## agent-intake.sh
+
+The `agent-intake.sh` command is the preferred agent entry point for concrete
+work. It checks `agent-intents.txt` first, then falls back to `agent-routes.txt`
+when no intent matches.
+
+```bash
+scripts/agent-intake.sh theme
+scripts/agent-intake.sh --json "change smu command"
+```
+
+Output includes:
+
+- primary and related repository paths
+- matching route summaries
+- current checkout state and origin sync state
+- validator command for each repository
+- local docs an agent should read before editing
+- next root validation commands
+
+Use `--json` for machine-readable task intake.
 
 ## doctor.sh
 

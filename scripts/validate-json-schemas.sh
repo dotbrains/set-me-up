@@ -39,6 +39,7 @@ checks = [
     ("ci-workflow-report.schema.json", ["scripts/ci-workflow-report.sh", "--checked-out", "--json"]),
     ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"]),
     ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"]),
+    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"]),
     ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"]),
     ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"]),
 ]

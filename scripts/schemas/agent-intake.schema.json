@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "set-me-up agent intake report",
+  "type": "object",
+  "required": ["query", "matchedIntents", "repositories", "nextCommands"],
+  "additionalProperties": false,
+  "properties": {
+    "query": { "type": "string" },
+    "matchedIntents": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "role",
+          "repo",
+          "route",
+          "summary",
+          "keywords",
+          "state",
+          "sync",
+          "validator",
+          "docs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string" },
+          "role": { "type": "string", "enum": ["primary", "related"] },
+          "repo": { "type": "string" },
+          "route": { "type": "string" },
+          "summary": { "type": "string" },
+          "keywords": { "type": "string" },
+          "state": { "type": "string" },
+          "sync": { "type": "string" },
+          "validator": { "type": "string" },
+          "docs": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "nextCommands": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

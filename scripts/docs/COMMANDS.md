@@ -16,6 +16,12 @@ scripts/generate-command-docs.sh
 Usage: scripts/add-repo.sh <repo> <local-path> <category> <route-id> <summary> <keywords> [validator]
 ```
 
+## scripts/agent-intake.sh
+
+```text
+Usage: scripts/agent-intake.sh [--tsv|--json] <query>
+```
+
 ## scripts/capabilities.sh
 
 ```text

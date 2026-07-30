@@ -11,7 +11,7 @@ mode="${1:---all}"
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
-        scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
+        scripts/agent-intake.sh scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
         scripts/validator-exceptions.sh scripts/capabilities.sh \
         scripts/ci-workflow-report.sh scripts/generate-docs.sh \
         scripts/native-workflow-template.sh scripts/health-report.sh \
@@ -30,7 +30,7 @@ shell_checks() {
     bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
-        scripts/route.sh scripts/doctor.sh scripts/sync-report.sh \
+        scripts/route.sh scripts/agent-intake.sh scripts/doctor.sh scripts/sync-report.sh \
         scripts/check-repo-contract.sh scripts/validator-exceptions.sh \
         scripts/capabilities.sh scripts/ci-workflow-report.sh \
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
@@ -115,6 +115,57 @@ route_map_checks() {
     done < scripts/agent-routes.txt
 }
 
+intent_map_checks() {
+    local line_number=0
+    local intent_id
+    local primary_paths
+    local related_paths
+    local summary
+    local keywords
+    local extra
+    local seen_intents=" "
+    local path
+
+    while IFS='|' read -r intent_id primary_paths related_paths summary keywords extra || \
+        [ -n "$intent_id" ]; do
+        line_number=$((line_number + 1))
+
+        [[ "$intent_id" =~ ^[[:space:]]*# || -z "$intent_id" ]] && continue
+
+        if [ -n "${extra:-}" ] || [ -z "$primary_paths" ] || \
+            [ -z "$related_paths" ] || [ -z "$summary" ] || \
+            [ -z "$keywords" ]; then
+            printf "Invalid intent line %s: expected intent_id|primary_paths|related_paths|summary|keywords\\n" \
+                "$line_number" >&2
+            exit 1
+        fi
+
+        if [[ ! "$intent_id" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            printf "Invalid intent id on line %s: %s\\n" \
+                "$line_number" "$intent_id" >&2
+            exit 1
+        fi
+
+        if [[ "$seen_intents" == *" $intent_id "* ]]; then
+            printf "Duplicate intent id on line %s: %s\\n" \
+                "$line_number" "$intent_id" >&2
+            exit 1
+        fi
+
+        IFS=',' read -r -a paths <<< "$primary_paths,$related_paths"
+        for path in "${paths[@]}"; do
+            [ -n "$path" ] || continue
+            if ! manifest_has_path "$path"; then
+                printf "Intent path on line %s is not in scripts/repos.txt: %s\\n" \
+                    "$line_number" "$path" >&2
+                exit 1
+            fi
+        done
+
+        seen_intents+="$intent_id "
+    done < scripts/agent-intents.txt
+}
+
 repo_validator_checks() {
     local line_number=0
     local path
@@ -195,6 +246,7 @@ coverage_checks() {
     scripts/freshness-report.sh --json >/dev/null
     scripts/change-report.sh --json >/dev/null
     scripts/capabilities.sh --json >/dev/null
+    scripts/agent-intake.sh --json theme >/dev/null
     scripts/sync-report.sh --json >/dev/null
     scripts/update.sh --plan --json >/dev/null
     scripts/ci-workflow-report.sh --checked-out --json >/dev/null
@@ -211,6 +263,7 @@ structure_checks() {
         scripts/setup.sh
         scripts/update.sh
         scripts/route.sh
+        scripts/agent-intake.sh
         scripts/doctor.sh
         scripts/sync-report.sh
         scripts/check-repo-contract.sh
@@ -230,6 +283,7 @@ structure_checks() {
         scripts/validate-json-schemas.sh
         scripts/repos.txt
         scripts/agent-routes.txt
+        scripts/agent-intents.txt
         scripts/repo-validators.txt
         scripts/lib/repos.sh
         scripts/lib/repo-state.sh
@@ -249,6 +303,7 @@ structure_checks() {
         scripts/schemas/ci-workflow-report.schema.json
         scripts/schemas/native-workflow-template.schema.json
         scripts/schemas/capabilities.schema.json
+        scripts/schemas/agent-intake.schema.json
         scripts/schemas/sync-report.schema.json
         scripts/schemas/update-report.schema.json
         scripts/docs/SCRIPTS-DETAILS.md
@@ -283,6 +338,10 @@ structure_checks() {
     }
     [ -x scripts/route.sh ] || {
         printf "scripts/route.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/agent-intake.sh ] || {
+        printf "scripts/agent-intake.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/doctor.sh ] || {
@@ -371,6 +430,7 @@ structure_checks() {
 
     manifest_checks
     route_map_checks
+    intent_map_checks
     repo_validator_checks
 
     grep -q "Quick Setup" README.md

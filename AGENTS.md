@@ -18,6 +18,10 @@ belong in those child repositories; this file explains how to route it.
   destination paths, and categories.
 - `scripts/agent-routes.txt`: Machine-readable route map from goals and
   keywords to owning repository paths.
+- `scripts/agent-intents.txt`: Machine-readable intent map from common agent
+  tasks to primary and related repository paths.
+- `scripts/agent-intake.sh`: Agent entrypoint that joins intents, routes,
+  checkout state, validators, docs to read, and next validation commands.
 - `scripts/route.sh`: Query helper for `scripts/agent-routes.txt`.
 - `scripts/doctor.sh`: Read-only health report for managed repo state, route
   coverage, validator coverage, and origin sync state.
@@ -70,24 +74,27 @@ the goal before editing:
 
 1. Run `scripts/route.sh <query>` or read `scripts/agent-routes.txt` to map
    goal keywords to likely owning repository paths.
-2. Read `scripts/repos.txt` to confirm managed repositories and local paths.
-3. Map the goal to the most likely repo or repos using the routing guide below.
-4. Run `scripts/doctor.sh --summary` when you need a quick health overview.
+2. Prefer `scripts/agent-intake.sh --json <query>` when starting a concrete
+   task. It joins intent matches, route matches, checkout state, validators,
+   docs to read, and next validation commands into one agent task plan.
+3. Read `scripts/repos.txt` to confirm managed repositories and local paths.
+4. Map the goal to the most likely repo or repos using the routing guide below.
+5. Run `scripts/doctor.sh --summary` when you need a quick health overview.
    Use `scripts/doctor.sh --verbose` when ahead, behind, or diverged checkout
    state matters for the requested work.
    Use `scripts/sync-report.sh` when dirty files or nested submodule state
    matter.
-5. Check whether those paths exist locally. If a required checkout is missing,
+6. Check whether those paths exist locally. If a required checkout is missing,
    run `./scripts/setup.sh` or clone only the needed repo, depending on scope.
-6. Enter each target repo and read its local `AGENTS.md`, `CLAUDE.md`,
+7. Enter each target repo and read its local `AGENTS.md`, `CLAUDE.md`,
    `README.md`, or contribution docs before making changes there.
-7. Make changes in the repo that owns the behavior. Cross-repo work is allowed
+8. Make changes in the repo that owns the behavior. Cross-repo work is allowed
    when the user goal spans multiple managed repos.
-8. Run validation from each changed repo, plus root validation when root files
+9. Run validation from each changed repo, plus root validation when root files
    changed.
    Use `scripts/validate-repos.sh --changed` from the root when multiple child
    repos may need validation.
-9. Report final status grouped by repository, including uncommitted changes and
+10. Report final status grouped by repository, including uncommitted changes and
    any checks that could not be run.
 
 Do not assume the root repo owns a file just because it is visible under this
