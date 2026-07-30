@@ -38,6 +38,42 @@ Use a forked/private blueprint for personal SSH, shell, and deployment
 customizations. Keep host secrets out of the blueprint repository and inject
 them through the VPS provider, a secrets manager, or one-off host setup.
 
+## Nix On VPS Hosts
+
+Debian, Ubuntu, and Arch VPS hosts can use the `home-manager` adapter when Nix
+and Home Manager are installed on the host. This keeps the operating system
+managed by the distro while allowing the user environment to come from Nix:
+
+```toml
+[provisioning]
+adapter = "home-manager"
+
+[profile.default]
+modules = ["nushell", "neovim", "mise"]
+```
+
+Then apply the profile:
+
+```bash
+smu provisioning-adapter apply --adapter home-manager --profile default --action build
+smu provisioning-adapter apply --adapter home-manager --profile default
+```
+
+Use the `nixos` adapter only on a real NixOS VPS image. On Debian, Ubuntu, and
+Arch hosts, `smu provisioning-adapter doctor --json` reports `host_supported:
+false` for `nixos` and apply refuses to run `nixos-rebuild`.
+
+For a mixed migration, use `hybrid`:
+
+```toml
+[provisioning]
+adapter = "hybrid"
+nix_adapter = "home-manager"
+```
+
+Hybrid applies modules with Home Manager when a module publishes that adapter
+and falls back to the existing `rcm` module path for legacy modules.
+
 ## Validation
 
 For root metadata and agent routing:
