@@ -72,7 +72,11 @@ For a mixed migration, use `hybrid`:
 [provisioning]
 adapter = "hybrid"
 nix_adapter = "home-manager"
+allow_rcm_fallback = true
 ```
+
+Set `allow_rcm_fallback = false` or run with `--strict` when a VPS profile
+must be fully Nix-backed before apply.
 
 Hybrid applies modules with Home Manager when a module publishes that adapter
 and falls back to the existing `rcm` module path for legacy modules.
