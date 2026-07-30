@@ -17,6 +17,10 @@
         "required": [
           "path",
           "role",
+          "confidence",
+          "score",
+          "source",
+          "explanation",
           "repo",
           "route",
           "summary",
@@ -24,12 +28,17 @@
           "state",
           "sync",
           "validator",
-          "docs"
+          "docs",
+          "warnings"
         ],
         "additionalProperties": false,
         "properties": {
           "path": { "type": "string" },
           "role": { "type": "string", "enum": ["primary", "related"] },
+          "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+          "score": { "type": "integer" },
+          "source": { "type": "string" },
+          "explanation": { "type": "string" },
           "repo": { "type": "string" },
           "route": { "type": "string" },
           "summary": { "type": "string" },
@@ -38,6 +47,10 @@
           "sync": { "type": "string" },
           "validator": { "type": "string" },
           "docs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "warnings": {
             "type": "array",
             "items": { "type": "string" }
           }

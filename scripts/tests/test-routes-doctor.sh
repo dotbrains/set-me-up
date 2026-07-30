@@ -113,7 +113,13 @@ test_agent_intake_json_reports_structured_plan() {
     assert_contains "$output" '"repositories":['
     assert_contains "$output" '"path":"modules/colorschemes"'
     assert_contains "$output" '"role":"primary"'
+    assert_contains "$output" '"confidence":"high"'
+    assert_contains "$output" '"score":'
+    assert_contains "$output" '"source":"add-theme"'
+    assert_contains "$output" '"explanation":"intent:add-theme'
+    assert_contains "$output" '"warnings":['
     assert_contains "$output" '"nextCommands":['
+    assert_contains "$output" '"scripts/validate.sh --coverage"'
 }
 
 test_agent_intake_falls_back_to_routes() {
@@ -132,6 +138,57 @@ test_agent_intake_falls_back_to_routes() {
 
     assert_contains "$output" "modules/debian"
     assert_contains "$output" "primary"
+}
+
+test_agent_intake_explain_outputs_reasons() {
+    local work_dir="$tmp_root/agent-intake-explain"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/installer/.git"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --explain smu > "$output"
+    )
+
+    assert_contains "$output" "confidence"
+    assert_contains "$output" "score"
+    assert_contains "$output" "explain"
+    assert_contains "$output" "intent:change-smu-command"
+}
+
+test_agent_intake_examples_keep_core_queries_stable() {
+    local work_dir="$tmp_root/agent-intake-examples"
+    local bin_dir="$work_dir/bin"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/modules/colorschemes/.git" \
+        "$work_dir/installer/.git" "$work_dir/home/.config/zsh/.git" \
+        "$work_dir/shared/ai-config/.git"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json theme > "$output"
+        assert_contains "$output" '"matchedIntents":["add-theme"'
+        assert_contains "$output" '"path":"modules/colorschemes"'
+
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json prompt > "$output"
+        assert_contains "$output" '"matchedIntents":["add-prompt"'
+        assert_contains "$output" '"path":"installer"'
+
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json "agent config" > "$output"
+        assert_contains "$output" '"matchedIntents":["agent-config"'
+        assert_contains "$output" '"path":"shared/ai-config"'
+
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json "new repo" > "$output"
+        assert_contains "$output" '"matchedIntents":["add-managed-repo"'
+        assert_contains "$output" '"path":"."'
+    )
 }
 
 test_doctor_reports_repo_health_summary() {
@@ -368,6 +425,8 @@ test_route_lookup_covers_core_concepts
 test_agent_intake_lists_intent_repositories
 test_agent_intake_json_reports_structured_plan
 test_agent_intake_falls_back_to_routes
+test_agent_intake_explain_outputs_reasons
+test_agent_intake_examples_keep_core_queries_stable
 test_doctor_reports_repo_health_summary
 test_doctor_verbose_reports_route_drift
 test_doctor_json_reports_structured_summary

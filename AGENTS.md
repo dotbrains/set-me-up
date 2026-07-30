@@ -76,7 +76,8 @@ the goal before editing:
    goal keywords to likely owning repository paths.
 2. Prefer `scripts/agent-intake.sh --json <query>` when starting a concrete
    task. It joins intent matches, route matches, checkout state, validators,
-   docs to read, and next validation commands into one agent task plan.
+   docs to read, missing-doc warnings, match confidence, explanations, and next
+   validation commands into one agent task plan.
 3. Read `scripts/repos.txt` to confirm managed repositories and local paths.
 4. Map the goal to the most likely repo or repos using the routing guide below.
 5. Run `scripts/doctor.sh --summary` when you need a quick health overview.

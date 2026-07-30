@@ -128,17 +128,18 @@ The `agent-intents.txt` file maps common agent task types to the repositories
 usually involved in the change. Each line follows the format:
 
 ```text
-intent_id|primary_paths|related_paths|summary|keywords
+intent_id|primary_paths|related_paths|validation_commands|summary|keywords
 ```
 
 - **intent_id**: Stable kebab-case task intent name
 - **primary_paths**: Comma-separated primary repo paths
 - **related_paths**: Comma-separated related repo paths
+- **validation_commands**: Semicolon-separated root commands for this task
 - **summary**: Short task description
 - **keywords**: Comma-separated matching hints
 
 Paths must be `.` or listed in `repos.txt`. Root validation rejects unknown
-intent paths.
+intent paths and keeps core intents present for common agent tasks.
 
 ## agent-intake.sh
 
@@ -148,17 +149,19 @@ when no intent matches.
 
 ```bash
 scripts/agent-intake.sh theme
+scripts/agent-intake.sh --explain theme
 scripts/agent-intake.sh --json "change smu command"
 ```
 
 Output includes:
 
 - primary and related repository paths
+- match confidence, numeric score, source, and explanation
 - matching route summaries
 - current checkout state and origin sync state
 - validator command for each repository
-- local docs an agent should read before editing
-- next root validation commands
+- local docs an agent should read before editing, with missing-doc warnings
+- intent-specific next validation commands
 
 Use `--json` for machine-readable task intake.
 

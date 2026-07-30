@@ -120,22 +120,23 @@ intent_map_checks() {
     local intent_id
     local primary_paths
     local related_paths
+    local validation_commands
     local summary
     local keywords
     local extra
     local seen_intents=" "
     local path
 
-    while IFS='|' read -r intent_id primary_paths related_paths summary keywords extra || \
+    while IFS='|' read -r intent_id primary_paths related_paths validation_commands summary keywords extra || \
         [ -n "$intent_id" ]; do
         line_number=$((line_number + 1))
 
         [[ "$intent_id" =~ ^[[:space:]]*# || -z "$intent_id" ]] && continue
 
         if [ -n "${extra:-}" ] || [ -z "$primary_paths" ] || \
-            [ -z "$related_paths" ] || [ -z "$summary" ] || \
-            [ -z "$keywords" ]; then
-            printf "Invalid intent line %s: expected intent_id|primary_paths|related_paths|summary|keywords\\n" \
+            [ -z "$related_paths" ] || [ -z "$validation_commands" ] || \
+            [ -z "$summary" ] || [ -z "$keywords" ]; then
+            printf "Invalid intent line %s: expected intent_id|primary_paths|related_paths|validation_commands|summary|keywords\\n" \
                 "$line_number" >&2
             exit 1
         fi
@@ -164,6 +165,14 @@ intent_map_checks() {
 
         seen_intents+="$intent_id "
     done < scripts/agent-intents.txt
+
+    for intent_id in add-theme add-prompt change-smu-command add-managed-repo \
+        add-module agent-config; do
+        grep -Eq "^${intent_id}\\|" scripts/agent-intents.txt || {
+            printf "Missing core agent intent: %s\\n" "$intent_id" >&2
+            exit 1
+        }
+    done
 }
 
 repo_validator_checks() {
