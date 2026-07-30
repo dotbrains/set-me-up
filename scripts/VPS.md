@@ -55,7 +55,10 @@ modules = ["nushell", "neovim", "mise"]
 Then apply the profile:
 
 ```bash
-smu provisioning-adapter apply --adapter home-manager --profile default --action build
+smu provisioning-adapter apply \
+  --adapter home-manager \
+  --profile default \
+  --action build
 smu provisioning-adapter apply --adapter home-manager --profile default
 ```
 
