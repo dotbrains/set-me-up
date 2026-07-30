@@ -166,12 +166,19 @@ test_update_json_plan_does_not_fetch() {
     assert_contains "$output" '"path":"clean"'
 }
 
+copy_release_script_fixture() {
+    local work_dir="$1"
+
+    mkdir -p "$work_dir/scripts/lib"
+    cp "$repo_root/scripts/release-install-update.sh" "$work_dir/scripts/"
+    cp "$repo_root/scripts/lib/repo-health.sh" "$work_dir/scripts/lib/"
+}
+
 test_release_check_outputs_json_readiness() {
     local work_dir="$tmp_root/release-json"
     local output="$work_dir/output.json"
 
-    mkdir -p "$work_dir/scripts"
-    cp "$repo_root/scripts/release-install-update.sh" "$work_dir/scripts/"
+    copy_release_script_fixture "$work_dir"
 
     local path
     for path in installer blueprint tests; do
@@ -220,8 +227,7 @@ test_release_failure_outputs_json_stage() {
     local work_dir="$tmp_root/release-json-failure"
     local output="$work_dir/output.json"
 
-    mkdir -p "$work_dir/scripts"
-    cp "$repo_root/scripts/release-install-update.sh" "$work_dir/scripts/"
+    copy_release_script_fixture "$work_dir"
 
     local path
     for path in installer blueprint tests; do
@@ -260,6 +266,162 @@ assert payload["failed"] != 0
 PY
 }
 
+test_release_publish_plan_outputs_actions() {
+    local work_dir="$tmp_root/release-publish-plan"
+    local output="$work_dir/output.json"
+
+    copy_release_script_fixture "$work_dir"
+
+    local path
+    for path in installer blueprint tests; do
+        mkdir -p "$work_dir/$path"
+        git -C "$work_dir/$path" init --quiet
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        touch "$work_dir/$path/README.md"
+        git -C "$work_dir/$path" add README.md
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+    done
+
+    (
+        cd "$work_dir"
+        bash scripts/release-install-update.sh --publish-plan --json \
+            --tag v0.0.0 --candidate candidate --github-release > "$output"
+    )
+
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+actions = {(item["action"], item["target"], item["detail"]) for item in payload["publish_plan"]}
+assert payload["mode"] == "publish-plan"
+assert payload["stage"] == "publish-plan"
+assert payload["validated"] is False
+assert ("push", "installer", "main") in actions
+assert ("candidate", "installer", "candidate") in actions
+assert ("tag", "installer", "v0.0.0") in actions
+assert ("github-release", "installer", "v0.0.0") in actions
+PY
+}
+
+test_release_candidate_check_fails_when_stale() {
+    local work_dir="$tmp_root/release-candidate-stale"
+    local output="$work_dir/output.json"
+    local remote_dir="$work_dir/remotes"
+
+    mkdir -p "$remote_dir"
+    copy_release_script_fixture "$work_dir"
+
+    local path branch
+    for path in installer blueprint tests; do
+        branch="main"
+        [ "$path" = "blueprint" ] && branch="master"
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+        git init --quiet --bare "$remote_dir/$path.git"
+        git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
+        git -C "$work_dir/$path" push --quiet -u origin "$branch"
+    done
+    git -C "$work_dir/installer" push --quiet origin HEAD:refs/heads/candidate
+    touch "$work_dir/installer/next"
+    git -C "$work_dir/installer" add next
+    git -C "$work_dir/installer" commit --quiet -m "new installer"
+
+    if (
+        cd "$work_dir"
+        bash scripts/release-install-update.sh --candidate-check --json > "$output"
+    ); then
+        fail "candidate freshness check succeeded while candidate was stale"
+    fi
+
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "candidate-check"
+assert payload["stage"] == "candidate:freshness"
+assert payload["candidate"]["fresh"] is False
+assert payload["failed"] != 0
+PY
+}
+
+test_release_github_release_uses_gh_cli() {
+    local work_dir="$tmp_root/release-gh"
+    local bin_dir="$work_dir/bin"
+    local remote_dir="$work_dir/remotes"
+    local output="$work_dir/output.json"
+    local gh_log="$work_dir/gh.log"
+
+    mkdir -p "$bin_dir" "$remote_dir"
+    copy_release_script_fixture "$work_dir"
+    cat > "$bin_dir/gh" <<'EOF'
+#!/usr/bin/env bash
+printf "%s\n" "$*" >> "$SMU_TEST_GH_LOG"
+EOF
+    chmod +x "$bin_dir/gh"
+
+    local path branch
+    for path in installer blueprint tests; do
+        branch="main"
+        [ "$path" = "blueprint" ] && branch="master"
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+        git init --quiet --bare "$remote_dir/$path.git"
+        git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
+        git -C "$work_dir/$path" push --quiet -u origin "$branch"
+    done
+
+    (
+        cd "$work_dir"
+        SMU_TEST_GH_LOG="$gh_log" PATH="$bin_dir:$PATH" \
+            bash scripts/release-install-update.sh --push --json \
+            --candidate "" --tag v0.0.1 --github-release \
+            --release-title "Installer v0.0.1" \
+            --release-notes "Release notes" > "$output"
+    )
+
+    assert_contains "$gh_log" "release create v0.0.1 --repo dotbrains/set-me-up-installer --title Installer v0.0.1 --notes Release notes"
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "push"
+assert payload["stage"] == "complete"
+assert payload["release"]["github_release"] is True
+assert payload["tagged"] is True
+assert payload["failed"] == 0
+PY
+}
+
 
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
@@ -270,3 +432,6 @@ test_update_json_plan_reports_repo_states
 test_update_json_plan_does_not_fetch
 test_release_check_outputs_json_readiness
 test_release_failure_outputs_json_stage
+test_release_publish_plan_outputs_actions
+test_release_candidate_check_fails_when_stale
+test_release_github_release_uses_gh_cli

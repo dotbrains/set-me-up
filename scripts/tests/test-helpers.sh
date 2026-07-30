@@ -152,6 +152,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/lib/manifest-index.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/check-runner.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-health.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/agent-intake-render.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/schemas/"*.json "$target/scripts/schemas/"
     cp "$repo_root/scripts/docs/"*.md "$target/scripts/docs/"
     cp -R "$repo_root/scripts/tests/fixtures/"* "$target/scripts/tests/fixtures/" 2>/dev/null || true

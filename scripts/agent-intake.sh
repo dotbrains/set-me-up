@@ -20,6 +20,7 @@ source "$repo_root/scripts/lib/json.sh"
 source "$repo_root/scripts/lib/manifest-index.sh"
 source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/agent-intake.sh"
+source "$repo_root/scripts/lib/agent-intake-render.sh"
 
 usage() {
     printf "Usage: %s [--tsv|--json|--plan] [--explain] [--strict] <query>\n" "$0" >&2

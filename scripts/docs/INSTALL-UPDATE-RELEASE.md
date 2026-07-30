@@ -74,6 +74,18 @@ to create a GitHub Release in `dotbrains/set-me-up-installer`; omit
 `--release-notes` to let GitHub generate notes, or pass explicit notes for a
 manual release summary.
 
+Preview the publish actions without rerunning validators or mutating remotes:
+
+```bash
+scripts/release-install-update.sh --publish-plan --json --tag vX.Y.Z --candidate candidate --github-release
+```
+
+Check whether the remote candidate branch already points at installer `main`:
+
+```bash
+scripts/release-install-update.sh --candidate-check --json
+```
+
 When root files changed, also run:
 
 ```bash

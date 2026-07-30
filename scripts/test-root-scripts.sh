@@ -24,5 +24,6 @@ esac
 "$test_dir/test-setup-update.sh"
 "$test_dir/test-manifests.sh"
 "$test_dir/test-routes-doctor.sh"
+"$test_dir/test-lib-modules.sh"
 
 printf "Root script tests passed.\n"

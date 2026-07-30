@@ -63,11 +63,15 @@ belong in those child repositories; this file explains how to route it.
   validator, route, docs, and warning facts.
 - `scripts/lib/check-runner.sh`: Shared Validation Runner module for timed
   checks, quiet output capture, verbose streaming, and summaries.
+- `scripts/lib/agent-intake-render.sh`: Shared Agent Intake Renderer module
+  for TSV, JSON, and plan output.
 - `scripts/setup.sh`: Clones every repo listed in `scripts/repos.txt`.
 - `scripts/update.sh`: Pulls every existing clean repo listed in
   `scripts/repos.txt`.
 - `scripts/test-root-scripts.sh`: Regression tests for root setup/update
   behavior using mocked Git operations.
+- `scripts/tests/test-lib-modules.sh`: Direct regression tests for shared root
+  library modules.
 - `scripts/validate-repos.sh`: Discovers child repo validators and runs them
   without touching dirty worktrees.
 - `scripts/SCRIPTS.md`: User-facing behavior and maintenance docs for the
@@ -180,6 +184,7 @@ update that nested reference.
   `scripts/lib/repo-state.sh`.
 - Change shared repo health facts in `scripts/lib/repo-health.sh`.
 - Change timed validation execution behavior in `scripts/lib/check-runner.sh`.
+- Change agent-intake output formatting in `scripts/lib/agent-intake-render.sh`.
 - Document setup/update behavior in `scripts/SCRIPTS.md`.
 - Document user-facing repo inventory or first-run commands in `README.md`.
 - Document contributor workflow, linting, and tests in `CONTRIBUTING.md`.

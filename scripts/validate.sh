@@ -53,12 +53,13 @@ bash_checks() {
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
-        scripts/tests/test-routes-doctor.sh \
+        scripts/tests/test-routes-doctor.sh scripts/tests/test-lib-modules.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh scripts/lib/json.sh \
         scripts/lib/agent-intake.sh scripts/lib/manifest-index.sh \
-        scripts/lib/check-runner.sh scripts/lib/repo-health.sh
+        scripts/lib/check-runner.sh scripts/lib/repo-health.sh \
+        scripts/lib/agent-intake-render.sh
 }
 
 shell_checks() {
@@ -77,11 +78,13 @@ shell_checks() {
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
+        scripts/tests/test-lib-modules.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh scripts/lib/json.sh \
         scripts/lib/agent-intake.sh scripts/lib/manifest-index.sh \
-        scripts/lib/check-runner.sh scripts/lib/repo-health.sh
+        scripts/lib/check-runner.sh scripts/lib/repo-health.sh \
+        scripts/lib/agent-intake-render.sh
 }
 
 markdown_checks() {
@@ -94,149 +97,15 @@ manifest_checks() {
 }
 
 route_map_checks() {
-    local line_number=0
-    local route_id
-    local path
-    local summary
-    local keywords
-    local extra
-    local seen_routes=" "
-
-    while IFS='|' read -r route_id path summary keywords extra || \
-        [ -n "$route_id" ]; do
-        line_number=$((line_number + 1))
-
-        [[ "$route_id" =~ ^[[:space:]]*# || -z "$route_id" ]] && continue
-
-        if [ -n "${extra:-}" ] || [ -z "$path" ] || [ -z "$summary" ] || \
-            [ -z "$keywords" ]; then
-            printf "Invalid route line %s: expected route_id|local_path|summary|keywords\\n" \
-                "$line_number" >&2
-            exit 1
-        fi
-
-        if [[ ! "$route_id" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
-            printf "Invalid route id on line %s: %s\\n" \
-                "$line_number" "$route_id" >&2
-            exit 1
-        fi
-
-        if [[ "$seen_routes" == *" $route_id "* ]]; then
-            printf "Duplicate route id on line %s: %s\\n" \
-                "$line_number" "$route_id" >&2
-            exit 1
-        fi
-
-        if ! smu_manifest_has_path scripts/repos.txt "$path"; then
-            printf "Route path on line %s is not in scripts/repos.txt: %s\\n" \
-                "$line_number" "$path" >&2
-            exit 1
-        fi
-
-        seen_routes+="$route_id "
-    done < scripts/agent-routes.txt
+    smu_validate_route_map scripts/repos.txt scripts/agent-routes.txt
 }
 
 intent_map_checks() {
-    local line_number=0
-    local intent_id
-    local primary_paths
-    local related_paths
-    local validation_commands
-    local summary
-    local keywords
-    local extra
-    local seen_intents=" "
-    local path
-    local keyword
-
-    while IFS='|' read -r intent_id primary_paths related_paths validation_commands summary keywords extra || \
-        [ -n "$intent_id" ]; do
-        line_number=$((line_number + 1))
-
-        [[ "$intent_id" =~ ^[[:space:]]*# || -z "$intent_id" ]] && continue
-
-        if [ -n "${extra:-}" ] || [ -z "$primary_paths" ] || \
-            [ -z "$related_paths" ] || [ -z "$validation_commands" ] || \
-            [ -z "$summary" ] || [ -z "$keywords" ]; then
-            printf "Invalid intent line %s: expected intent_id|primary_paths|related_paths|validation_commands|summary|keywords\\n" \
-                "$line_number" >&2
-            exit 1
-        fi
-
-        if [[ ! "$intent_id" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
-            printf "Invalid intent id on line %s: %s\\n" \
-                "$line_number" "$intent_id" >&2
-            exit 1
-        fi
-
-        if [[ "$seen_intents" == *" $intent_id "* ]]; then
-            printf "Duplicate intent id on line %s: %s\\n" \
-                "$line_number" "$intent_id" >&2
-            exit 1
-        fi
-
-        IFS=',' read -r -a paths <<< "$primary_paths,$related_paths"
-        for path in "${paths[@]}"; do
-            [ -n "$path" ] || continue
-            if ! smu_manifest_has_path scripts/repos.txt "$path"; then
-                printf "Intent path on line %s is not in scripts/repos.txt: %s\\n" \
-                    "$line_number" "$path" >&2
-                exit 1
-            fi
-        done
-
-        seen_intents+="$intent_id "
-    done < scripts/agent-intents.txt
-
-    for intent_id in add-theme add-prompt change-smu-command add-managed-repo \
-        add-module agent-config; do
-        grep -Eq "^${intent_id}\\|" scripts/agent-intents.txt || {
-            printf "Missing core agent intent: %s\\n" "$intent_id" >&2
-            exit 1
-        }
-    done
-
-    for keyword in theme prompt smu agent module repo; do
-        grep -Eq "^[^#].*\\|[^|]*\\b${keyword}\\b[^|]*$" scripts/agent-intents.txt || {
-            printf "Missing route-to-intent coverage keyword: %s\\n" "$keyword" >&2
-            exit 1
-        }
-    done
+    smu_validate_intent_map scripts/repos.txt scripts/agent-intents.txt
 }
 
 repo_validator_checks() {
-    local line_number=0
-    local path
-    local command
-    local extra
-    local seen_paths=" "
-
-    while IFS='|' read -r path command extra || [ -n "$path" ]; do
-        line_number=$((line_number + 1))
-
-        [[ "$path" =~ ^[[:space:]]*# || -z "$path" ]] && continue
-
-        if [ -n "${extra:-}" ] || [ -z "$command" ]; then
-            printf "Invalid validator line %s: expected local_path|command\\n" \
-                "$line_number" >&2
-            exit 1
-        fi
-
-        if [[ "$seen_paths" == *" $path "* ]]; then
-            printf "Duplicate validator path on line %s: %s\\n" \
-                "$line_number" "$path" >&2
-            exit 1
-        fi
-
-        if ! smu_manifest_has_path scripts/repos.txt "$path"; then
-            printf "Validator path on line %s is not in scripts/repos.txt: %s\\n" \
-                "$line_number" "$path" >&2
-            exit 1
-        fi
-
-        seen_paths+="$path "
-    done < scripts/repo-validators.txt
+    smu_validate_repo_validators scripts/repos.txt scripts/repo-validators.txt
 }
 
 coverage_checks() {
@@ -349,11 +218,13 @@ structure_checks() {
         scripts/lib/manifest-index.sh
         scripts/lib/check-runner.sh
         scripts/lib/repo-health.sh
+        scripts/lib/agent-intake-render.sh
         scripts/test-root-scripts.sh
         scripts/tests/test-helpers.sh
         scripts/tests/test-setup-update.sh
         scripts/tests/test-manifests.sh
         scripts/tests/test-routes-doctor.sh
+        scripts/tests/test-lib-modules.sh
         scripts/validate-repos.sh
         scripts/schemas/health-report.schema.json
         scripts/schemas/health-report.example.json

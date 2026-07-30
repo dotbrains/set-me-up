@@ -16,6 +16,7 @@ smu_run_timed_check() {
     shift
 
     printf "checking %s\n" "$label"
+    set +e
     python3 - "$label" "$timeout_seconds" "$smu_check_runner_verbose" "$@" <<'PY'
 import subprocess
 import sys
@@ -46,6 +47,9 @@ except subprocess.CalledProcessError as exc:
         message = f"{message}\n{output}"
     raise SystemExit(message)
 PY
+    local exit_code="$?"
+    set -e
+    [ "$exit_code" -eq 0 ] || return "$exit_code"
     smu_check_runner_passed=$((smu_check_runner_passed + 1))
 }
 

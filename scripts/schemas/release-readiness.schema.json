@@ -2,15 +2,18 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "set-me-up release readiness",
   "type": "object",
-  "required": ["mode", "stage", "candidate", "release", "validated", "pushed", "tagged", "failed", "repositories"],
+  "required": ["mode", "stage", "candidate", "release", "publish_plan", "validated", "pushed", "tagged", "failed", "repositories"],
   "properties": {
-    "mode": { "enum": ["check", "push"] },
+    "mode": { "enum": ["check", "push", "publish-plan", "candidate-check"] },
     "stage": { "type": "string" },
     "candidate": {
       "type": "object",
-      "required": ["ref"],
+      "required": ["ref", "head", "target", "fresh"],
       "properties": {
-        "ref": { "type": "string" }
+        "ref": { "type": "string" },
+        "head": { "type": "string" },
+        "target": { "type": "string" },
+        "fresh": { "type": "boolean" }
       },
       "additionalProperties": false
     },
@@ -23,6 +26,19 @@
         "github_release": { "type": "boolean" }
       },
       "additionalProperties": false
+    },
+    "publish_plan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "target", "detail"],
+        "properties": {
+          "action": { "type": "string" },
+          "target": { "type": "string" },
+          "detail": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
     },
     "validated": { "type": "boolean" },
     "pushed": { "type": "boolean" },

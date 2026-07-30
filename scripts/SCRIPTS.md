@@ -190,6 +190,9 @@ For install/update release readiness:
 
 ```bash
 scripts/release-install-update.sh --check --json
+scripts/release-install-update.sh --candidate-check --json
+scripts/release-install-update.sh --publish-plan --json \
+  --tag vX.Y.Z --candidate candidate
 scripts/release-install-update.sh --push --candidate candidate
 scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
 ```

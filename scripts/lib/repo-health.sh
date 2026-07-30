@@ -65,3 +65,48 @@ smu_repo_health_doc_warnings() {
 
     printf "%s" "$warnings"
 }
+
+smu_repo_health_branch() {
+    local repo_root="$1"
+    local path="$2"
+
+    git -C "$repo_root/$path" rev-parse --abbrev-ref HEAD 2>/dev/null || \
+        printf "unknown"
+}
+
+smu_repo_health_head() {
+    local repo_root="$1"
+    local path="$2"
+
+    git -C "$repo_root/$path" rev-parse HEAD 2>/dev/null || printf "unknown"
+}
+
+smu_repo_health_upstream_sync() {
+    local repo_root="$1"
+    local path="$2"
+    local left_right
+
+    git -C "$repo_root/$path" rev-parse --git-dir >/dev/null 2>&1 || {
+        printf "not-git"
+        return 0
+    }
+
+    if git -C "$repo_root/$path" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+        left_right="$(git -C "$repo_root/$path" rev-list --left-right --count HEAD...'@{u}')"
+        case "$left_right" in
+            "0	0") printf "synced" ;;
+            0$'\t'*) printf "behind" ;;
+            *$'\t'0) printf "ahead" ;;
+            *) printf "diverged" ;;
+        esac
+    else
+        printf "unknown"
+    fi
+}
+
+smu_repo_health_clean() {
+    local repo_root="$1"
+    local path="$2"
+
+    [ -z "$(git -C "$repo_root/$path" status --porcelain 2>/dev/null || printf "unknown")" ]
+}

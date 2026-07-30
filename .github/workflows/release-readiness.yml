@@ -23,4 +23,36 @@ jobs:
         run: scripts/setup.sh
 
       - name: Run release readiness check
-        run: scripts/release-install-update.sh --check --json
+        run: scripts/release-install-update.sh --check --json > release-readiness.json
+
+      - name: Summarize release readiness
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+
+          with open("release-readiness.json", encoding="utf-8") as handle:
+              payload = json.load(handle)
+
+          print("## Install/update release readiness")
+          print("")
+          print(f"- Mode: `{payload['mode']}`")
+          print(f"- Stage: `{payload['stage']}`")
+          print(f"- Candidate: `{payload['candidate']['ref']}`")
+          print(f"- Candidate fresh: `{payload['candidate']['fresh']}`")
+          print(f"- Failed: `{payload['failed']}`")
+          print("")
+          print("| Repository | Branch | Clean | Sync |")
+          print("| --- | --- | --- | --- |")
+          for repo in payload["repositories"]:
+              print(
+                  f"| `{repo['path']}` | `{repo['branch']}` | "
+                  f"`{repo['clean']}` | `{repo['sync']}` |"
+              )
+          PY
+
+      - name: Upload release readiness artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-readiness
+          path: release-readiness.json
+          if-no-files-found: error
