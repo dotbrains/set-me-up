@@ -32,16 +32,17 @@ from pathlib import Path
 root = Path(sys.argv[1])
 
 checks = [
-    ("health-report.schema.json", ["scripts/health-report.sh", "--json"]),
-    ("doctor.schema.json", ["scripts/doctor.sh", "--json"]),
-    ("freshness-report.schema.json", ["scripts/freshness-report.sh", "--json"]),
-    ("change-report.schema.json", ["scripts/change-report.sh", "--json"]),
-    ("ci-workflow-report.schema.json", ["scripts/ci-workflow-report.sh", "--checked-out", "--json"]),
-    ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"]),
-    ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"]),
-    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"]),
-    ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"]),
-    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"]),
+    ("health-report.schema.json", ["scripts/health-report.sh", "--json"], False),
+    ("doctor.schema.json", ["scripts/doctor.sh", "--json"], False),
+    ("freshness-report.schema.json", ["scripts/freshness-report.sh", "--json"], False),
+    ("change-report.schema.json", ["scripts/change-report.sh", "--json"], False),
+    ("ci-workflow-report.schema.json", ["scripts/ci-workflow-report.sh", "--checked-out", "--json"], False),
+    ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"], False),
+    ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"], False),
+    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"], False),
+    ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"], False),
+    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"], False),
+    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--check", "--json"], True),
 ]
 
 
@@ -80,7 +81,7 @@ def validate(schema, value, path):
             validate(schema["items"], item, f"{path}[{index}]")
 
 
-for schema_name, command in checks:
+for schema_name, command, allow_failure_payload in checks:
     schema_path = root / "scripts" / "schemas" / schema_name
     schema = json.loads(schema_path.read_text())
     print(f"checking {schema_name} via {' '.join(command)}")
@@ -97,9 +98,12 @@ for schema_name, command in checks:
             f"{schema_name}: command timed out: {' '.join(command)}"
         ) from exc
     except subprocess.CalledProcessError as exc:
-        raise SystemExit(
-            f"{schema_name}: command failed: {' '.join(command)}\n{exc.output}"
-        ) from exc
+        if allow_failure_payload:
+            payload_text = exc.output
+        else:
+            raise SystemExit(
+                f"{schema_name}: command failed: {' '.join(command)}\n{exc.output}"
+            ) from exc
     payload = json.loads(payload_text)
     validate(schema, payload, schema_name)
 

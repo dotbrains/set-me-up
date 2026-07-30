@@ -94,8 +94,9 @@ zed|home/.config/zed|config
 
 Lines starting with `#` are comments and empty lines are ignored.
 
-`scripts/lib/repos.sh` validates this format for all root scripts. Update that
-file when changing category order or manifest rules.
+`scripts/lib/repos.sh` validates this format for all root scripts.
+`scripts/lib/manifest-index.sh` owns cross-manifest lookups. Update those files
+when changing category order, manifest rules, or lookup behavior.
 
 ## agent-routes.txt
 
@@ -183,6 +184,14 @@ Run the fast agent-operability validation surface with:
 scripts/validate.sh --agent
 scripts/validate.sh --coverage --verbose
 SMU_VALIDATE_TIMEOUT=90 scripts/validate.sh --coverage
+```
+
+For install/update release readiness:
+
+```bash
+scripts/release-install-update.sh --check --json
+scripts/release-install-update.sh --push --candidate candidate
+scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
 ```
 
 ## doctor.sh

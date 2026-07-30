@@ -191,7 +191,8 @@ EOF
 
     (
         cd "$work_dir"
-        bash scripts/release-install-update.sh --check --json --tag v0.0.0 --candidate candidate > "$output"
+        bash scripts/release-install-update.sh --check --json --tag v0.0.0 \
+            --candidate candidate --signed-tag --github-release > "$output"
     )
 
     python3 - "$output" <<'PY'
@@ -202,13 +203,60 @@ with open(sys.argv[1], encoding="utf-8") as handle:
     payload = json.load(handle)
 
 assert payload["mode"] == "check"
+assert payload["stage"] == "complete"
 assert payload["candidate"]["ref"] == "candidate"
 assert payload["release"]["tag"] == "v0.0.0"
+assert payload["release"]["signed"] is True
+assert payload["release"]["github_release"] is True
 assert payload["validated"] is True
 assert payload["pushed"] is False
 assert payload["tagged"] is True
 assert payload["failed"] == 0
 assert [repo["path"] for repo in payload["repositories"]] == ["installer", "blueprint", "tests"]
+PY
+}
+
+test_release_failure_outputs_json_stage() {
+    local work_dir="$tmp_root/release-json-failure"
+    local output="$work_dir/output.json"
+
+    mkdir -p "$work_dir/scripts"
+    cp "$repo_root/scripts/release-install-update.sh" "$work_dir/scripts/"
+
+    local path
+    for path in installer blueprint tests; do
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+[ "$(basename "$(pwd)")" != "blueprint" ]
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        git -C "$work_dir/$path" init --quiet
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+    done
+
+    if (
+        cd "$work_dir"
+        bash scripts/release-install-update.sh --check --json > "$output"
+    ); then
+        fail "release readiness succeeded after a child validator failed"
+    fi
+
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "check"
+assert payload["stage"] == "validate:blueprint"
+assert payload["validated"] is False
+assert payload["failed"] != 0
 PY
 }
 
@@ -221,3 +269,4 @@ test_update_outputs_json_plan
 test_update_json_plan_reports_repo_states
 test_update_json_plan_does_not_fetch
 test_release_check_outputs_json_readiness
+test_release_failure_outputs_json_stage

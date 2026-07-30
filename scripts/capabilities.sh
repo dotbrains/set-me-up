@@ -13,6 +13,7 @@ query=""
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/json.sh"
 
 usage() {
@@ -75,16 +76,17 @@ while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
         summary="${rest%%|*}"
         keywords="${rest#*|}"
     fi
-    validator="none"
-    resolved=""
     if [ "$declared_only" -eq 1 ] && \
         resolved="$(smu_declared_validator_for_repo "$validators_file" "$path")"
     then
         validator="$(smu_validator_label "$resolved")"
     elif [ "$declared_only" -eq 0 ] && \
-        resolved="$(smu_validator_for_repo "$validators_file" "$path")"
+        validator="$(smu_repo_health_validator_label "$validators_file" "$path")" && \
+        [ "$validator" != "none" ]
     then
-        validator="$(smu_validator_label "$resolved")"
+        :
+    else
+        validator="none"
     fi
     haystack="$repo $path $category $route_id $summary $keywords $validator"
     matches_query "$haystack" || continue

@@ -34,6 +34,10 @@ candidate channel from the current installer commit:
 scripts/release-install-update.sh --push --candidate candidate
 ```
 
+Protect the `candidate` branch in GitHub so only maintainers can update it, and
+update it through this helper. That keeps the candidate channel tied to the same
+release-readiness checks as `main`.
+
 Users and CI can then test that channel with:
 
 ```bash
@@ -62,7 +66,13 @@ After child commits are ready, push them in release order:
 ```bash
 scripts/release-install-update.sh --push
 scripts/release-install-update.sh --push --tag vX.Y.Z --candidate candidate
+scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
 ```
+
+Use `--signed-tag` when local GPG signing is configured. Use `--github-release`
+to create a GitHub Release in `dotbrains/set-me-up-installer`; omit
+`--release-notes` to let GitHub generate notes, or pass explicit notes for a
+manual release summary.
 
 When root files changed, also run:
 
@@ -109,4 +119,14 @@ systems change:
 
 ```text
 scripts/docs/INSTALL-UPDATE-COMPATIBILITY.md
+```
+
+## Failure Payloads
+
+Automation should call the helper with `--json`. On failure it emits the stage
+that failed, for example `validate:installer`, `clean:tests`, or
+`release:github`, then exits non-zero. The JSON contract is validated by:
+
+```bash
+scripts/validate-json-schemas.sh
 ```

@@ -97,7 +97,7 @@ Usage: scripts/new-repo-check.sh <managed-local-path>
 ## scripts/release-install-update.sh
 
 ```text
-Usage: scripts/release-install-update.sh [--check|--push] [--json] [--tag TAG] [--candidate REF]
+Usage: scripts/release-install-update.sh [--check|--push] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]
 ```
 
 ## scripts/route-quality.sh

@@ -10,6 +10,8 @@ validators_file="$repo_root/scripts/repo-validators.txt"
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/manifest-index.sh"
+source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/json.sh"
 
 usage() {
@@ -27,45 +29,8 @@ case "$mode" in
         ;;
 esac
 
-manifest_has_path() {
-    local wanted_path="$1"
-    local repo
-    local path
-    local category
-
-    [ "$wanted_path" = "." ] && return 0
-
-    while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
-        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-        : "$category"
-        [ "$path" = "$wanted_path" ] && return 0
-    done < "$repos_file"
-
-    return 1
-}
-
-route_paths() {
-    local route_id
-    local path
-    local summary
-    local keywords
-
-    while IFS='|' read -r route_id path summary keywords _ || [ -n "$route_id" ]; do
-        [[ "$route_id" =~ ^[[:space:]]*# || -z "$route_id" ]] && continue
-        : "$summary" "$keywords"
-        printf "%s\\n" "$path"
-    done < "$routes_file"
-}
-
 route_exists_for_path() {
-    local wanted_path="$1"
-    local path
-
-    while IFS= read -r path; do
-        [ "$path" = "$wanted_path" ] && return 0
-    done < <(route_paths)
-
-    return 1
+    smu_route_exists_for_path "$routes_file" "$1"
 }
 
 count_state() {
@@ -125,10 +90,7 @@ inspect_repo() {
     total=$((total + 1))
     state="$(smu_repo_state "$path")"
     count_state "$state"
-    if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
-        [ "$state" != "detached" ]; then
-        sync_status="$(smu_repo_sync_status "$path")"
-    fi
+    sync_status="$(smu_repo_health_sync_for_state "$path" "$state")"
     count_sync "$sync_status"
 
     if smu_validator_for_repo "$validators_file" "$path" >/dev/null; then
@@ -168,7 +130,7 @@ check_route_drift() {
     while IFS='|' read -r route_id path summary keywords _ || [ -n "$route_id" ]; do
         [[ "$route_id" =~ ^[[:space:]]*# || -z "$route_id" ]] && continue
         : "$summary" "$keywords"
-        if ! manifest_has_path "$path"; then
+        if ! smu_manifest_has_path "$repos_file" "$path"; then
             route_drift=$((route_drift + 1))
             [ "$mode" = "--verbose" ] && \
                 printf "route-drift\\t%s\\t%s\\n" "$route_id" "$path"

@@ -43,4 +43,5 @@ passes:
 ```bash
 scripts/release-install-update.sh --check --json
 scripts/release-install-update.sh --push --tag vX.Y.Z --candidate candidate
+scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
 ```

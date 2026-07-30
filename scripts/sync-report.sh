@@ -10,6 +10,7 @@ format="${1:---tsv}"
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/json.sh"
 
 usage() {
@@ -41,14 +42,8 @@ print_repo() {
 
     : "$repo" "$category"
     state="$(smu_repo_state "$path")"
-    sync="unknown"
-    if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
-        [ "$state" != "detached" ]; then
-        sync="$(smu_repo_sync_status "$path")"
-    fi
-    if smu_validator_for_repo "$validators_file" "$path" >/dev/null; then
-        validator="$(smu_validator_label "$(smu_validator_for_repo "$validators_file" "$path")")"
-    fi
+    sync="$(smu_repo_health_sync_for_state "$path" "$state")"
+    validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
 
     if [ "$format" = "--json" ]; then
         printf '%s{"path":"%s","state":"%s","sync":"%s","validator":"%s"}' \

@@ -17,6 +17,8 @@ source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
 source "$repo_root/scripts/lib/json.sh"
+source "$repo_root/scripts/lib/manifest-index.sh"
+source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/agent-intake.sh"
 
 usage() {

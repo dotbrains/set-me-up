@@ -15,40 +15,15 @@ path=""
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/manifest-index.sh"
 source "$repo_root/scripts/lib/json.sh"
 
 usage() {
     printf "Usage: %s [--json] [--allow-diverged] [--checked-out] [--all|<managed-local-path>]\\n" "$0" >&2
 }
 
-manifest_has_path() {
-    local wanted_path="$1"
-    local repo
-    local local_path
-    local category
-
-    while IFS='|' read -r repo local_path category _ || [ -n "$repo" ]; do
-        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-        : "$category"
-        [ "$local_path" = "$wanted_path" ] && return 0
-    done < "$repos_file"
-    return 1
-}
-
 route_exists_for_path() {
-    local wanted_path="$1"
-    local route_id
-    local local_path
-    local summary
-    local keywords
-
-    while IFS='|' read -r route_id local_path summary keywords _ || \
-        [ -n "$route_id" ]; do
-        [[ "$route_id" =~ ^[[:space:]]*# || -z "$route_id" ]] && continue
-        : "$summary" "$keywords"
-        [ "$local_path" = "$wanted_path" ] && return 0
-    done < "$routes_file"
-    return 1
+    smu_route_exists_for_path "$routes_file" "$1"
 }
 
 check() {
@@ -102,7 +77,7 @@ reset_checks() {
 
 run_contract_checks() {
     reset_checks
-    check "manifest path" manifest_has_path "$path"
+    check "manifest path" smu_manifest_has_path "$repos_file" "$path"
     check "route entry" route_exists_for_path "$path"
     check "validator" has_validator
     check "native validator" has_native_validator

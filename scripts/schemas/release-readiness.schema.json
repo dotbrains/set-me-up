@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "set-me-up release readiness",
+  "type": "object",
+  "required": ["mode", "stage", "candidate", "release", "validated", "pushed", "tagged", "failed", "repositories"],
+  "properties": {
+    "mode": { "enum": ["check", "push"] },
+    "stage": { "type": "string" },
+    "candidate": {
+      "type": "object",
+      "required": ["ref"],
+      "properties": {
+        "ref": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "release": {
+      "type": "object",
+      "required": ["tag", "signed", "github_release"],
+      "properties": {
+        "tag": { "type": "string" },
+        "signed": { "type": "boolean" },
+        "github_release": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "validated": { "type": "boolean" },
+    "pushed": { "type": "boolean" },
+    "tagged": { "type": "boolean" },
+    "failed": { "type": "integer" },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "branch", "head", "clean", "sync"],
+        "properties": {
+          "path": { "enum": ["installer", "blueprint", "tests"] },
+          "branch": { "type": "string" },
+          "head": { "type": "string" },
+          "clean": { "type": "boolean" },
+          "sync": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

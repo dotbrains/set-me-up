@@ -96,6 +96,9 @@ Ensure these files exist:
 - `scripts/repo-validators.txt`
 - `scripts/lib/repos.sh`
 - `scripts/lib/repo-state.sh`
+- `scripts/lib/manifest-index.sh`
+- `scripts/lib/repo-health.sh`
+- `scripts/lib/check-runner.sh`
 - `scripts/route.sh` (must be executable)
 - `scripts/doctor.sh` (must be executable)
 - `scripts/setup.sh` (must be executable)

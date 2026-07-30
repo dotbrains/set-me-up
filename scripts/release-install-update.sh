@@ -7,10 +7,24 @@ mode="--check"
 json_output=false
 release_tag="${SMU_RELEASE_TAG:-}"
 candidate_ref="${SMU_CANDIDATE_REF:-candidate}"
+signed_tag=false
+github_release=false
+release_title="${SMU_RELEASE_TITLE:-}"
+release_notes="${SMU_RELEASE_NOTES:-}"
+current_stage="parse-arguments"
 
 usage() {
-    printf "Usage: %s [--check|--push] [--json] [--tag TAG] [--candidate REF]\n" "$0" >&2
+    printf "Usage: %s [--check|--push] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]\n" "$0" >&2
 }
+
+on_exit() {
+    local exit_code="$?"
+
+    if [ "$exit_code" -ne 0 ] && [ "$json_output" = true ]; then
+        status_json "$exit_code" false false false "$current_stage"
+    fi
+}
+trap on_exit EXIT
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -33,6 +47,26 @@ while [ "$#" -gt 0 ]; do
             ;;
         --candidate=*)
             candidate_ref="${1#*=}"
+            ;;
+        --signed-tag)
+            signed_tag=true
+            ;;
+        --github-release)
+            github_release=true
+            ;;
+        --release-title)
+            shift
+            release_title="${1:-}"
+            ;;
+        --release-title=*)
+            release_title="${1#*=}"
+            ;;
+        --release-notes)
+            shift
+            release_notes="${1:-}"
+            ;;
+        --release-notes=*)
+            release_notes="${1#*=}"
             ;;
         -h | --help)
             usage
@@ -58,17 +92,23 @@ json_escape() {
 repo_branch_head() {
     local path="$1"
 
-    git -C "$repo_root/$path" rev-parse --abbrev-ref HEAD
+    git -C "$repo_root/$path" rev-parse --abbrev-ref HEAD 2>/dev/null || \
+        printf "unknown"
 }
 
 repo_head() {
     local path="$1"
 
-    git -C "$repo_root/$path" rev-parse HEAD
+    git -C "$repo_root/$path" rev-parse HEAD 2>/dev/null || printf "unknown"
 }
 
 repo_sync() {
     local path="$1"
+
+    git -C "$repo_root/$path" rev-parse --git-dir >/dev/null 2>&1 || {
+        printf "not-git"
+        return 0
+    }
 
     if git -C "$repo_root/$path" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
         local left_right
@@ -89,18 +129,28 @@ status_json() {
     local validated="$2"
     local pushed="$3"
     local tagged="$4"
+    local stage="${5:-complete}"
 
-    printf '{"mode":"%s","candidate":{"ref":"%s"},"release":{"tag":"%s"},"validated":%s,"pushed":%s,"tagged":%s,"failed":%s,"repositories":[' \
-        "$(json_escape "${mode#--}")" "$(json_escape "$candidate_ref")" "$(json_escape "$release_tag")" \
-        "$validated" "$pushed" "$tagged" "$failed"
+    printf '{"mode":"%s","stage":"%s","candidate":{"ref":"%s"},"release":{"tag":"%s","signed":%s,"github_release":%s},"validated":%s,"pushed":%s,"tagged":%s,"failed":%s,"repositories":[' \
+        "$(json_escape "${mode#--}")" "$(json_escape "$stage")" \
+        "$(json_escape "$candidate_ref")" "$(json_escape "$release_tag")" \
+        "$signed_tag" "$github_release" "$validated" "$pushed" "$tagged" "$failed"
     local first=true
     local path branch clean sync head
     for path in installer blueprint tests; do
-        branch="$(repo_branch_head "$path")"
-        head="$(repo_head "$path")"
-        sync="$(repo_sync "$path")"
-        clean=true
-        [ -n "$(git -C "$repo_root/$path" status --porcelain)" ] && clean=false
+        branch="missing"
+        head="unknown"
+        sync="missing"
+        clean=false
+        if [ -d "$repo_root/$path/.git" ]; then
+            branch="$(repo_branch_head "$path")"
+            head="$(repo_head "$path")"
+            sync="$(repo_sync "$path")"
+            clean=true
+            [ -n "$(git -C "$repo_root/$path" status --porcelain 2>/dev/null || printf "unknown")" ] && clean=false
+        elif [ -d "$repo_root/$path" ]; then
+            sync="not-git"
+        fi
         if [ "$first" = true ]; then
             first=false
         else
@@ -117,16 +167,24 @@ validate_repo() {
     local path="$1"
     local command="$2"
 
+    current_stage="validate:$path"
     [ "$json_output" = true ] || printf "validate\t%s\t%s\n" "$path" "$command"
-    (cd "$repo_root/$path" && eval "$command")
+    if [ "$json_output" = true ]; then
+        (cd "$repo_root/$path" && eval "$command") >/dev/null 2>&1
+    else
+        (cd "$repo_root/$path" && eval "$command")
+    fi
 }
 
 require_clean_repo() {
     local path="$1"
 
+    current_stage="clean:$path"
     if [ -n "$(git -C "$repo_root/$path" status --porcelain)" ]; then
-        printf "Dirty repository: %s\n" "$path" >&2
-        git -C "$repo_root/$path" status --short >&2
+        if [ "$json_output" != true ]; then
+            printf "Dirty repository: %s\n" "$path" >&2
+            git -C "$repo_root/$path" status --short >&2
+        fi
         return 1
     fi
 }
@@ -135,8 +193,13 @@ push_repo() {
     local path="$1"
     local branch="$2"
 
+    current_stage="push:$path"
     [ "$json_output" = true ] || printf "push\t%s\t%s\n" "$path" "$branch"
-    git -C "$repo_root/$path" push origin "$branch"
+    if [ "$json_output" = true ]; then
+        git -C "$repo_root/$path" push --quiet origin "$branch" >/dev/null 2>&1
+    else
+        git -C "$repo_root/$path" push origin "$branch"
+    fi
 }
 
 tag_installer_release() {
@@ -144,14 +207,23 @@ tag_installer_release() {
         return 0
     fi
 
+    current_stage="tag:installer"
     if git -C "$repo_root/installer" rev-parse "$release_tag" >/dev/null 2>&1; then
         [ "$json_output" = true ] || printf "tag\tinstaller\t%s\talready-exists\n" "$release_tag"
     else
         [ "$json_output" = true ] || printf "tag\tinstaller\t%s\n" "$release_tag"
-        git -C "$repo_root/installer" tag -a "$release_tag" -m "Release $release_tag"
+        if [ "$signed_tag" = true ]; then
+            git -C "$repo_root/installer" tag -s "$release_tag" -m "Release $release_tag"
+        else
+            git -C "$repo_root/installer" tag -a "$release_tag" -m "Release $release_tag"
+        fi
     fi
 
-    git -C "$repo_root/installer" push origin "$release_tag"
+    if [ "$json_output" = true ]; then
+        git -C "$repo_root/installer" push --quiet origin "$release_tag" >/dev/null 2>&1
+    else
+        git -C "$repo_root/installer" push origin "$release_tag"
+    fi
 }
 
 update_candidate_ref() {
@@ -162,8 +234,45 @@ update_candidate_ref() {
         return 0
     fi
 
+    current_stage="candidate:installer"
     [ "$json_output" = true ] || printf "candidate\tinstaller\t%s\n" "$candidate_ref"
-    git -C "$repo_root/installer" push origin "HEAD:refs/heads/$candidate_ref"
+    if [ "$json_output" = true ]; then
+        git -C "$repo_root/installer" push --quiet origin "HEAD:refs/heads/$candidate_ref" >/dev/null 2>&1
+    else
+        git -C "$repo_root/installer" push origin "HEAD:refs/heads/$candidate_ref"
+    fi
+}
+
+publish_github_release() {
+    if [ "$mode" != "--push" ] || [ "$github_release" != true ]; then
+        return 0
+    fi
+    if [ -z "$release_tag" ]; then
+        printf "--github-release requires --tag TAG\n" >&2
+        return 2
+    fi
+    if ! command -v gh >/dev/null 2>&1; then
+        printf "--github-release requires the GitHub CLI: gh\n" >&2
+        return 2
+    fi
+
+    current_stage="release:github"
+    local -a command=(gh release create "$release_tag" --repo dotbrains/set-me-up-installer)
+    if [ -n "$release_title" ]; then
+        command+=(--title "$release_title")
+    else
+        command+=(--title "set-me-up installer $release_tag")
+    fi
+    if [ -n "$release_notes" ]; then
+        command+=(--notes "$release_notes")
+    else
+        command+=(--generate-notes)
+    fi
+    if [ "$json_output" = true ]; then
+        "${command[@]}" >/dev/null 2>&1
+    else
+        "${command[@]}"
+    fi
 }
 
 validate_repo "installer" "scripts/validate.sh --all"
@@ -182,15 +291,18 @@ if [ "$mode" = "--push" ]; then
 fi
 
 tag_installer_release
+publish_github_release
 
 if [ "$json_output" = true ]; then
     tagged=false
     [ -n "$release_tag" ] && tagged=true
     pushed=false
     [ "$mode" = "--push" ] && pushed=true
-    status_json 0 true "$pushed" "$tagged"
+    status_json 0 true "$pushed" "$tagged" "complete"
 else
     printf "release install/update %s complete\n" "${mode#--}"
     [ -n "$release_tag" ] && printf "release tag\t%s\n" "$release_tag"
+    [ "$signed_tag" = true ] && printf "release provenance\tsigned-tag\n"
+    [ "$github_release" = true ] && printf "github release\t%s\n" "$release_tag"
     [ "$mode" = "--push" ] && [ -n "$candidate_ref" ] && printf "candidate ref\t%s\n" "$candidate_ref"
 fi

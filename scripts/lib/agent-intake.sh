@@ -96,43 +96,11 @@ append_semicolon_unique() {
 }
 
 manifest_has_path() {
-    local wanted_path="$1"
-    local repo
-    local path
-    local category
-
-    [ "$wanted_path" = "." ] && return 0
-
-    while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
-        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-        : "$category"
-        [ "$path" = "$wanted_path" ] && return 0
-    done < "$repos_file"
-
-    return 1
+    smu_manifest_has_path "$repos_file" "$1"
 }
 
 repo_name_for_path() {
-    local wanted_path="$1"
-    local repo
-    local path
-    local category
-
-    [ "$wanted_path" = "." ] && {
-        printf "set-me-up"
-        return 0
-    }
-
-    while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
-        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-        : "$category"
-        if [ "$path" = "$wanted_path" ]; then
-            printf "%s" "$repo"
-            return 0
-        fi
-    done < "$repos_file"
-
-    return 1
+    smu_repo_name_for_path "$repos_file" "$1" "set-me-up"
 }
 
 route_details_for_path() {
@@ -181,44 +149,17 @@ sync_for_path() {
     fi
 
     state="$(smu_repo_state "$path")"
-    if [ "$state" = "missing" ] || [ "$state" = "not-git" ] || \
-        [ "$state" = "detached" ]; then
-        printf "unknown"
-    else
-        smu_repo_sync_status "$path"
-    fi
+    smu_repo_health_sync_for_state "$path" "$state"
 }
 
 docs_for_path() {
     local path="$1"
-    local docs=""
-    local candidate
-
-    for candidate in AGENTS.md CLAUDE.md README.md CONTRIBUTING.md; do
-        if [ "$path" = "." ]; then
-            [ -f "$repo_root/$candidate" ] || continue
-        else
-            [ -f "$repo_root/$path/$candidate" ] || continue
-        fi
-        [ -z "$docs" ] || docs+=","
-        docs+="$candidate"
-    done
-
-    printf "%s" "$docs"
+    smu_repo_health_docs "$repo_root" "$path"
 }
 
 doc_warnings_for_path() {
     local path="$1"
-    local base="$repo_root/$path"
-    local warnings=""
-
-    [ "$path" = "." ] && base="$repo_root"
-    [ -f "$base/AGENTS.md" ] || \
-        warnings="$(append_csv_unique "$warnings" "missing AGENTS.md")"
-    [ -f "$base/README.md" ] || [ -f "$base/README" ] || \
-        warnings="$(append_csv_unique "$warnings" "missing README")"
-
-    printf "%s" "$warnings"
+    smu_repo_health_doc_warnings "$repo_root" "$path"
 }
 
 append_path() {

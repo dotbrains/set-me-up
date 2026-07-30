@@ -55,8 +55,14 @@ belong in those child repositories; this file explains how to route it.
   child repositories.
 - `scripts/lib/repos.sh`: Shared Repository Manifest module for category
   order, manifest validation, and repository iteration.
+- `scripts/lib/manifest-index.sh`: Shared Manifest Index module for path,
+  route, intent, and validator lookup helpers.
 - `scripts/lib/repo-state.sh`: Shared Repository State module for missing,
   not-git, dirty, detached, changed, and clean checkout classification.
+- `scripts/lib/repo-health.sh`: Shared Repository Health module for sync,
+  validator, route, docs, and warning facts.
+- `scripts/lib/check-runner.sh`: Shared Validation Runner module for timed
+  checks, quiet output capture, verbose streaming, and summaries.
 - `scripts/setup.sh`: Clones every repo listed in `scripts/repos.txt`.
 - `scripts/update.sh`: Pulls every existing clean repo listed in
   `scripts/repos.txt`.
@@ -169,8 +175,11 @@ update that nested reference.
   validation contract yet.
 - Change manifest parsing, category order, or manifest validation in
   `scripts/lib/repos.sh`.
+- Change cross-manifest lookup helpers in `scripts/lib/manifest-index.sh`.
 - Change repository cleanliness, detached-head, or origin-drift detection in
   `scripts/lib/repo-state.sh`.
+- Change shared repo health facts in `scripts/lib/repo-health.sh`.
+- Change timed validation execution behavior in `scripts/lib/check-runner.sh`.
 - Document setup/update behavior in `scripts/SCRIPTS.md`.
 - Document user-facing repo inventory or first-run commands in `README.md`.
 - Document contributor workflow, linting, and tests in `CONTRIBUTING.md`.
@@ -201,8 +210,9 @@ Valid categories are:
 
 `local_path` values are reserved for cloned external repositories. Do not add
 first-party root source files under a managed `local_path`.
-All root scripts that read `scripts/repos.txt` must use
-`scripts/lib/repos.sh`; do not add another ad hoc parser.
+All root scripts that read `scripts/repos.txt` must use `scripts/lib/repos.sh`
+or lookup helpers from `scripts/lib/manifest-index.sh`; do not add another ad
+hoc parser.
 
 ## Agent Route Map Rules
 

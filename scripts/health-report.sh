@@ -12,6 +12,7 @@ source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
+source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/json.sh"
 
 usage() {
@@ -39,19 +40,9 @@ comma=""
 while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
     [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
     state="$(smu_repo_state "$path")"
-    sync="unknown"
-    if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
-        [ "$state" != "detached" ]; then
-        sync="$(smu_repo_sync_status "$path")"
-    fi
-    route_id=""
-    if route="$(smu_route_for_path "$routes_file" "$path")"; then
-        route_id="${route%%|*}"
-    fi
-    validator="none"
-    if resolved="$(smu_validator_for_repo "$validators_file" "$path")"; then
-        validator="$(smu_validator_label "$resolved")"
-    fi
+    sync="$(smu_repo_health_sync_for_state "$path" "$state")"
+    route_id="$(smu_repo_health_route_id "$routes_file" "$path")"
+    validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
     printf '%s{"repo":"%s","path":"%s","category":"%s","state":"%s","sync":"%s","route":"%s","validator":"%s"}' \
         "$comma" "$(smu_json_escape "$repo")" "$(smu_json_escape "$path")" \
         "$(smu_json_escape "$category")" "$(smu_json_escape "$state")" \

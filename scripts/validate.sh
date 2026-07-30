@@ -5,10 +5,11 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 source "$repo_root/scripts/lib/repos.sh"
+source "$repo_root/scripts/lib/manifest-index.sh"
+source "$repo_root/scripts/lib/check-runner.sh"
 
 mode="--all"
 verbose=0
-timed_checks_passed=0
 
 usage() {
     printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test] [--verbose]\\n" "$0" >&2
@@ -35,44 +36,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 run_timed_check() {
-    local label="$1"
-    local timeout_seconds="${SMU_VALIDATE_TIMEOUT:-45}"
-    shift
-
-    printf "checking %s\n" "$label"
-    python3 - "$label" "$timeout_seconds" "$verbose" "$@" <<'PY'
-import subprocess
-import sys
-
-label = sys.argv[1]
-timeout_seconds = int(sys.argv[2])
-verbose = sys.argv[3] == "1"
-command = sys.argv[4:]
-try:
-    completed = subprocess.run(
-        command,
-        check=True,
-        text=True,
-        stdout=None if verbose else subprocess.PIPE,
-        stderr=None if verbose else subprocess.STDOUT,
-        timeout=timeout_seconds,
-    )
-except subprocess.TimeoutExpired as exc:
-    output = exc.output or ""
-    message = f"{label}: timed out after {timeout_seconds}s"
-    if output and not verbose:
-        message = f"{message}\n{output}"
-    raise SystemExit(message)
-except subprocess.CalledProcessError as exc:
-    output = exc.output or ""
-    message = f"{label}: failed with exit {exc.returncode}"
-    if output and not verbose:
-        message = f"{message}\n{output}"
-    raise SystemExit(message)
-if verbose:
-    pass
-PY
-    timed_checks_passed=$((timed_checks_passed + 1))
+    smu_run_timed_check "$@"
 }
 
 bash_checks() {
@@ -93,7 +57,8 @@ bash_checks() {
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh scripts/lib/json.sh \
-        scripts/lib/agent-intake.sh
+        scripts/lib/agent-intake.sh scripts/lib/manifest-index.sh \
+        scripts/lib/check-runner.sh scripts/lib/repo-health.sh
 }
 
 shell_checks() {
@@ -115,7 +80,8 @@ shell_checks() {
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh scripts/lib/json.sh \
-        scripts/lib/agent-intake.sh
+        scripts/lib/agent-intake.sh scripts/lib/manifest-index.sh \
+        scripts/lib/check-runner.sh scripts/lib/repo-health.sh
 }
 
 markdown_checks() {
@@ -125,23 +91,6 @@ markdown_checks() {
 
 manifest_checks() {
     smu_validate_repos_manifest scripts/repos.txt
-}
-
-manifest_has_path() {
-    local wanted_path="$1"
-    local repo
-    local path
-    local category
-
-    [ "$wanted_path" = "." ] && return 0
-
-    while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
-        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-        : "$category"
-        [ "$path" = "$wanted_path" ] && return 0
-    done < scripts/repos.txt
-
-    return 1
 }
 
 route_map_checks() {
@@ -178,7 +127,7 @@ route_map_checks() {
             exit 1
         fi
 
-        if ! manifest_has_path "$path"; then
+        if ! smu_manifest_has_path scripts/repos.txt "$path"; then
             printf "Route path on line %s is not in scripts/repos.txt: %s\\n" \
                 "$line_number" "$path" >&2
             exit 1
@@ -230,7 +179,7 @@ intent_map_checks() {
         IFS=',' read -r -a paths <<< "$primary_paths,$related_paths"
         for path in "${paths[@]}"; do
             [ -n "$path" ] || continue
-            if ! manifest_has_path "$path"; then
+            if ! smu_manifest_has_path scripts/repos.txt "$path"; then
                 printf "Intent path on line %s is not in scripts/repos.txt: %s\\n" \
                     "$line_number" "$path" >&2
                 exit 1
@@ -280,7 +229,7 @@ repo_validator_checks() {
             exit 1
         fi
 
-        if ! manifest_has_path "$path"; then
+        if ! smu_manifest_has_path scripts/repos.txt "$path"; then
             printf "Validator path on line %s is not in scripts/repos.txt: %s\\n" \
                 "$line_number" "$path" >&2
             exit 1
@@ -294,6 +243,7 @@ coverage_checks() {
     local doctor_output
     local missing_validators
 
+    smu_check_runner_init "$verbose"
     doctor_output="$(scripts/doctor.sh --summary)"
     printf "%s\\n" "$doctor_output"
 
@@ -344,10 +294,11 @@ coverage_checks() {
     run_timed_check "native workflow json" scripts/native-workflow-template.sh --check --json
     run_timed_check "json schema validation" scripts/validate-json-schemas.sh
     run_timed_check "tree smoke test" scripts/tree-smoke-test.sh
-    printf "coverage checks: %s passed, 0 failed\n" "$timed_checks_passed"
+    smu_check_runner_summary "coverage"
 }
 
 agent_checks() {
+    smu_check_runner_init "$verbose"
     route_map_checks
     intent_map_checks
     run_timed_check "agent intake json" scripts/agent-intake.sh --json theme
@@ -355,7 +306,7 @@ agent_checks() {
     run_timed_check "agent intake fixtures" scripts/agent-intake-fixtures.sh --check
     run_timed_check "agent intake schema" scripts/validate-json-schemas.sh
     grep -q "Agent Intake Contract" scripts/docs/AGENT-INTAKE.md
-    printf "agent checks: %s passed, 0 failed\n" "$timed_checks_passed"
+    smu_check_runner_summary "agent"
 }
 
 structure_checks() {
@@ -395,6 +346,9 @@ structure_checks() {
         scripts/lib/routes.sh
         scripts/lib/validators.sh
         scripts/lib/agent-intake.sh
+        scripts/lib/manifest-index.sh
+        scripts/lib/check-runner.sh
+        scripts/lib/repo-health.sh
         scripts/test-root-scripts.sh
         scripts/tests/test-helpers.sh
         scripts/tests/test-setup-update.sh
@@ -412,6 +366,7 @@ structure_checks() {
         scripts/schemas/agent-intake.schema.json
         scripts/schemas/sync-report.schema.json
         scripts/schemas/update-report.schema.json
+        scripts/schemas/release-readiness.schema.json
         scripts/docs/SCRIPTS-DETAILS.md
         scripts/docs/COMMANDS.md
         scripts/docs/AGENT-INTAKE.md
