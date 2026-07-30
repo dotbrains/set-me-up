@@ -47,11 +47,7 @@ while [ "$#" -gt 0 ]; do
             exit 2
             ;;
         *)
-            [ -z "$query" ] || {
-                usage
-                exit 2
-            }
-            query="$1"
+            query="${query:+$query }$1"
             ;;
     esac
     shift

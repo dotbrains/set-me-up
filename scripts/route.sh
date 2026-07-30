@@ -4,7 +4,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 routes_file="$repo_root/scripts/agent-routes.txt"
-query="${1:-}"
+query="$*"
 
 usage() {
     printf "Usage: %s <query>\\n" "$0" >&2
@@ -17,8 +17,15 @@ normalize() {
 route_matches() {
     local haystack="$1"
     local needle="$2"
+    local haystack_normal
+    local word
 
-    [[ "$(normalize "$haystack")" == *"$(normalize "$needle")"* ]]
+    haystack_normal="$(normalize "$haystack")"
+    [[ "$haystack_normal" == *"$(normalize "$needle")"* ]] && return 0
+
+    for word in $(normalize "$needle"); do
+        [[ "$haystack_normal" == *"$word"* ]] || return 1
+    done
 }
 
 if [ -z "$query" ]; then
