@@ -97,7 +97,7 @@ Usage: scripts/new-repo-check.sh <managed-local-path>
 ## scripts/release-install-update.sh
 
 ```text
-Usage: scripts/release-install-update.sh [--check|--push]
+Usage: scripts/release-install-update.sh [--check|--push] [--json] [--tag TAG] [--candidate REF]
 ```
 
 ## scripts/route-quality.sh
@@ -157,7 +157,7 @@ Usage: scripts/validate-repos.sh [--changed|--clean|--all|--list|--missing]
 ## scripts/validate.sh
 
 ```text
-Usage: scripts/validate.sh [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test]
+Usage: scripts/validate.sh [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test] [--verbose]
 ```
 
 ## scripts/validator-exceptions.sh

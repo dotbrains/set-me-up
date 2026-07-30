@@ -1,5 +1,7 @@
 # Install And Update Release Checklist
 
+<!-- markdownlint-disable MD013 -->
+
 Use this checklist when changing the blueprint bootstrap, installer update
 commands, or scenario tests that fetch the installer from GitHub.
 
@@ -25,12 +27,26 @@ SMU_PASS_HOST_ENV=true SMU_INSTALLER_REF=my-branch ./scripts/run-scenario.sh def
 
 Use `SMU_INSTALLER_URL` instead when testing a fork or nonstandard raw URL.
 
+The stable installer channel is `main`. Maintainers can publish a validated
+candidate channel from the current installer commit:
+
+```bash
+scripts/release-install-update.sh --push --candidate candidate
+```
+
+Users and CI can then test that channel with:
+
+```bash
+SMU_INSTALLER_REF=candidate bash <(curl -sSL https://raw.githubusercontent.com/dotbrains/set-me-up-installer/main/install.sh) --plan --json
+```
+
 ## Local Validation
 
 Run the native validator in every changed child repo:
 
 ```bash
 scripts/release-install-update.sh --check
+scripts/release-install-update.sh --check --json
 ```
 
 This runs the child validators in release order. To run them manually:
@@ -45,6 +61,7 @@ After child commits are ready, push them in release order:
 
 ```bash
 scripts/release-install-update.sh --push
+scripts/release-install-update.sh --push --tag vX.Y.Z --candidate candidate
 ```
 
 When root files changed, also run:
@@ -70,3 +87,26 @@ smu update --all --dry-run
 If a checkout is dirty, `smu update doctor --json` should report that
 `--force-reset` would be required. Do not use `--force-reset` unless local
 changes should be discarded.
+
+## Rollback
+
+If a candidate install or update is wrong, inspect the local state first:
+
+```bash
+smu update doctor --json
+smu update --plan --json
+```
+
+For dirty checkouts, commit or stash local work before trying another update.
+Use `--force-reset` only when the local work can be discarded. To return the
+installer to the stable channel, rerun the stable install command without
+`SMU_INSTALLER_REF` or `SMU_INSTALLER_URL`.
+
+## Compatibility
+
+Keep the release matrix current when scenarios, supported channels, or operating
+systems change:
+
+```text
+scripts/docs/INSTALL-UPDATE-COMPATIBILITY.md
+```

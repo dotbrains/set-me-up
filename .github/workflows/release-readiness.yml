@@ -1,0 +1,26 @@
+name: Release Readiness
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 9 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-readiness:
+    name: Install/update release readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Checkout managed repositories
+        run: scripts/setup.sh
+
+      - name: Run release readiness check
+        run: scripts/release-install-update.sh --check --json

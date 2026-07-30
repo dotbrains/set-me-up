@@ -14,6 +14,7 @@ scripts/agent-intake.sh --strict <query>
 scripts/agent-intake-fixtures.sh --check
 scripts/agent-intake-fixtures.sh --write
 scripts/validate.sh --agent
+scripts/validate.sh --agent --verbose
 ```
 
 Use `--json` for automation, `--plan` for a human-readable checklist, and
@@ -77,3 +78,4 @@ scripts/agent-intake-fixtures.sh --check
 
 `scripts/validate.sh --agent` runs the fast agent-operability contract: routes,
 intents, intake JSON/plan output, fixtures, schema checks, and this document.
+Set `SMU_VALIDATE_TIMEOUT` to override the default timed-check timeout.

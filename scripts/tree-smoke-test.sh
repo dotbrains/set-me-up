@@ -29,8 +29,9 @@ trap cleanup EXIT
 
 cd "$repo_root"
 
-mkdir -p "$tmp_root/set-me-up/scripts/lib"
+mkdir -p "$tmp_root/set-me-up/.github" "$tmp_root/set-me-up/scripts/lib"
 cp README.md REPOSITORIES.md .gitignore "$tmp_root/set-me-up/"
+cp -R .github/workflows "$tmp_root/set-me-up/.github/"
 cp scripts/*.sh scripts/*.txt scripts/SCRIPTS.md "$tmp_root/set-me-up/scripts/"
 cp scripts/lib/*.sh "$tmp_root/set-me-up/scripts/lib/"
 cp -R scripts/tests "$tmp_root/set-me-up/scripts/"

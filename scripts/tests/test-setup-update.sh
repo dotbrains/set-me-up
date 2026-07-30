@@ -166,6 +166,52 @@ test_update_json_plan_does_not_fetch() {
     assert_contains "$output" '"path":"clean"'
 }
 
+test_release_check_outputs_json_readiness() {
+    local work_dir="$tmp_root/release-json"
+    local output="$work_dir/output.json"
+
+    mkdir -p "$work_dir/scripts"
+    cp "$repo_root/scripts/release-install-update.sh" "$work_dir/scripts/"
+
+    local path
+    for path in installer blueprint tests; do
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        git -C "$work_dir/$path" init --quiet
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+    done
+
+    (
+        cd "$work_dir"
+        bash scripts/release-install-update.sh --check --json --tag v0.0.0 --candidate candidate > "$output"
+    )
+
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "check"
+assert payload["candidate"]["ref"] == "candidate"
+assert payload["release"]["tag"] == "v0.0.0"
+assert payload["validated"] is True
+assert payload["pushed"] is False
+assert payload["tagged"] is True
+assert payload["failed"] == 0
+assert [repo["path"] for repo in payload["repositories"]] == ["installer", "blueprint", "tests"]
+PY
+}
+
 
 test_piped_setup_resolves_cloned_manifest
 test_piped_setup_ignores_unrelated_git_repo
@@ -174,3 +220,4 @@ test_update_plans_skips_and_current_repos
 test_update_outputs_json_plan
 test_update_json_plan_reports_repo_states
 test_update_json_plan_does_not_fetch
+test_release_check_outputs_json_readiness

@@ -181,6 +181,8 @@ Run the fast agent-operability validation surface with:
 
 ```bash
 scripts/validate.sh --agent
+scripts/validate.sh --coverage --verbose
+SMU_VALIDATE_TIMEOUT=90 scripts/validate.sh --coverage
 ```
 
 ## doctor.sh
@@ -206,9 +208,10 @@ Summary output includes:
 Verbose output adds per-repository sync status such as `ahead:1`,
 `behind:2`, or `diverged:21:7`.
 JSON output is the preferred agent entry point for structured repository state.
-Schema validation reports each command before it runs and fails timed-out report
-commands explicitly, so validation hangs point to the command that needs
-attention.
+Schema and coverage validation report each timed command before it runs and
+fail timed-out report commands explicitly, so validation hangs point to the
+command that needs attention. Timed check output is quiet by default and shown
+only on failure; pass `--verbose` to stream command output while debugging.
 
 ## sync-report.sh
 

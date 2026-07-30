@@ -6,26 +6,73 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 source "$repo_root/scripts/lib/repos.sh"
 
-mode="${1:---all}"
+mode="--all"
+verbose=0
+timed_checks_passed=0
+
+usage() {
+    printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test] [--verbose]\\n" "$0" >&2
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test)
+            mode="$1"
+            ;;
+        --verbose)
+            verbose=1
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            usage
+            exit 2
+            ;;
+    esac
+    shift
+done
 
 run_timed_check() {
     local label="$1"
+    local timeout_seconds="${SMU_VALIDATE_TIMEOUT:-45}"
     shift
 
     printf "checking %s\n" "$label"
-    python3 - "$label" "$@" <<'PY'
+    python3 - "$label" "$timeout_seconds" "$verbose" "$@" <<'PY'
 import subprocess
 import sys
 
 label = sys.argv[1]
-command = sys.argv[2:]
+timeout_seconds = int(sys.argv[2])
+verbose = sys.argv[3] == "1"
+command = sys.argv[4:]
 try:
-    subprocess.run(command, check=True, timeout=45)
-except subprocess.TimeoutExpired:
-    raise SystemExit(f"{label}: timed out")
+    completed = subprocess.run(
+        command,
+        check=True,
+        text=True,
+        stdout=None if verbose else subprocess.PIPE,
+        stderr=None if verbose else subprocess.STDOUT,
+        timeout=timeout_seconds,
+    )
+except subprocess.TimeoutExpired as exc:
+    output = exc.output or ""
+    message = f"{label}: timed out after {timeout_seconds}s"
+    if output and not verbose:
+        message = f"{message}\n{output}"
+    raise SystemExit(message)
 except subprocess.CalledProcessError as exc:
-    raise SystemExit(f"{label}: failed with exit {exc.returncode}")
+    output = exc.output or ""
+    message = f"{label}: failed with exit {exc.returncode}"
+    if output and not verbose:
+        message = f"{message}\n{output}"
+    raise SystemExit(message)
+if verbose:
+    pass
 PY
+    timed_checks_passed=$((timed_checks_passed + 1))
 }
 
 bash_checks() {
@@ -297,6 +344,7 @@ coverage_checks() {
     run_timed_check "native workflow json" scripts/native-workflow-template.sh --check --json
     run_timed_check "json schema validation" scripts/validate-json-schemas.sh
     run_timed_check "tree smoke test" scripts/tree-smoke-test.sh
+    printf "coverage checks: %s passed, 0 failed\n" "$timed_checks_passed"
 }
 
 agent_checks() {
@@ -307,6 +355,7 @@ agent_checks() {
     run_timed_check "agent intake fixtures" scripts/agent-intake-fixtures.sh --check
     run_timed_check "agent intake schema" scripts/validate-json-schemas.sh
     grep -q "Agent Intake Contract" scripts/docs/AGENT-INTAKE.md
+    printf "agent checks: %s passed, 0 failed\n" "$timed_checks_passed"
 }
 
 structure_checks() {
@@ -366,6 +415,9 @@ structure_checks() {
         scripts/docs/SCRIPTS-DETAILS.md
         scripts/docs/COMMANDS.md
         scripts/docs/AGENT-INTAKE.md
+        scripts/docs/INSTALL-UPDATE-RELEASE.md
+        scripts/docs/INSTALL-UPDATE-COMPATIBILITY.md
+        .github/workflows/release-readiness.yml
         .gitignore
     )
     local required_ignores=(
@@ -541,7 +593,7 @@ case "$mode" in
         test_checks
         ;;
     *)
-        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test]\\n" "$0" >&2
+        usage
         exit 2
         ;;
 esac

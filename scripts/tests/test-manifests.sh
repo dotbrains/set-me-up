@@ -176,6 +176,29 @@ test_add_repo_updates_manifests_and_docs() {
     assert_contains "$output" "Added managed repo new-repo at new/repo."
 }
 
+test_validate_agent_reports_timed_check_timeout() {
+    local work_dir="$tmp_root/validate-timeout"
+    local output="$work_dir/output.log"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git"
+    cat > "$work_dir/scripts/agent-intake-fixtures.sh" <<'EOF'
+#!/usr/bin/env bash
+    sleep 10
+EOF
+    chmod +x "$work_dir/scripts/agent-intake-fixtures.sh"
+
+    if (
+        cd "$work_dir"
+        SMU_VALIDATE_TIMEOUT=5 bash scripts/validate.sh --agent > "$output" 2>&1
+    ); then
+        fail "validate.sh --agent succeeded after timed check timeout"
+    fi
+
+    assert_contains "$output" "checking agent intake fixtures"
+    assert_contains "$output" "agent intake fixtures: timed out after 5s"
+}
+
 
 test_manifest_validation_rejects_duplicates
 test_validate_repos_rejects_invalid_categories
@@ -185,3 +208,4 @@ test_repo_validators_reject_unknown_paths
 test_validate_repos_lists_declared_validator
 test_validate_repos_reports_missing_validators
 test_add_repo_updates_manifests_and_docs
+test_validate_agent_reports_timed_check_timeout
