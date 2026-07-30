@@ -86,6 +86,25 @@ Check whether the remote candidate branch already points at installer `main`:
 scripts/release-install-update.sh --candidate-check --json
 ```
 
+Run the release-helper-only mocked smoke tests:
+
+```bash
+scripts/release-install-update.sh --self-test
+```
+
+Apply branch protection through the GitHub CLI after checking the plan:
+
+```bash
+scripts/configure-branch-protection.sh --plan
+scripts/configure-branch-protection.sh --apply
+```
+
+Use the release notes template when creating installer releases:
+
+```text
+scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
+```
+
 When root files changed, also run:
 
 ```bash

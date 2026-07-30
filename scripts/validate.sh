@@ -49,17 +49,20 @@ bash_checks() {
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
+        scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/tree-smoke-test.sh \
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
         scripts/tests/test-routes-doctor.sh scripts/tests/test-lib-modules.sh \
+        scripts/tests/test-output-snapshots.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh scripts/lib/json.sh \
         scripts/lib/agent-intake.sh scripts/lib/manifest-index.sh \
         scripts/lib/check-runner.sh scripts/lib/repo-health.sh \
-        scripts/lib/agent-intake-render.sh
+        scripts/lib/agent-intake-match.sh scripts/lib/agent-intake-render.sh \
+        scripts/lib/release-readiness-render.sh
 }
 
 shell_checks() {
@@ -73,18 +76,21 @@ shell_checks() {
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
         scripts/health-report.sh scripts/route-quality.sh \
         scripts/freshness-report.sh scripts/new-repo-check.sh scripts/add-repo.sh \
-        scripts/change-report.sh scripts/release-install-update.sh \
+        scripts/change-report.sh scripts/configure-branch-protection.sh \
+        scripts/release-install-update.sh \
         scripts/tree-smoke-test.sh \
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
         scripts/tests/test-lib-modules.sh \
+        scripts/tests/test-output-snapshots.sh \
         scripts/generate-command-docs.sh scripts/lib/repos.sh \
         scripts/lib/repo-state.sh scripts/lib/routes.sh \
         scripts/lib/validators.sh scripts/lib/json.sh \
         scripts/lib/agent-intake.sh scripts/lib/manifest-index.sh \
         scripts/lib/check-runner.sh scripts/lib/repo-health.sh \
-        scripts/lib/agent-intake-render.sh
+        scripts/lib/agent-intake-match.sh scripts/lib/agent-intake-render.sh \
+        scripts/lib/release-readiness-render.sh
 }
 
 markdown_checks() {
@@ -202,6 +208,7 @@ structure_checks() {
         scripts/new-repo-check.sh
         scripts/add-repo.sh
         scripts/change-report.sh
+        scripts/configure-branch-protection.sh
         scripts/release-install-update.sh
         scripts/tree-smoke-test.sh
         scripts/generate-command-docs.sh
@@ -218,13 +225,19 @@ structure_checks() {
         scripts/lib/manifest-index.sh
         scripts/lib/check-runner.sh
         scripts/lib/repo-health.sh
+        scripts/lib/agent-intake-match.sh
         scripts/lib/agent-intake-render.sh
+        scripts/lib/release-readiness-render.sh
         scripts/test-root-scripts.sh
         scripts/tests/test-helpers.sh
         scripts/tests/test-setup-update.sh
         scripts/tests/test-manifests.sh
         scripts/tests/test-routes-doctor.sh
         scripts/tests/test-lib-modules.sh
+        scripts/tests/test-output-snapshots.sh
+        scripts/tests/fixtures/output-snapshots/agent-intake-theme.json
+        scripts/tests/fixtures/output-snapshots/health-report.json
+        scripts/tests/fixtures/output-snapshots/release-readiness.json
         scripts/validate-repos.sh
         scripts/schemas/health-report.schema.json
         scripts/schemas/health-report.example.json
@@ -243,6 +256,7 @@ structure_checks() {
         scripts/docs/AGENT-INTAKE.md
         scripts/docs/INSTALL-UPDATE-RELEASE.md
         scripts/docs/INSTALL-UPDATE-COMPATIBILITY.md
+        scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
         .github/workflows/release-readiness.yml
         .gitignore
     )
@@ -338,6 +352,10 @@ structure_checks() {
     }
     [ -x scripts/change-report.sh ] || {
         printf "scripts/change-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/configure-branch-protection.sh ] || {
+        printf "scripts/configure-branch-protection.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/release-install-update.sh ] || {

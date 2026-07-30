@@ -52,6 +52,12 @@ Usage: scripts/check-repo-contract.sh [--json] [--allow-diverged] [--checked-out
 Usage: scripts/ci-workflow-report.sh [--checked-out] [--strict] [--tsv|--json]
 ```
 
+## scripts/configure-branch-protection.sh
+
+```text
+Usage: scripts/configure-branch-protection.sh [--plan|--apply]
+```
+
 ## scripts/doctor.sh
 
 ```text
@@ -97,7 +103,7 @@ Usage: scripts/new-repo-check.sh <managed-local-path>
 ## scripts/release-install-update.sh
 
 ```text
-Usage: scripts/release-install-update.sh [--check|--push|--publish-plan|--candidate-check] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]
+Usage: scripts/release-install-update.sh [--check|--push|--publish-plan|--candidate-check|--self-test] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]
 ```
 
 ## scripts/route-quality.sh

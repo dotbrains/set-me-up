@@ -1,0 +1,4 @@
+{
+  "repositoriesContain": "blueprint",
+  "requiredRepositoryKeys": ["repo", "path", "category", "state", "sync", "route", "validator"]
+}

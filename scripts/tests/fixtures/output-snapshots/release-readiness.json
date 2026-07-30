@@ -1,0 +1,6 @@
+{
+  "mode": "publish-plan",
+  "stage": "publish-plan",
+  "candidateKeys": ["ref", "head", "target", "fresh", "age_days", "max_age_days", "age_ok"],
+  "publishActionsContain": ["push", "candidate"]
+}

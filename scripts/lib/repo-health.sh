@@ -110,3 +110,27 @@ smu_repo_health_clean() {
 
     [ -z "$(git -C "$repo_root/$path" status --porcelain 2>/dev/null || printf "unknown")" ]
 }
+
+smu_each_repo_health() {
+    local repo_root="$1"
+    local repos_file="$2"
+    local routes_file="$3"
+    local validators_file="$4"
+    local callback="$5"
+    local repo
+    local path
+    local category
+    local state
+    local sync
+    local route_id
+    local validator
+
+    while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
+        [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
+        state="$(smu_repo_state "$path")"
+        sync="$(smu_repo_health_sync_for_state "$path" "$state")"
+        route_id="$(smu_repo_health_route_id "$routes_file" "$path")"
+        validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
+        "$callback" "$repo" "$path" "$category" "$state" "$sync" "$route_id" "$validator"
+    done < "$repos_file"
+}

@@ -4,10 +4,13 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$repo_root/scripts/lib/repo-health.sh"
+source "$repo_root/scripts/lib/json.sh"
+source "$repo_root/scripts/lib/release-readiness-render.sh"
 mode="--check"
 json_output=false
 release_tag="${SMU_RELEASE_TAG:-}"
 candidate_ref="${SMU_CANDIDATE_REF:-candidate}"
+candidate_max_age_days="${SMU_CANDIDATE_MAX_AGE_DAYS:-14}"
 signed_tag=false
 github_release=false
 release_title="${SMU_RELEASE_TITLE:-}"
@@ -15,21 +18,21 @@ release_notes="${SMU_RELEASE_NOTES:-}"
 current_stage="parse-arguments"
 
 usage() {
-    printf "Usage: %s [--check|--push|--publish-plan|--candidate-check] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]\n" "$0" >&2
+    printf "Usage: %s [--check|--push|--publish-plan|--candidate-check|--self-test] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]\n" "$0" >&2
 }
 
 on_exit() {
     local exit_code="$?"
 
     if [ "$exit_code" -ne 0 ] && [ "$json_output" = true ]; then
-        status_json "$exit_code" false false false "$current_stage"
+        release_status_json "$exit_code" false false false "$current_stage"
     fi
 }
 trap on_exit EXIT
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        --check | --push | --publish-plan | --candidate-check)
+        --check | --push | --publish-plan | --candidate-check | --self-test)
             mode="$1"
             ;;
         --json)
@@ -81,15 +84,6 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-json_escape() {
-    local value="$1"
-
-    value="${value//\\/\\\\}"
-    value="${value//\"/\\\"}"
-    value="${value//$'\n'/\\n}"
-    printf "%s" "$value"
-}
-
 repo_branch_head() {
     smu_repo_health_branch "$repo_root" "$1"
 }
@@ -128,80 +122,32 @@ candidate_fresh() {
     [ "$remote_candidate_head" = "$installer_head" ] && printf "true" || printf "false"
 }
 
-status_json() {
-    local failed="$1"
-    local validated="$2"
-    local pushed="$3"
-    local tagged="$4"
-    local stage="${5:-complete}"
-    local installer_target_head
-    local remote_candidate_head
-    local fresh
+candidate_age_days() {
+    local remote_candidate_head="$1"
+    local commit_time
+    local now
 
-    installer_target_head="$(repo_head installer)"
-    remote_candidate_head="$(candidate_head)"
-    fresh="$(candidate_fresh "$installer_target_head" "$remote_candidate_head")"
-
-    printf '{"mode":"%s","stage":"%s","candidate":{"ref":"%s","head":"%s","target":"%s","fresh":%s},"release":{"tag":"%s","signed":%s,"github_release":%s},"publish_plan":[' \
-        "$(json_escape "${mode#--}")" "$(json_escape "$stage")" \
-        "$(json_escape "$candidate_ref")" "$(json_escape "$remote_candidate_head")" \
-        "$(json_escape "$installer_target_head")" "$fresh" "$(json_escape "$release_tag")" \
-        "$signed_tag" "$github_release"
-    publish_plan_json
-    printf '],"validated":%s,"pushed":%s,"tagged":%s,"failed":%s,"repositories":[' \
-        "$validated" "$pushed" "$tagged" "$failed"
-    local first=true
-    local path branch clean sync head
-    for path in installer blueprint tests; do
-        branch="missing"
-        head="unknown"
-        sync="missing"
-        clean=false
-        if [ -d "$repo_root/$path/.git" ]; then
-            branch="$(repo_branch_head "$path")"
-            head="$(repo_head "$path")"
-            sync="$(repo_sync "$path")"
-            smu_repo_health_clean "$repo_root" "$path" && clean=true || clean=false
-        elif [ -d "$repo_root/$path" ]; then
-            sync="not-git"
-        fi
-        if [ "$first" = true ]; then
-            first=false
-        else
-            printf ','
-        fi
-        printf '{"path":"%s","branch":"%s","head":"%s","clean":%s,"sync":"%s"}' \
-            "$(json_escape "$path")" "$(json_escape "$branch")" "$(json_escape "$head")" \
-            "$clean" "$(json_escape "$sync")"
-    done
-    printf ']}\n'
+    [ "$remote_candidate_head" != "unknown" ] || {
+        printf "%s" "-1"
+        return 0
+    }
+    if ! git -C "$repo_root/installer" cat-file -e "$remote_candidate_head^{commit}" 2>/dev/null; then
+        git -C "$repo_root/installer" fetch --quiet origin "$remote_candidate_head" 2>/dev/null || true
+    fi
+    commit_time="$(git -C "$repo_root/installer" show -s --format=%ct "$remote_candidate_head" 2>/dev/null || printf "0")"
+    [ "$commit_time" -gt 0 ] || {
+        printf "%s" "-1"
+        return 0
+    }
+    now="$(date +%s)"
+    printf "%s" "$(((now - commit_time) / 86400))"
 }
 
-publish_plan_json() {
-    local first=true
+candidate_age_ok() {
+    local age_days="$1"
 
-    emit_action() {
-        local action="$1"
-        local target="$2"
-        local detail="$3"
-
-        if [ "$first" = true ]; then
-            first=false
-        else
-            printf ','
-        fi
-        printf '{"action":"%s","target":"%s","detail":"%s"}' \
-            "$(json_escape "$action")" "$(json_escape "$target")" \
-            "$(json_escape "$detail")"
-    }
-
-    emit_action "push" "installer" "main"
-    emit_action "push" "blueprint" "master"
-    emit_action "push" "tests" "main"
-    [ -n "$candidate_ref" ] && emit_action "candidate" "installer" "$candidate_ref"
-    [ -n "$release_tag" ] && emit_action "tag" "installer" "$release_tag"
-    [ "$github_release" = true ] && emit_action "github-release" "installer" "${release_tag:-<required-tag>}"
-    return 0
+    [ "$age_days" -ge 0 ] && [ "$age_days" -le "$candidate_max_age_days" ] && \
+        printf "true" || printf "false"
 }
 
 validate_repo() {
@@ -323,12 +269,25 @@ candidate_check() {
     current_stage="candidate:freshness"
     installer_target_head="$(repo_head installer)"
     remote_candidate_head="$(candidate_head)"
-    [ "$(candidate_fresh "$installer_target_head" "$remote_candidate_head")" = true ]
+    [ "$(candidate_fresh "$installer_target_head" "$remote_candidate_head")" = true ] && \
+        [ "$(candidate_age_ok "$(candidate_age_days "$remote_candidate_head")")" = true ]
 }
+
+self_test() {
+    current_stage="self-test"
+    SMU_RELEASE_HELPER_SELF_TEST=1 "$repo_root/scripts/tests/test-setup-update.sh"
+}
+
+if [ "$mode" = "--self-test" ]; then
+    self_test
+    [ "$json_output" = true ] && release_status_json 0 true false false "complete" || \
+        printf "release install/update self-test complete\n"
+    exit 0
+fi
 
 if [ "$mode" = "--publish-plan" ]; then
     json_output=true
-    status_json 0 false false false "publish-plan"
+    release_status_json 0 false false false "publish-plan"
     exit 0
 fi
 
@@ -359,7 +318,7 @@ if [ "$json_output" = true ]; then
     [ -n "$release_tag" ] && tagged=true
     pushed=false
     [ "$mode" = "--push" ] && pushed=true
-    status_json 0 true "$pushed" "$tagged" "complete"
+    release_status_json 0 true "$pushed" "$tagged" "complete"
 else
     printf "release install/update %s complete\n" "${mode#--}"
     [ -n "$release_tag" ] && printf "release tag\t%s\n" "$release_tag"

@@ -195,6 +195,8 @@ scripts/release-install-update.sh --publish-plan --json \
   --tag vX.Y.Z --candidate candidate
 scripts/release-install-update.sh --push --candidate candidate
 scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
+scripts/release-install-update.sh --self-test
+scripts/configure-branch-protection.sh --plan
 ```
 
 ## doctor.sh

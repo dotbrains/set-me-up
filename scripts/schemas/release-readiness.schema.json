@@ -4,16 +4,19 @@
   "type": "object",
   "required": ["mode", "stage", "candidate", "release", "publish_plan", "validated", "pushed", "tagged", "failed", "repositories"],
   "properties": {
-    "mode": { "enum": ["check", "push", "publish-plan", "candidate-check"] },
+    "mode": { "enum": ["check", "push", "publish-plan", "candidate-check", "self-test"] },
     "stage": { "type": "string" },
     "candidate": {
       "type": "object",
-      "required": ["ref", "head", "target", "fresh"],
+      "required": ["ref", "head", "target", "fresh", "age_days", "max_age_days", "age_ok"],
       "properties": {
         "ref": { "type": "string" },
         "head": { "type": "string" },
         "target": { "type": "string" },
-        "fresh": { "type": "boolean" }
+        "fresh": { "type": "boolean" },
+        "age_days": { "type": "integer" },
+        "max_age_days": { "type": "integer" },
+        "age_ok": { "type": "boolean" }
       },
       "additionalProperties": false
     },

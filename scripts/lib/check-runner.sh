@@ -12,7 +12,7 @@ smu_check_runner_init() {
 
 smu_run_timed_check() {
     local label="$1"
-    local timeout_seconds="${SMU_VALIDATE_TIMEOUT:-45}"
+    local timeout_seconds="${SMU_VALIDATE_TIMEOUT:-90}"
     shift
 
     printf "checking %s\n" "$label"

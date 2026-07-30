@@ -20,6 +20,7 @@ source "$repo_root/scripts/lib/json.sh"
 source "$repo_root/scripts/lib/manifest-index.sh"
 source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/agent-intake.sh"
+source "$repo_root/scripts/lib/agent-intake-match.sh"
 source "$repo_root/scripts/lib/agent-intake-render.sh"
 
 usage() {

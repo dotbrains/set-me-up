@@ -99,7 +99,9 @@ Ensure these files exist:
 - `scripts/lib/manifest-index.sh`
 - `scripts/lib/repo-health.sh`
 - `scripts/lib/check-runner.sh`
+- `scripts/lib/agent-intake-match.sh`
 - `scripts/lib/agent-intake-render.sh`
+- `scripts/lib/release-readiness-render.sh`
 - `scripts/route.sh` (must be executable)
 - `scripts/doctor.sh` (must be executable)
 - `scripts/setup.sh` (must be executable)

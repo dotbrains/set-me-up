@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "17 9 * * 1"
 
+permissions:
+  contents: read
+  issues: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -23,14 +27,25 @@ jobs:
         run: scripts/setup.sh
 
       - name: Run release readiness check
+        id: readiness
+        continue-on-error: true
         run: scripts/release-install-update.sh --check --json > release-readiness.json
 
       - name: Summarize release readiness
+        if: always()
         run: |
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
+          from pathlib import Path
 
-          with open("release-readiness.json", encoding="utf-8") as handle:
+          path = Path("release-readiness.json")
+          if not path.exists():
+              print("## Install/update release readiness")
+              print("")
+              print("Release readiness did not produce an artifact.")
+              raise SystemExit(0)
+
+          with path.open(encoding="utf-8") as handle:
               payload = json.load(handle)
 
           print("## Install/update release readiness")
@@ -51,8 +66,56 @@ jobs:
           PY
 
       - name: Upload release readiness artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release-readiness
           path: release-readiness.json
-          if-no-files-found: error
+          if-no-files-found: warn
+
+      - name: Open or update readiness failure issue
+        if: steps.readiness.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Install/update release readiness is failing"
+          body_file="$(mktemp)"
+          {
+            echo "Release readiness failed for ${GITHUB_REPOSITORY}@${GITHUB_SHA}."
+            echo
+            echo "Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            if [ -f release-readiness.json ]; then
+              echo '```json'
+              cat release-readiness.json
+              echo
+              echo '```'
+            fi
+          } > "$body_file"
+          gh label create release-readiness \
+            --repo "$GITHUB_REPOSITORY" \
+            --color "B60205" \
+            --description "Install/update release readiness failures" \
+            --force
+          existing="$(
+            gh issue list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --label release-readiness \
+              --search "$title in:title" \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
+          else
+            gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --label release-readiness \
+              --body-file "$body_file"
+          fi
+
+      - name: Fail workflow on readiness failure
+        if: steps.readiness.outcome == 'failure'
+        run: exit 1

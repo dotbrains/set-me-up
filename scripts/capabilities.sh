@@ -11,6 +11,7 @@ format="--tsv"
 query=""
 
 source "$repo_root/scripts/lib/repos.sh"
+source "$repo_root/scripts/lib/repo-state.sh"
 source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
 source "$repo_root/scripts/lib/repo-health.sh"
@@ -63,11 +64,24 @@ if [ "$format" = "--json" ]; then
 else
     printf "repo\\tpath\\tcategory\\troute\\tsummary\\tkeywords\\tvalidator\\n"
 fi
-while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
-    [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-    route_id=""
-    summary=""
-    keywords=""
+print_repo() {
+    local repo="$1"
+    local path="$2"
+    local category="$3"
+    local state="$4"
+    local sync="$5"
+    local health_route_id="$6"
+    local health_validator="$7"
+    local route_id=""
+    local summary=""
+    local keywords=""
+    local validator
+    local resolved
+    local haystack
+    local route
+    local rest
+
+    : "$state" "$sync" "$health_route_id"
     route=""
     rest=""
     if route="$(smu_route_for_path "$routes_file" "$path")"; then
@@ -81,7 +95,7 @@ while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
     then
         validator="$(smu_validator_label "$resolved")"
     elif [ "$declared_only" -eq 0 ] && \
-        validator="$(smu_repo_health_validator_label "$validators_file" "$path")" && \
+        validator="$health_validator" && \
         [ "$validator" != "none" ]
     then
         :
@@ -89,18 +103,21 @@ while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
         validator="none"
     fi
     haystack="$repo $path $category $route_id $summary $keywords $validator"
-    matches_query "$haystack" || continue
-    if [ "$format" = "--json" ]; then
-        printf '%s{"repo":"%s","path":"%s","category":"%s","route":"%s","summary":"%s","keywords":"%s","validator":"%s"}' \
-            "$comma" "$(smu_json_escape "$repo")" "$(smu_json_escape "$path")" \
-            "$(smu_json_escape "$category")" "$(smu_json_escape "$route_id")" \
-            "$(smu_json_escape "$summary")" "$(smu_json_escape "$keywords")" \
-            "$(smu_json_escape "$validator")"
-        comma=","
-    else
-        printf "%s\\t%s\\t%s\\t%s\\t%s\\t%s\\t%s\\n" \
-            "$repo" "$path" "$category" "$route_id" "$summary" "$keywords" \
-            "$validator"
+    if matches_query "$haystack"; then
+        if [ "$format" = "--json" ]; then
+            printf '%s{"repo":"%s","path":"%s","category":"%s","route":"%s","summary":"%s","keywords":"%s","validator":"%s"}' \
+                "$comma" "$(smu_json_escape "$repo")" "$(smu_json_escape "$path")" \
+                "$(smu_json_escape "$category")" "$(smu_json_escape "$route_id")" \
+                "$(smu_json_escape "$summary")" "$(smu_json_escape "$keywords")" \
+                "$(smu_json_escape "$validator")"
+            comma=","
+        else
+            printf "%s\\t%s\\t%s\\t%s\\t%s\\t%s\\t%s\\n" \
+                "$repo" "$path" "$category" "$route_id" "$summary" "$keywords" \
+                "$validator"
+        fi
     fi
-done < "$repos_file"
+}
+
+smu_each_repo_health "$repo_root" "$repos_file" "$routes_file" "$validators_file" print_repo
 [ "$format" = "--tsv" ] || printf ']}\n'

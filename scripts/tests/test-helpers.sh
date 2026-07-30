@@ -130,6 +130,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/new-repo-check.sh" "$target/scripts/"
     cp "$repo_root/scripts/add-repo.sh" "$target/scripts/"
     cp "$repo_root/scripts/change-report.sh" "$target/scripts/"
+    cp "$repo_root/scripts/configure-branch-protection.sh" "$target/scripts/"
     [ ! -f "$repo_root/scripts/release-install-update.sh" ] || \
         cp "$repo_root/scripts/release-install-update.sh" "$target/scripts/"
     cp "$repo_root/scripts/tree-smoke-test.sh" "$target/scripts/"
@@ -152,7 +153,9 @@ copy_root_scripts() {
     cp "$repo_root/scripts/lib/manifest-index.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/check-runner.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-health.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/agent-intake-match.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/lib/agent-intake-render.sh" "$target/scripts/lib/"
+    cp "$repo_root/scripts/lib/release-readiness-render.sh" "$target/scripts/lib/"
     cp "$repo_root/scripts/schemas/"*.json "$target/scripts/schemas/"
     cp "$repo_root/scripts/docs/"*.md "$target/scripts/docs/"
     cp -R "$repo_root/scripts/tests/fixtures/"* "$target/scripts/tests/fixtures/" 2>/dev/null || true

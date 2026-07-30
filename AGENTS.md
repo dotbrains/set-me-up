@@ -43,6 +43,8 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/new-repo-check.sh`: Checklist validator for adding a managed repo.
 - `scripts/add-repo.sh`: Validated workflow for adding a managed repo.
 - `scripts/change-report.sh`: Recent cross-repo commit summary.
+- `scripts/configure-branch-protection.sh`: GitHub branch-protection plan/apply
+  helper for release-governance branches.
 - `scripts/tree-smoke-test.sh`: Fresh-tree smoke test for root discovery tools.
 - `scripts/docs/COMMANDS.md`: Generated command usage reference.
 - `scripts/docs/AGENT-INTAKE.md`: Stable field and behavior contract for
@@ -63,8 +65,12 @@ belong in those child repositories; this file explains how to route it.
   validator, route, docs, and warning facts.
 - `scripts/lib/check-runner.sh`: Shared Validation Runner module for timed
   checks, quiet output capture, verbose streaming, and summaries.
+- `scripts/lib/agent-intake-match.sh`: Shared Agent Intake Match module for
+  query normalization, scoring, and route/intent selection.
 - `scripts/lib/agent-intake-render.sh`: Shared Agent Intake Renderer module
   for TSV, JSON, and plan output.
+- `scripts/lib/release-readiness-render.sh`: Shared Release Readiness Renderer
+  module for release-helper JSON payloads.
 - `scripts/setup.sh`: Clones every repo listed in `scripts/repos.txt`.
 - `scripts/update.sh`: Pulls every existing clean repo listed in
   `scripts/repos.txt`.
@@ -184,7 +190,10 @@ update that nested reference.
   `scripts/lib/repo-state.sh`.
 - Change shared repo health facts in `scripts/lib/repo-health.sh`.
 - Change timed validation execution behavior in `scripts/lib/check-runner.sh`.
+- Change agent-intake matching in `scripts/lib/agent-intake-match.sh`.
 - Change agent-intake output formatting in `scripts/lib/agent-intake-render.sh`.
+- Change release readiness JSON formatting in
+  `scripts/lib/release-readiness-render.sh`.
 - Document setup/update behavior in `scripts/SCRIPTS.md`.
 - Document user-facing repo inventory or first-run commands in `README.md`.
 - Document contributor workflow, linting, and tests in `CONTRIBUTING.md`.

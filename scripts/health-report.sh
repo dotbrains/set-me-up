@@ -37,17 +37,22 @@ smu_validate_repos_manifest "$repos_file"
 
 printf '{"repositories":['
 comma=""
-while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
-    [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-    state="$(smu_repo_state "$path")"
-    sync="$(smu_repo_health_sync_for_state "$path" "$state")"
-    route_id="$(smu_repo_health_route_id "$routes_file" "$path")"
-    validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
+print_repo() {
+    local repo="$1"
+    local path="$2"
+    local category="$3"
+    local state="$4"
+    local sync="$5"
+    local route_id="$6"
+    local validator="$7"
+
     printf '%s{"repo":"%s","path":"%s","category":"%s","state":"%s","sync":"%s","route":"%s","validator":"%s"}' \
         "$comma" "$(smu_json_escape "$repo")" "$(smu_json_escape "$path")" \
         "$(smu_json_escape "$category")" "$(smu_json_escape "$state")" \
         "$(smu_json_escape "$sync")" "$(smu_json_escape "$route_id")" \
         "$(smu_json_escape "$validator")"
     comma=","
-done < "$repos_file"
+}
+
+smu_each_repo_health "$repo_root" "$repos_file" "$routes_file" "$validators_file" print_repo
 printf ']}\n'

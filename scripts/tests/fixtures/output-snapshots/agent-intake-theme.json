@@ -1,0 +1,6 @@
+{
+  "query": "theme",
+  "matchedIntentsContains": "add-theme",
+  "repositoryPathsContain": "modules/colorschemes",
+  "nextCommandsContain": "scripts/validate-repos.sh --changed"
+}

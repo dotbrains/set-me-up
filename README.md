@@ -2,6 +2,7 @@
 
 [![Lint](https://github.com/dotbrains/set-me-up/workflows/Lint/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/lint.yml)
 [![Tests](https://github.com/dotbrains/set-me-up/workflows/Tests/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/tests.yml)
+[![Release Readiness](https://github.com/dotbrains/set-me-up/actions/workflows/release-readiness.yml/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/release-readiness.yml)
 [![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/License-PolyForm%20Shield%201.0.0-blue.svg)](https://polyformproject.org/licenses/shield/1.0.0)
 
 A comprehensive dotfiles and system configuration framework.
@@ -13,6 +14,19 @@ For detailed information about how set-me-up works, see the [documentation](http
 For information about the setup and update scripts, see [scripts/SCRIPTS.md](scripts/SCRIPTS.md).
 For the generated repository, route, capability, and validator index, see
 [REPOSITORIES.md](REPOSITORIES.md).
+
+## Install/Update Readiness
+
+The release-readiness workflow checks installer, blueprint, and scenario-test
+compatibility on a schedule. It publishes a `release-readiness.json` artifact,
+writes a run summary, and opens or updates an issue when readiness fails.
+
+Local maintainers can run:
+
+```bash
+scripts/release-install-update.sh --check --json
+scripts/release-install-update.sh --candidate-check --json
+```
 
 ## Contributing
 

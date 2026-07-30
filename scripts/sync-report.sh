@@ -4,11 +4,13 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repos_file="$repo_root/scripts/repos.txt"
+routes_file="$repo_root/scripts/agent-routes.txt"
 validators_file="$repo_root/scripts/repo-validators.txt"
 format="${1:---tsv}"
 
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
+source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
 source "$repo_root/scripts/lib/repo-health.sh"
 source "$repo_root/scripts/lib/json.sh"
@@ -34,16 +36,14 @@ print_repo() {
     local repo="$1"
     local path="$2"
     local category="$3"
-    local state
-    local sync
-    local validator="none"
+    local state="$4"
+    local sync="$5"
+    local route_id="$6"
+    local validator="$7"
     local dirty_paths
     local submodule_paths
 
-    : "$repo" "$category"
-    state="$(smu_repo_state "$path")"
-    sync="$(smu_repo_health_sync_for_state "$path" "$state")"
-    validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
+    : "$repo" "$category" "$route_id"
 
     if [ "$format" = "--json" ]; then
         printf '%s{"path":"%s","state":"%s","sync":"%s","validator":"%s"}' \
@@ -76,5 +76,5 @@ if [ "$format" = "--json" ]; then
 else
     printf "path\\tstate\\tsync\\tvalidator\\n"
 fi
-smu_each_repo "$repos_file" print_repo
+smu_each_repo_health "$repo_root" "$repos_file" "$routes_file" "$validators_file" print_repo
 [ "$format" = "--tsv" ] || printf ']}\n'

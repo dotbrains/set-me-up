@@ -171,7 +171,9 @@ copy_release_script_fixture() {
 
     mkdir -p "$work_dir/scripts/lib"
     cp "$repo_root/scripts/release-install-update.sh" "$work_dir/scripts/"
+    cp "$repo_root/scripts/lib/json.sh" "$work_dir/scripts/lib/"
     cp "$repo_root/scripts/lib/repo-health.sh" "$work_dir/scripts/lib/"
+    cp "$repo_root/scripts/lib/release-readiness-render.sh" "$work_dir/scripts/lib/"
 }
 
 test_release_check_outputs_json_readiness() {
@@ -423,15 +425,23 @@ PY
 }
 
 
-test_piped_setup_resolves_cloned_manifest
-test_piped_setup_ignores_unrelated_git_repo
-test_setup_propagates_clone_failures
-test_update_plans_skips_and_current_repos
-test_update_outputs_json_plan
-test_update_json_plan_reports_repo_states
-test_update_json_plan_does_not_fetch
-test_release_check_outputs_json_readiness
-test_release_failure_outputs_json_stage
-test_release_publish_plan_outputs_actions
-test_release_candidate_check_fails_when_stale
-test_release_github_release_uses_gh_cli
+if [ "${SMU_RELEASE_HELPER_SELF_TEST:-}" = 1 ]; then
+    test_release_check_outputs_json_readiness
+    test_release_failure_outputs_json_stage
+    test_release_publish_plan_outputs_actions
+    test_release_candidate_check_fails_when_stale
+    test_release_github_release_uses_gh_cli
+else
+    test_piped_setup_resolves_cloned_manifest
+    test_piped_setup_ignores_unrelated_git_repo
+    test_setup_propagates_clone_failures
+    test_update_plans_skips_and_current_repos
+    test_update_outputs_json_plan
+    test_update_json_plan_reports_repo_states
+    test_update_json_plan_does_not_fetch
+    test_release_check_outputs_json_readiness
+    test_release_failure_outputs_json_stage
+    test_release_publish_plan_outputs_actions
+    test_release_candidate_check_fails_when_stale
+    test_release_github_release_uses_gh_cli
+fi
