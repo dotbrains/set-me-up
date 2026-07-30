@@ -54,8 +54,9 @@ def normalize(payload):
 
 for query, fixture_path in fixtures.items():
     payload = json.loads(subprocess.check_output(
-        ["scripts/agent-intake.sh", "--json", query],
+        ["bash", "scripts/agent-intake.sh", "--json", query],
         text=True,
+        timeout=30,
     ))
     normalized = normalize(payload)
     if mode == "--write":

@@ -110,6 +110,9 @@ test_agent_intake_json_reports_structured_plan() {
 
     assert_contains "$output" '"query":"theme"'
     assert_contains "$output" '"matchedIntents":["add-theme"'
+    assert_contains "$output" '"riskSummary":{'
+    assert_contains "$output" '"blocking":'
+    assert_contains "$output" '"ambiguities":['
     assert_contains "$output" '"repositories":['
     assert_contains "$output" '"path":"modules/colorschemes"'
     assert_contains "$output" '"role":"primary"'
