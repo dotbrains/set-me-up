@@ -36,6 +36,9 @@ jobs:
       - name: Verify route and validator coverage
         run: scripts/validate.sh --coverage
 
+      - name: Verify agent intake fixtures
+        run: scripts/agent-intake-fixtures.sh --check
+
       - name: Generate test report
         if: always()
         run: |

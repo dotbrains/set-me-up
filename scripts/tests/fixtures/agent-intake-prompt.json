@@ -1,6 +1,21 @@
 {
   "query": "prompt",
-  "matchedIntents": ["add-prompt", "shell-config"],
+  "matchedIntents": [
+    "add-prompt",
+    "shell-config"
+  ],
+  "ambiguities": [
+    {
+      "intent": "add-prompt",
+      "confidence": "high",
+      "score": 200
+    },
+    {
+      "intent": "shell-config",
+      "confidence": "high",
+      "score": 140
+    }
+  ],
   "firstRepository": {
     "path": "installer",
     "role": "primary",

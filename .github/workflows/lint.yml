@@ -9,7 +9,9 @@ on:
       - '**.bash'
       - 'scripts/repos.txt'
       - 'scripts/agent-routes.txt'
+      - 'scripts/agent-intents.txt'
       - 'scripts/repo-validators.txt'
+      - 'scripts/tests/fixtures/**'
       - '.github/workflows/lint.yml'
       - '.github/workflows/tests.yml'
   push:
@@ -22,7 +24,9 @@ on:
       - '**.bash'
       - 'scripts/repos.txt'
       - 'scripts/agent-routes.txt'
+      - 'scripts/agent-intents.txt'
       - 'scripts/repo-validators.txt'
+      - 'scripts/tests/fixtures/**'
       - '.github/workflows/lint.yml'
       - '.github/workflows/tests.yml'
 

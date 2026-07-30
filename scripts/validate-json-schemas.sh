@@ -50,6 +50,7 @@ def type_matches(value, expected):
         return any(type_matches(value, item) for item in expected)
     return {
         "array": isinstance(value, list),
+        "boolean": isinstance(value, bool),
         "integer": isinstance(value, int) and not isinstance(value, bool),
         "object": isinstance(value, dict),
         "string": isinstance(value, str),

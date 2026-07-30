@@ -1,6 +1,22 @@
 {
   "query": "theme",
-  "matchedIntents": ["add-theme", "shell-config", "editor-config"],
+  "matchedIntents": [
+    "add-theme",
+    "shell-config",
+    "editor-config"
+  ],
+  "ambiguities": [
+    {
+      "intent": "add-theme",
+      "confidence": "high",
+      "score": 180
+    },
+    {
+      "intent": "editor-config",
+      "confidence": "high",
+      "score": 140
+    }
+  ],
   "firstRepository": {
     "path": "modules/colorschemes",
     "role": "primary",

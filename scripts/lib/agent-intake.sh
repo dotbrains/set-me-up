@@ -464,6 +464,117 @@ strict_has_blocking_risks() {
     return 1
 }
 
+risk_summary_counts() {
+    local path
+    local level
+    local high=0
+    local medium=0
+    local low=0
+
+    IFS=',' read -r -a paths <<< "$selected_paths"
+    for path in "${paths[@]}"; do
+        level="$(risk_level_for_path "$path")"
+        case "$level" in
+            high)
+                high=$((high + 1))
+                ;;
+            medium)
+                medium=$((medium + 1))
+                ;;
+            low)
+                low=$((low + 1))
+                ;;
+        esac
+    done
+
+    printf "%s,%s,%s" "$high" "$medium" "$low"
+}
+
+blocking_risk_reasons() {
+    local path
+    local risks
+    local blocking_reasons=""
+    local risk
+
+    IFS=',' read -r -a paths <<< "$selected_paths"
+    for path in "${paths[@]}"; do
+        risks="$(risk_flags_for_path "$path")"
+        IFS=',' read -r -a risk_list <<< "$risks"
+        for risk in "${risk_list[@]}"; do
+            [ -n "$risk" ] || continue
+            case "$risk" in
+                dirty|detached|diverged|behind|missing|not-git|no-validator)
+                    blocking_reasons="$(append_csv_unique "$blocking_reasons" "$path:$risk")"
+                    ;;
+            esac
+        done
+    done
+
+    printf "%s" "$blocking_reasons"
+}
+
+print_risk_summary_json() {
+    local counts
+    local high
+    local medium
+    local low
+    local rest
+    local blocking=false
+
+    counts="$(risk_summary_counts)"
+    high="${counts%%,*}"
+    rest="${counts#*,}"
+    medium="${rest%%,*}"
+    low="${rest##*,}"
+    strict_has_blocking_risks && blocking=true
+
+    printf '{"high":%s,"medium":%s,"low":%s,"blocking":%s,"reasons":' \
+        "$high" "$medium" "$low" "$blocking"
+    json_array_from_csv "$(blocking_risk_reasons)"
+    printf "}"
+}
+
+high_confidence_intent_count() {
+    local score
+    local count=0
+
+    [ -n "$matched_intent_scores" ] || {
+        printf "0"
+        return 0
+    }
+    IFS=',' read -r -a scores <<< "$matched_intent_scores"
+    for score in "${scores[@]}"; do
+        [ "$(confidence_for_score "$score")" = "high" ] && count=$((count + 1))
+    done
+    printf "%s" "$count"
+}
+
+print_ambiguities_json() {
+    local count
+    local comma=""
+    local index
+    local intent
+    local score
+
+    count="$(high_confidence_intent_count)"
+    printf "["
+    [ "$count" -gt 1 ] || {
+        printf "]"
+        return 0
+    }
+    IFS=',' read -r -a intents <<< "$matched_intents"
+    IFS=',' read -r -a scores <<< "$matched_intent_scores"
+    for index in "${!intents[@]}"; do
+        intent="${intents[$index]}"
+        score="${scores[$index]}"
+        [ "$(confidence_for_score "$score")" = "high" ] || continue
+        printf '%s{"intent":"%s","confidence":"high","score":%s}' \
+            "$comma" "$(smu_json_escape "$intent")" "$score"
+        comma=","
+    done
+    printf "]"
+}
+
 print_tsv() {
     local index
     local path
@@ -576,6 +687,10 @@ print_json() {
 
     printf '{"query":"%s","matchedIntents":' "$(smu_json_escape "$query")"
     json_array_from_csv "$matched_intents"
+    printf ',"riskSummary":'
+    print_risk_summary_json
+    printf ',"ambiguities":'
+    print_ambiguities_json
     printf ',"repositories":['
     IFS=',' read -r -a paths <<< "$selected_paths"
     IFS=',' read -r -a roles <<< "$selected_roles"

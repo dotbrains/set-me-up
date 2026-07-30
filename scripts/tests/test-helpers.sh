@@ -113,6 +113,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/update.sh" "$target/scripts/"
     cp "$repo_root/scripts/route.sh" "$target/scripts/"
     cp "$repo_root/scripts/agent-intake.sh" "$target/scripts/"
+    cp "$repo_root/scripts/agent-intake-fixtures.sh" "$target/scripts/"
     cp "$repo_root/scripts/doctor.sh" "$target/scripts/"
     cp "$repo_root/scripts/sync-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/check-repo-contract.sh" "$target/scripts/"
@@ -127,6 +128,8 @@ copy_root_scripts() {
     cp "$repo_root/scripts/new-repo-check.sh" "$target/scripts/"
     cp "$repo_root/scripts/add-repo.sh" "$target/scripts/"
     cp "$repo_root/scripts/change-report.sh" "$target/scripts/"
+    [ ! -f "$repo_root/scripts/release-install-update.sh" ] || \
+        cp "$repo_root/scripts/release-install-update.sh" "$target/scripts/"
     cp "$repo_root/scripts/tree-smoke-test.sh" "$target/scripts/"
     cp "$repo_root/scripts/generate-command-docs.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-json-schemas.sh" "$target/scripts/"

@@ -2,13 +2,48 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "set-me-up agent intake report",
   "type": "object",
-  "required": ["query", "matchedIntents", "repositories", "nextCommands"],
+  "required": [
+    "query",
+    "matchedIntents",
+    "riskSummary",
+    "ambiguities",
+    "repositories",
+    "nextCommands"
+  ],
   "additionalProperties": false,
   "properties": {
     "query": { "type": "string" },
     "matchedIntents": {
       "type": "array",
       "items": { "type": "string" }
+    },
+    "riskSummary": {
+      "type": "object",
+      "required": ["high", "medium", "low", "blocking", "reasons"],
+      "additionalProperties": false,
+      "properties": {
+        "high": { "type": "integer" },
+        "medium": { "type": "integer" },
+        "low": { "type": "integer" },
+        "blocking": { "type": "boolean" },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["intent", "confidence", "score"],
+        "additionalProperties": false,
+        "properties": {
+          "intent": { "type": "string" },
+          "confidence": { "type": "string", "enum": ["high"] },
+          "score": { "type": "integer" }
+        }
+      }
     },
     "repositories": {
       "type": "array",

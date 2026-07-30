@@ -16,6 +16,12 @@ scripts/generate-command-docs.sh
 Usage: scripts/add-repo.sh <repo> <local-path> <category> <route-id> <summary> <keywords> [validator]
 ```
 
+## scripts/agent-intake-fixtures.sh
+
+```text
+Usage: scripts/agent-intake-fixtures.sh [--write|--check]
+```
+
 ## scripts/agent-intake.sh
 
 ```text
@@ -86,6 +92,12 @@ Usage: scripts/native-workflow-template.sh [--report|--check] [--tsv|--json]
 
 ```text
 Usage: scripts/new-repo-check.sh <managed-local-path>
+```
+
+## scripts/release-install-update.sh
+
+```text
+Usage: scripts/release-install-update.sh [--check|--push]
 ```
 
 ## scripts/route-quality.sh

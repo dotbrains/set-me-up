@@ -30,9 +30,21 @@ Use `SMU_INSTALLER_URL` instead when testing a fork or nonstandard raw URL.
 Run the native validator in every changed child repo:
 
 ```bash
+scripts/release-install-update.sh --check
+```
+
+This runs the child validators in release order. To run them manually:
+
+```bash
 (cd installer && scripts/validate.sh --all)
 (cd blueprint && scripts/validate.sh)
 (cd tests && scripts/validate.sh)
+```
+
+After child commits are ready, push them in release order:
+
+```bash
+scripts/release-install-update.sh --push
 ```
 
 When root files changed, also run:

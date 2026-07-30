@@ -1,6 +1,9 @@
 {
   "query": "new repo",
-  "matchedIntents": ["add-managed-repo"],
+  "matchedIntents": [
+    "add-managed-repo"
+  ],
+  "ambiguities": [],
   "firstRepository": {
     "path": ".",
     "role": "primary",

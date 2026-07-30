@@ -11,13 +11,15 @@ mode="${1:---all}"
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
-        scripts/agent-intake.sh scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
+        scripts/agent-intake.sh scripts/agent-intake-fixtures.sh \
+        scripts/doctor.sh scripts/sync-report.sh scripts/check-repo-contract.sh \
         scripts/validator-exceptions.sh scripts/capabilities.sh \
         scripts/ci-workflow-report.sh scripts/generate-docs.sh \
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
-        scripts/tree-smoke-test.sh scripts/validate-json-schemas.sh \
+        scripts/release-install-update.sh scripts/tree-smoke-test.sh \
+        scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
         scripts/tests/test-routes-doctor.sh \
@@ -31,13 +33,15 @@ shell_checks() {
     bash_checks
     shellcheck --severity=warning scripts/setup.sh scripts/update.sh \
         scripts/validate.sh scripts/test-root-scripts.sh scripts/validate-repos.sh \
-        scripts/route.sh scripts/agent-intake.sh scripts/doctor.sh scripts/sync-report.sh \
+        scripts/route.sh scripts/agent-intake.sh scripts/agent-intake-fixtures.sh \
+        scripts/doctor.sh scripts/sync-report.sh \
         scripts/check-repo-contract.sh scripts/validator-exceptions.sh \
         scripts/capabilities.sh scripts/ci-workflow-report.sh \
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
         scripts/health-report.sh scripts/route-quality.sh \
         scripts/freshness-report.sh scripts/new-repo-check.sh scripts/add-repo.sh \
-        scripts/change-report.sh scripts/tree-smoke-test.sh \
+        scripts/change-report.sh scripts/release-install-update.sh \
+        scripts/tree-smoke-test.sh \
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
@@ -128,6 +132,7 @@ intent_map_checks() {
     local extra
     local seen_intents=" "
     local path
+    local keyword
 
     while IFS='|' read -r intent_id primary_paths related_paths validation_commands summary keywords extra || \
         [ -n "$intent_id" ]; do
@@ -172,6 +177,13 @@ intent_map_checks() {
         add-module agent-config; do
         grep -Eq "^${intent_id}\\|" scripts/agent-intents.txt || {
             printf "Missing core agent intent: %s\\n" "$intent_id" >&2
+            exit 1
+        }
+    done
+
+    for keyword in theme prompt smu agent module repo; do
+        grep -Eq "^[^#].*\\|[^|]*\\b${keyword}\\b[^|]*$" scripts/agent-intents.txt || {
+            printf "Missing route-to-intent coverage keyword: %s\\n" "$keyword" >&2
             exit 1
         }
     done
@@ -258,6 +270,7 @@ coverage_checks() {
     scripts/change-report.sh --json >/dev/null
     scripts/capabilities.sh --json >/dev/null
     scripts/agent-intake.sh --json theme >/dev/null
+    scripts/agent-intake-fixtures.sh --check >/dev/null
     scripts/sync-report.sh --json >/dev/null
     scripts/update.sh --plan --json >/dev/null
     scripts/ci-workflow-report.sh --checked-out --json >/dev/null
@@ -275,6 +288,7 @@ structure_checks() {
         scripts/update.sh
         scripts/route.sh
         scripts/agent-intake.sh
+        scripts/agent-intake-fixtures.sh
         scripts/doctor.sh
         scripts/sync-report.sh
         scripts/check-repo-contract.sh
@@ -289,6 +303,7 @@ structure_checks() {
         scripts/new-repo-check.sh
         scripts/add-repo.sh
         scripts/change-report.sh
+        scripts/release-install-update.sh
         scripts/tree-smoke-test.sh
         scripts/generate-command-docs.sh
         scripts/validate-json-schemas.sh
@@ -320,6 +335,7 @@ structure_checks() {
         scripts/schemas/update-report.schema.json
         scripts/docs/SCRIPTS-DETAILS.md
         scripts/docs/COMMANDS.md
+        scripts/docs/AGENT-INTAKE.md
         .gitignore
     )
     local required_ignores=(
@@ -354,6 +370,10 @@ structure_checks() {
     }
     [ -x scripts/agent-intake.sh ] || {
         printf "scripts/agent-intake.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/agent-intake-fixtures.sh ] || {
+        printf "scripts/agent-intake-fixtures.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/doctor.sh ] || {
@@ -410,6 +430,10 @@ structure_checks() {
     }
     [ -x scripts/change-report.sh ] || {
         printf "scripts/change-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/release-install-update.sh ] || {
+        printf "scripts/release-install-update.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/tree-smoke-test.sh ] || {

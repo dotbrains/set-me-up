@@ -45,6 +45,8 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/change-report.sh`: Recent cross-repo commit summary.
 - `scripts/tree-smoke-test.sh`: Fresh-tree smoke test for root discovery tools.
 - `scripts/docs/COMMANDS.md`: Generated command usage reference.
+- `scripts/docs/AGENT-INTAKE.md`: Stable field and behavior contract for
+  `scripts/agent-intake.sh`.
 - `scripts/schemas/`: JSON schemas for machine-readable root reports.
 - `scripts/validate-json-schemas.sh`: Validates generated JSON report shape.
 - `REPOSITORIES.md`: Generated repository, route, capability, and validator

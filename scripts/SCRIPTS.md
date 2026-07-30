@@ -154,6 +154,7 @@ scripts/agent-intake.sh --explain theme
 scripts/agent-intake.sh --plan theme
 scripts/agent-intake.sh --strict theme
 scripts/agent-intake.sh --json "change smu command"
+scripts/agent-intake-fixtures.sh --check
 ```
 
 Output includes:
@@ -172,6 +173,9 @@ human-readable checklist. Use `--strict` when automation should fail on dirty,
 detached, missing, not-git, behind, diverged, or missing-validator selected
 repositories. Low-score matches are filtered unless they are the best available
 match.
+
+The machine-readable field contract is documented in
+[AGENT-INTAKE.md](docs/AGENT-INTAKE.md).
 
 ## doctor.sh
 
