@@ -110,7 +110,7 @@ copy_root_scripts() {
     cp "$repo_root/REPOSITORIES.md" "$target/"
     cp "$repo_root/.gitignore" "$target/"
     cp -R "$repo_root/.github/workflows" "$target/.github/"
-    cp "$repo_root/scripts/SCRIPTS.md" "$target/scripts/"
+    cp "$repo_root/scripts/"*.md "$target/scripts/"
     cp "$repo_root/scripts/setup.sh" "$target/scripts/"
     cp "$repo_root/scripts/update.sh" "$target/scripts/"
     cp "$repo_root/scripts/route.sh" "$target/scripts/"

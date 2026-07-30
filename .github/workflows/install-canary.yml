@@ -1,0 +1,109 @@
+name: Install Canary
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "43 10 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-installer:
+    name: Public installer one-liner
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Run public installer plan
+        id: canary
+        continue-on-error: true
+        run: |
+          SMU_PASS_HOST_ENV=true \
+            bash <(curl -sSL https://raw.githubusercontent.com/dotbrains/set-me-up-installer/main/install.sh) \
+              --plan --json > install-canary.log
+          grep -q '"installer"' install-canary.log
+
+      - name: Upload canary artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-canary
+          path: install-canary.log
+          if-no-files-found: warn
+
+      - name: Open or update canary failure issue
+        if: steps.canary.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Public install canary is failing"
+          body_file="$(mktemp)"
+          {
+            echo "The public installer one-liner failed."
+            echo
+            echo "Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            if [ -f install-canary.log ]; then
+              echo '```text'
+              cat install-canary.log
+              echo
+              echo '```'
+            fi
+          } > "$body_file"
+          gh label create install-canary \
+            --repo "$GITHUB_REPOSITORY" \
+            --color "D93F0B" \
+            --description "Public installer canary failures" \
+            --force
+          existing="$(
+            gh issue list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --label install-canary \
+              --search "$title in:title" \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
+          else
+            gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --label install-canary \
+              --body-file "$body_file"
+          fi
+
+      - name: Close canary failure issue
+        if: steps.canary.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Public install canary is failing"
+          existing="$(
+            gh issue list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --label install-canary \
+              --search "$title in:title" \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body "The public installer one-liner is green again."
+            gh issue close "$existing" \
+              --repo "$GITHUB_REPOSITORY" \
+              --reason completed
+          fi
+
+      - name: Fail workflow on canary failure
+        if: steps.canary.outcome == 'failure'
+        run: exit 1

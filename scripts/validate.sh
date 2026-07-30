@@ -251,6 +251,7 @@ structure_checks() {
         scripts/schemas/sync-report.schema.json
         scripts/schemas/update-report.schema.json
         scripts/schemas/release-readiness.schema.json
+        scripts/VPS.md
         scripts/docs/SCRIPTS-DETAILS.md
         scripts/docs/COMMANDS.md
         scripts/docs/AGENT-INTAKE.md
@@ -258,6 +259,7 @@ structure_checks() {
         scripts/docs/INSTALL-UPDATE-COMPATIBILITY.md
         scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
         .github/workflows/release-readiness.yml
+        .github/workflows/install-canary.yml
         .gitignore
     )
     local required_ignores=(

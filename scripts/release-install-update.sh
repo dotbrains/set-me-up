@@ -8,6 +8,7 @@ source "$repo_root/scripts/lib/json.sh"
 source "$repo_root/scripts/lib/release-readiness-render.sh"
 mode="--check"
 json_output=false
+dry_run=false
 release_tag="${SMU_RELEASE_TAG:-}"
 candidate_ref="${SMU_CANDIDATE_REF:-candidate}"
 candidate_max_age_days="${SMU_CANDIDATE_MAX_AGE_DAYS:-14}"
@@ -15,10 +16,11 @@ signed_tag=false
 github_release=false
 release_title="${SMU_RELEASE_TITLE:-}"
 release_notes="${SMU_RELEASE_NOTES:-}"
+release_notes_file="${SMU_RELEASE_NOTES_FILE:-}"
 current_stage="parse-arguments"
 
 usage() {
-    printf "Usage: %s [--check|--push|--publish-plan|--candidate-check|--self-test] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES]\n" "$0" >&2
+    printf "Usage: %s [--check|--push|--release TAG|--publish-plan|--candidate-check|--self-test] [--dry-run] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES|--notes-file FILE]\n" "$0" >&2
 }
 
 on_exit() {
@@ -34,6 +36,20 @@ while [ "$#" -gt 0 ]; do
     case "$1" in
         --check | --push | --publish-plan | --candidate-check | --self-test)
             mode="$1"
+            ;;
+        --release)
+            shift
+            mode="--push"
+            release_tag="${1:-}"
+            github_release=true
+            ;;
+        --release=*)
+            mode="--push"
+            release_tag="${1#*=}"
+            github_release=true
+            ;;
+        --dry-run)
+            dry_run=true
             ;;
         --json)
             json_output=true
@@ -72,6 +88,13 @@ while [ "$#" -gt 0 ]; do
         --release-notes=*)
             release_notes="${1#*=}"
             ;;
+        --notes-file)
+            shift
+            release_notes_file="${1:-}"
+            ;;
+        --notes-file=*)
+            release_notes_file="${1#*=}"
+            ;;
         -h | --help)
             usage
             exit 0
@@ -83,6 +106,25 @@ while [ "$#" -gt 0 ]; do
     esac
     shift
 done
+
+if [ -n "$release_notes" ] && [ -n "$release_notes_file" ]; then
+    printf "--release-notes and --notes-file are mutually exclusive\n" >&2
+    exit 2
+fi
+
+if [ -n "$release_notes_file" ]; then
+    current_stage="notes:file"
+    [ -f "$release_notes_file" ] || {
+        printf "Release notes file not found: %s\n" "$release_notes_file" >&2
+        exit 2
+    }
+    release_notes="$(cat "$release_notes_file")"
+fi
+
+if [ "$mode" = "--push" ] && [ "$github_release" = true ] && [ -z "$release_tag" ]; then
+    printf "--github-release requires --tag TAG or --release TAG\n" >&2
+    exit 2
+fi
 
 repo_branch_head() {
     smu_repo_health_branch "$repo_root" "$1"
@@ -181,6 +223,10 @@ push_repo() {
     local branch="$2"
 
     current_stage="push:$path"
+    if [ "$dry_run" = true ]; then
+        [ "$json_output" = true ] || printf "dry-run\tpush\t%s\t%s\n" "$path" "$branch"
+        return 0
+    fi
     [ "$json_output" = true ] || printf "push\t%s\t%s\n" "$path" "$branch"
     if [ "$json_output" = true ]; then
         git -C "$repo_root/$path" push --quiet origin "$branch" >/dev/null 2>&1
@@ -195,6 +241,10 @@ tag_installer_release() {
     fi
 
     current_stage="tag:installer"
+    if [ "$dry_run" = true ]; then
+        [ "$json_output" = true ] || printf "dry-run\ttag\tinstaller\t%s\n" "$release_tag"
+        return 0
+    fi
     if git -C "$repo_root/installer" rev-parse "$release_tag" >/dev/null 2>&1; then
         [ "$json_output" = true ] || printf "tag\tinstaller\t%s\talready-exists\n" "$release_tag"
     else
@@ -222,6 +272,10 @@ update_candidate_ref() {
     fi
 
     current_stage="candidate:installer"
+    if [ "$dry_run" = true ]; then
+        [ "$json_output" = true ] || printf "dry-run\tcandidate\tinstaller\t%s\n" "$candidate_ref"
+        return 0
+    fi
     [ "$json_output" = true ] || printf "candidate\tinstaller\t%s\n" "$candidate_ref"
     if [ "$json_output" = true ]; then
         git -C "$repo_root/installer" push --quiet origin "HEAD:refs/heads/$candidate_ref" >/dev/null 2>&1
@@ -238,12 +292,16 @@ publish_github_release() {
         printf "--github-release requires --tag TAG\n" >&2
         return 2
     fi
+    current_stage="release:github"
+    if [ "$dry_run" = true ]; then
+        [ "$json_output" = true ] || printf "dry-run\tgithub-release\tinstaller\t%s\n" "$release_tag"
+        return 0
+    fi
     if ! command -v gh >/dev/null 2>&1; then
         printf "--github-release requires the GitHub CLI: gh\n" >&2
         return 2
     fi
 
-    current_stage="release:github"
     local -a command=(gh release create "$release_tag" --repo dotbrains/set-me-up-installer)
     if [ -n "$release_title" ]; then
         command+=(--title "$release_title")
@@ -317,10 +375,14 @@ if [ "$json_output" = true ]; then
     tagged=false
     [ -n "$release_tag" ] && tagged=true
     pushed=false
-    [ "$mode" = "--push" ] && pushed=true
+    [ "$mode" = "--push" ] && [ "$dry_run" != true ] && pushed=true
     release_status_json 0 true "$pushed" "$tagged" "complete"
 else
-    printf "release install/update %s complete\n" "${mode#--}"
+    if [ "$dry_run" = true ]; then
+        printf "release install/update %s dry-run complete\n" "${mode#--}"
+    else
+        printf "release install/update %s complete\n" "${mode#--}"
+    fi
     [ -n "$release_tag" ] && printf "release tag\t%s\n" "$release_tag"
     [ "$signed_tag" = true ] && printf "release provenance\tsigned-tag\n"
     [ "$github_release" = true ] && printf "github release\t%s\n" "$release_tag"

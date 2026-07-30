@@ -65,14 +65,20 @@ After child commits are ready, push them in release order:
 
 ```bash
 scripts/release-install-update.sh --push
+scripts/release-install-update.sh --push --dry-run --tag vX.Y.Z --candidate candidate --github-release
 scripts/release-install-update.sh --push --tag vX.Y.Z --candidate candidate
 scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
+scripts/release-install-update.sh --release vX.Y.Z --notes-file scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
 ```
 
 Use `--signed-tag` when local GPG signing is configured. Use `--github-release`
 to create a GitHub Release in `dotbrains/set-me-up-installer`; omit
 `--release-notes` to let GitHub generate notes, or pass explicit notes for a
-manual release summary.
+manual release summary. Use `--notes-file` for markdown release notes. Use
+`--release vX.Y.Z` as the one-command maintainer release flow; it validates,
+requires clean release repositories, pushes, tags, updates the candidate branch,
+and creates the GitHub Release. Add `--dry-run` to run validation and clean
+checks while previewing the mutation steps.
 
 Preview the publish actions without rerunning validators or mutating remotes:
 
@@ -86,6 +92,10 @@ Check whether the remote candidate branch already points at installer `main`:
 scripts/release-install-update.sh --candidate-check --json
 ```
 
+Readiness JSON includes release provenance: UTC timestamp, workflow run URL
+when available, installer SHA, candidate SHA, tag SHA, blueprint SHA, and tests
+SHA.
+
 Run the release-helper-only mocked smoke tests:
 
 ```bash
@@ -96,14 +106,22 @@ Apply branch protection through the GitHub CLI after checking the plan:
 
 ```bash
 scripts/configure-branch-protection.sh --plan
+scripts/configure-branch-protection.sh --check
 scripts/configure-branch-protection.sh --apply
 ```
+
+`--check` compares the expected required status checks against GitHub branch
+protection and exits non-zero on drift.
 
 Use the release notes template when creating installer releases:
 
 ```text
 scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
 ```
+
+The scheduled install canary runs the public one-liner against
+`dotbrains/set-me-up-installer/main` and opens `install-canary` issues when the
+published entrypoint breaks.
 
 When root files changed, also run:
 

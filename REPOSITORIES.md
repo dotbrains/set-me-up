@@ -17,7 +17,7 @@ scripts/generate-docs.sh
 - Category: `top-level`
 - Route: `blueprint`
 - Summary: Blueprint structure and bootstrap composition
-- Keywords: `blueprint,bootstrap,composition`
+- Keywords: `blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet`
 - Validator:
 
   ```bash
@@ -45,7 +45,7 @@ scripts/generate-docs.sh
 - Category: `top-level`
 - Route: `installer`
 - Summary: Installer behavior and smu command implementation
-- Keywords: `installer,smu,cli,theme,prompt,catalog,profile`
+- Keywords: `installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet`
 - Validator:
 
   ```bash
@@ -59,7 +59,7 @@ scripts/generate-docs.sh
 - Category: `top-level`
 - Route: `tests`
 - Summary: End-to-end provisioning scenarios
-- Keywords: `test,tests,e2e,scenario,provisioning,docker`
+- Keywords: `test,tests,e2e,scenario,provisioning,docker,vps,server,headless,digitalocean,droplet`
 - Validator:
 
   ```bash
@@ -103,7 +103,7 @@ scripts/generate-docs.sh
 - Category: `module`
 - Route: `modules-debian`
 - Summary: Debian and Linux modules
-- Keywords: `debian,linux,apt,module`
+- Keywords: `debian,linux,apt,module,vps,server,headless,digitalocean,droplet,ubuntu`
 - Validator:
 
   ```bash

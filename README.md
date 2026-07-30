@@ -15,17 +15,23 @@ For information about the setup and update scripts, see [scripts/SCRIPTS.md](scr
 For the generated repository, route, capability, and validator index, see
 [REPOSITORIES.md](REPOSITORIES.md).
 
+For a headless Ubuntu/Debian VPS such as a DigitalOcean Droplet, use the
+first-class VPS path documented in [scripts/VPS.md](scripts/VPS.md).
+
 ## Install/Update Readiness
 
 The release-readiness workflow checks installer, blueprint, and scenario-test
 compatibility on a schedule. It publishes a `release-readiness.json` artifact,
-writes a run summary, and opens or updates an issue when readiness fails.
+writes a run summary, opens or updates an issue when readiness fails, and
+closes that issue when readiness is green again. A separate install canary runs
+the public one-liner on a schedule.
 
 Local maintainers can run:
 
 ```bash
 scripts/release-install-update.sh --check --json
 scripts/release-install-update.sh --candidate-check --json
+scripts/release-install-update.sh --push --dry-run --tag vX.Y.Z --github-release
 ```
 
 ## Contributing
@@ -43,6 +49,19 @@ cd set-me-up
 chmod +x scripts/setup.sh
 ./scripts/setup.sh
 ```
+
+## VPS Setup
+
+Agents and maintainers can route VPS or DigitalOcean work through the
+`vps-server-setup` intent:
+
+```bash
+scripts/agent-intake.sh --plan vps
+```
+
+The supported headless path installs a blueprint, then provisions the
+Debian-only `server/headless` module instead of the workstation-oriented Debian
+module set.
 
 ## Updating Repositories
 

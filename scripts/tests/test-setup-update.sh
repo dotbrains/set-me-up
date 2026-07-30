@@ -217,6 +217,11 @@ assert payload["candidate"]["ref"] == "candidate"
 assert payload["release"]["tag"] == "v0.0.0"
 assert payload["release"]["signed"] is True
 assert payload["release"]["github_release"] is True
+assert payload["release"]["notes_file"] == ""
+assert payload["dry_run"] is False
+assert payload["provenance"]["installer"] != ""
+assert payload["provenance"]["blueprint"] != ""
+assert payload["provenance"]["tests"] != ""
 assert payload["validated"] is True
 assert payload["pushed"] is False
 assert payload["tagged"] is True
@@ -424,6 +429,123 @@ assert payload["failed"] == 0
 PY
 }
 
+test_release_dry_run_push_does_not_mutate_remotes() {
+    local work_dir="$tmp_root/release-dry-run"
+    local remote_dir="$work_dir/remotes"
+    local output="$work_dir/output.json"
+
+    mkdir -p "$remote_dir"
+    copy_release_script_fixture "$work_dir"
+
+    local path branch
+    for path in installer blueprint tests; do
+        branch="main"
+        [ "$path" = "blueprint" ] && branch="master"
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+        git init --quiet --bare "$remote_dir/$path.git"
+        git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
+        git -C "$work_dir/$path" push --quiet -u origin "$branch"
+    done
+
+    (
+        cd "$work_dir"
+        bash scripts/release-install-update.sh --push --dry-run --json \
+            --tag v0.0.2 --candidate candidate --github-release > "$output"
+    )
+
+    if git -C "$remote_dir/installer.git" rev-parse refs/tags/v0.0.2 >/dev/null 2>&1; then
+        fail "dry-run unexpectedly pushed a tag"
+    fi
+    if git -C "$remote_dir/installer.git" rev-parse refs/heads/candidate >/dev/null 2>&1; then
+        fail "dry-run unexpectedly pushed candidate"
+    fi
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "push"
+assert payload["dry_run"] is True
+assert payload["validated"] is True
+assert payload["pushed"] is False
+assert payload["tagged"] is True
+PY
+}
+
+test_release_notes_file_and_release_mode_use_gh_cli() {
+    local work_dir="$tmp_root/release-notes-file"
+    local bin_dir="$work_dir/bin"
+    local remote_dir="$work_dir/remotes"
+    local output="$work_dir/output.json"
+    local gh_log="$work_dir/gh.log"
+    local notes_file="$work_dir/notes.md"
+
+    mkdir -p "$bin_dir" "$remote_dir"
+    copy_release_script_fixture "$work_dir"
+    printf "Release notes from file\n" > "$notes_file"
+    cat > "$bin_dir/gh" <<'EOF'
+#!/usr/bin/env bash
+printf "%s\n" "$*" >> "$SMU_TEST_GH_LOG"
+EOF
+    chmod +x "$bin_dir/gh"
+
+    local path branch
+    for path in installer blueprint tests; do
+        branch="main"
+        [ "$path" = "blueprint" ] && branch="master"
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+        git init --quiet --bare "$remote_dir/$path.git"
+        git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
+        git -C "$work_dir/$path" push --quiet -u origin "$branch"
+    done
+
+    (
+        cd "$work_dir"
+        SMU_TEST_GH_LOG="$gh_log" PATH="$bin_dir:$PATH" \
+            bash scripts/release-install-update.sh --release v0.0.3 --json \
+            --candidate "" --notes-file "$notes_file" > "$output"
+    )
+
+    assert_contains "$gh_log" "release create v0.0.3 --repo dotbrains/set-me-up-installer --title set-me-up installer v0.0.3 --notes Release notes from file"
+    python3 - "$output" "$notes_file" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "push"
+assert payload["release"]["tag"] == "v0.0.3"
+assert payload["release"]["github_release"] is True
+assert payload["release"]["notes_file"] == sys.argv[2]
+assert payload["pushed"] is True
+PY
+}
+
 
 if [ "${SMU_RELEASE_HELPER_SELF_TEST:-}" = 1 ]; then
     test_release_check_outputs_json_readiness
@@ -431,6 +553,8 @@ if [ "${SMU_RELEASE_HELPER_SELF_TEST:-}" = 1 ]; then
     test_release_publish_plan_outputs_actions
     test_release_candidate_check_fails_when_stale
     test_release_github_release_uses_gh_cli
+    test_release_dry_run_push_does_not_mutate_remotes
+    test_release_notes_file_and_release_mode_use_gh_cli
 else
     test_piped_setup_resolves_cloned_manifest
     test_piped_setup_ignores_unrelated_git_repo
@@ -444,4 +568,6 @@ else
     test_release_publish_plan_outputs_actions
     test_release_candidate_check_fails_when_stale
     test_release_github_release_uses_gh_cli
+    test_release_dry_run_push_does_not_mutate_remotes
+    test_release_notes_file_and_release_mode_use_gh_cli
 fi

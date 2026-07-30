@@ -54,6 +54,8 @@ jobs:
           print(f"- Stage: `{payload['stage']}`")
           print(f"- Candidate: `{payload['candidate']['ref']}`")
           print(f"- Candidate fresh: `{payload['candidate']['fresh']}`")
+          print(f"- Candidate age: `{payload['candidate']['age_days']}` days")
+          print(f"- Workflow run: `{payload['provenance']['workflow_run']}`")
           print(f"- Failed: `{payload['failed']}`")
           print("")
           print("| Repository | Branch | Clean | Sync |")
@@ -116,6 +118,44 @@ jobs:
               --body-file "$body_file"
           fi
 
+      - name: Close readiness failure issue
+        if: steps.readiness.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Install/update release readiness is failing"
+          existing="$(
+            gh issue list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --label release-readiness \
+              --search "$title in:title" \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body "Release readiness is green again for ${GITHUB_REPOSITORY}@${GITHUB_SHA}."
+            gh issue close "$existing" \
+              --repo "$GITHUB_REPOSITORY" \
+              --reason completed
+          fi
+
       - name: Fail workflow on readiness failure
         if: steps.readiness.outcome == 'failure'
         run: exit 1
+
+  branch-protection:
+    name: Branch protection drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check branch protection
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/configure-branch-protection.sh --check

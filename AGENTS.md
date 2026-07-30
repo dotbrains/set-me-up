@@ -43,9 +43,11 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/new-repo-check.sh`: Checklist validator for adding a managed repo.
 - `scripts/add-repo.sh`: Validated workflow for adding a managed repo.
 - `scripts/change-report.sh`: Recent cross-repo commit summary.
-- `scripts/configure-branch-protection.sh`: GitHub branch-protection plan/apply
-  helper for release-governance branches.
+- `scripts/configure-branch-protection.sh`: GitHub branch-protection
+  plan/check/apply helper for release-governance branches.
 - `scripts/tree-smoke-test.sh`: Fresh-tree smoke test for root discovery tools.
+- `scripts/VPS.md`: Routing and validation guide for the first-class headless
+  VPS/DigitalOcean setup path.
 - `scripts/docs/COMMANDS.md`: Generated command usage reference.
 - `scripts/docs/AGENT-INTAKE.md`: Stable field and behavior contract for
   `scripts/agent-intake.sh`.

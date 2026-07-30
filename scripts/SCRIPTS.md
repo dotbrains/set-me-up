@@ -122,6 +122,7 @@ Query routes with:
 scripts/route.sh theme
 scripts/route.sh prompt
 scripts/route.sh installer
+scripts/route.sh vps
 ```
 
 ## agent-intents.txt
@@ -155,6 +156,7 @@ scripts/agent-intake.sh --explain theme
 scripts/agent-intake.sh --plan theme
 scripts/agent-intake.sh --strict theme
 scripts/agent-intake.sh --json "change smu command"
+scripts/agent-intake.sh --plan vps
 scripts/agent-intake-fixtures.sh --check
 ```
 
@@ -193,10 +195,14 @@ scripts/release-install-update.sh --check --json
 scripts/release-install-update.sh --candidate-check --json
 scripts/release-install-update.sh --publish-plan --json \
   --tag vX.Y.Z --candidate candidate
+scripts/release-install-update.sh --push --dry-run --tag vX.Y.Z --github-release
 scripts/release-install-update.sh --push --candidate candidate
 scripts/release-install-update.sh --push --tag vX.Y.Z --signed-tag --github-release
+scripts/release-install-update.sh --release vX.Y.Z \
+  --notes-file scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
 scripts/release-install-update.sh --self-test
 scripts/configure-branch-protection.sh --plan
+scripts/configure-branch-protection.sh --check
 ```
 
 ## doctor.sh
