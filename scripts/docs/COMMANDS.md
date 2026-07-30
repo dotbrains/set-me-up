@@ -157,7 +157,7 @@ Usage: scripts/validate-repos.sh [--changed|--clean|--all|--list|--missing]
 ## scripts/validate.sh
 
 ```text
-Usage: scripts/validate.sh [--all|--bash|--shell|--markdown|--structure|--coverage|--test]
+Usage: scripts/validate.sh [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test]
 ```
 
 ## scripts/validator-exceptions.sh

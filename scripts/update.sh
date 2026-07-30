@@ -50,6 +50,29 @@ repo_head() {
     git -C "$1" rev-parse HEAD 2>/dev/null || printf "unknown"
 }
 
+fetch_origin_quiet() {
+    local path="$1"
+    local timeout_seconds="${SMU_UPDATE_FETCH_TIMEOUT:-15}"
+
+    GIT_TERMINAL_PROMPT=0 python3 - "$path" "$timeout_seconds" <<'PY'
+import subprocess
+import sys
+
+path = sys.argv[1]
+timeout_seconds = int(sys.argv[2])
+try:
+    subprocess.run(
+        ["git", "-C", path, "fetch", "--quiet", "origin"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        timeout=timeout_seconds,
+    )
+except (OSError, subprocess.TimeoutExpired):
+    pass
+PY
+}
+
 repo_action() {
     local state="$1"
     local sync="$2"
@@ -96,9 +119,13 @@ inspect_repo() {
     if [ "$state" != "missing" ] && [ "$state" != "not-git" ]; then
         before="$(repo_head "$path")"
     fi
+    if [ "$mode" = "--apply" ] && \
+        [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
+        [ "$state" != "detached" ]; then
+        fetch_origin_quiet "$path"
+    fi
     if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
         [ "$state" != "detached" ]; then
-        git -C "$path" fetch --quiet origin 2>/dev/null || true
         sync="$(smu_repo_sync_status "$path")"
     fi
 

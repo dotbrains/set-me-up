@@ -13,6 +13,7 @@ scripts/agent-intake.sh --explain <query>
 scripts/agent-intake.sh --strict <query>
 scripts/agent-intake-fixtures.sh --check
 scripts/agent-intake-fixtures.sh --write
+scripts/validate.sh --agent
 ```
 
 Use `--json` for automation, `--plan` for a human-readable checklist, and
@@ -73,3 +74,6 @@ only when the intended matching contract changes:
 scripts/agent-intake-fixtures.sh --write
 scripts/agent-intake-fixtures.sh --check
 ```
+
+`scripts/validate.sh --agent` runs the fast agent-operability contract: routes,
+intents, intake JSON/plan output, fixtures, schema checks, and this document.

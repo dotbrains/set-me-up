@@ -8,6 +8,26 @@ source "$repo_root/scripts/lib/repos.sh"
 
 mode="${1:---all}"
 
+run_timed_check() {
+    local label="$1"
+    shift
+
+    printf "checking %s\n" "$label"
+    python3 - "$label" "$@" <<'PY'
+import subprocess
+import sys
+
+label = sys.argv[1]
+command = sys.argv[2:]
+try:
+    subprocess.run(command, check=True, timeout=45)
+except subprocess.TimeoutExpired:
+    raise SystemExit(f"{label}: timed out")
+except subprocess.CalledProcessError as exc:
+    raise SystemExit(f"{label}: failed with exit {exc.returncode}")
+PY
+}
+
 bash_checks() {
     bash -n scripts/setup.sh scripts/update.sh scripts/validate.sh \
         scripts/test-root-scripts.sh scripts/validate-repos.sh scripts/route.sh \
@@ -259,24 +279,34 @@ coverage_checks() {
             ;;
     esac
 
-    scripts/validator-exceptions.sh --checked-out --strict
-    scripts/check-repo-contract.sh --all --checked-out >/dev/null
-    scripts/ci-workflow-report.sh --checked-out --strict >/dev/null
-    scripts/native-workflow-template.sh --check >/dev/null
-    scripts/route-quality.sh >/dev/null
-    scripts/health-report.sh --json >/dev/null
-    scripts/doctor.sh --json >/dev/null
-    scripts/freshness-report.sh --json >/dev/null
-    scripts/change-report.sh --json >/dev/null
-    scripts/capabilities.sh --json >/dev/null
-    scripts/agent-intake.sh --json theme >/dev/null
-    scripts/agent-intake-fixtures.sh --check >/dev/null
-    scripts/sync-report.sh --json >/dev/null
-    scripts/update.sh --plan --json >/dev/null
-    scripts/ci-workflow-report.sh --checked-out --json >/dev/null
-    scripts/native-workflow-template.sh --check --json >/dev/null
-    scripts/validate-json-schemas.sh >/dev/null
-    scripts/tree-smoke-test.sh >/dev/null
+    run_timed_check "validator exceptions" scripts/validator-exceptions.sh --checked-out --strict
+    run_timed_check "repo contracts" scripts/check-repo-contract.sh --all --checked-out
+    run_timed_check "workflow coverage" scripts/ci-workflow-report.sh --checked-out --strict
+    run_timed_check "native workflow template" scripts/native-workflow-template.sh --check
+    run_timed_check "route quality" scripts/route-quality.sh
+    run_timed_check "health report json" scripts/health-report.sh --json
+    run_timed_check "doctor json" scripts/doctor.sh --json
+    run_timed_check "freshness report json" scripts/freshness-report.sh --json
+    run_timed_check "change report json" scripts/change-report.sh --json
+    run_timed_check "capabilities json" scripts/capabilities.sh --json
+    run_timed_check "agent intake json" scripts/agent-intake.sh --json theme
+    run_timed_check "agent intake fixtures" scripts/agent-intake-fixtures.sh --check
+    run_timed_check "sync report json" scripts/sync-report.sh --json
+    run_timed_check "update plan json" scripts/update.sh --plan --json
+    run_timed_check "ci workflow json" scripts/ci-workflow-report.sh --checked-out --json
+    run_timed_check "native workflow json" scripts/native-workflow-template.sh --check --json
+    run_timed_check "json schema validation" scripts/validate-json-schemas.sh
+    run_timed_check "tree smoke test" scripts/tree-smoke-test.sh
+}
+
+agent_checks() {
+    route_map_checks
+    intent_map_checks
+    run_timed_check "agent intake json" scripts/agent-intake.sh --json theme
+    run_timed_check "agent intake plan" scripts/agent-intake.sh --plan theme
+    run_timed_check "agent intake fixtures" scripts/agent-intake-fixtures.sh --check
+    run_timed_check "agent intake schema" scripts/validate-json-schemas.sh
+    grep -q "Agent Intake Contract" scripts/docs/AGENT-INTAKE.md
 }
 
 structure_checks() {
@@ -497,6 +527,9 @@ case "$mode" in
     --coverage)
         coverage_checks
         ;;
+    --agent)
+        agent_checks
+        ;;
     --test)
         test_checks
         ;;
@@ -508,7 +541,7 @@ case "$mode" in
         test_checks
         ;;
     *)
-        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--coverage|--test]\\n" "$0" >&2
+        printf "Usage: %s [--all|--bash|--shell|--markdown|--structure|--coverage|--agent|--test]\\n" "$0" >&2
         exit 2
         ;;
 esac

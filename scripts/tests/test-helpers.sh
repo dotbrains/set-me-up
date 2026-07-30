@@ -82,6 +82,7 @@ case "${1:-}" in
         printf "Already up to date.\\n"
         ;;
     fetch)
+        [ -z "${SMU_TEST_GIT_FETCH_LOG:-}" ] || printf "fetch\n" >> "$SMU_TEST_GIT_FETCH_LOG"
         ;;
     branch)
         [ "${2:-}" = "--show-current" ] && printf "main\\n"

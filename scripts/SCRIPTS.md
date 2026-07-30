@@ -177,6 +177,12 @@ match.
 The machine-readable field contract is documented in
 [AGENT-INTAKE.md](docs/AGENT-INTAKE.md).
 
+Run the fast agent-operability validation surface with:
+
+```bash
+scripts/validate.sh --agent
+```
+
 ## doctor.sh
 
 The `doctor.sh` command is read-only. It reports checkout state, route
@@ -200,6 +206,9 @@ Summary output includes:
 Verbose output adds per-repository sync status such as `ahead:1`,
 `behind:2`, or `diverged:21:7`.
 JSON output is the preferred agent entry point for structured repository state.
+Schema validation reports each command before it runs and fails timed-out report
+commands explicitly, so validation hangs point to the command that needs
+attention.
 
 ## sync-report.sh
 

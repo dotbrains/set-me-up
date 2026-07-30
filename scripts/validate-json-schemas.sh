@@ -83,7 +83,24 @@ def validate(schema, value, path):
 for schema_name, command in checks:
     schema_path = root / "scripts" / "schemas" / schema_name
     schema = json.loads(schema_path.read_text())
-    payload = json.loads(subprocess.check_output(command, cwd=root, text=True))
+    print(f"checking {schema_name} via {' '.join(command)}")
+    try:
+        payload_text = subprocess.check_output(
+            command,
+            cwd=root,
+            text=True,
+            stderr=subprocess.STDOUT,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise SystemExit(
+            f"{schema_name}: command timed out: {' '.join(command)}"
+        ) from exc
+    except subprocess.CalledProcessError as exc:
+        raise SystemExit(
+            f"{schema_name}: command failed: {' '.join(command)}\n{exc.output}"
+        ) from exc
+    payload = json.loads(payload_text)
     validate(schema, payload, schema_name)
 
 print("JSON schema checks passed.")
