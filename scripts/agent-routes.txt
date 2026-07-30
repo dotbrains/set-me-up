@@ -4,7 +4,7 @@ root-orchestration|.|Root setup orchestration, repo manifest, validation, root C
 installer|installer|Installer behavior and smu command implementation|installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet
 tests|tests|End-to-end provisioning scenarios|test,tests,e2e,scenario,provisioning,docker,vps,server,headless,digitalocean,droplet
 utilities|utilities|Shared utility shell functions|utility,utilities,shell,function,helper
-blueprint|blueprint|Blueprint structure and bootstrap composition|blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,github-actions,doctor,migrate,readiness,ci-contract,contract
+blueprint|blueprint|Blueprint structure and bootstrap composition|blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,github-actions,doctor,migrate,readiness,ci-contract,contract,portable
 docs|docs|Published documentation site and content|docs,documentation,site,guide
 ai-config|shared/ai-config|Shared AI agent configuration and skills|agent,ai,skill,skills,shared-config
 claude|home/claude|Claude Code configuration|claude,claude-code,agent-config
@@ -29,4 +29,4 @@ modules-preferences|modules/preferences|Preferences module|preferences,defaults,
 modules-template|modules/template-module|Template for new modules|template,module,new-module,scaffold
 modules-universal|modules/universal|Cross-platform modules|universal,cross-platform,module
 modules-xcode|modules/xcode|Xcode module|xcode,developer-tools,module
-provisioning-adapters|installer|Provisioning adapter selection for rcm, Nix, Home Manager, nix-darwin, and NixOS blueprints|provisioning,adapter,adapters,rcm,nix,home-manager,nix-darwin,nixos,flake,migration,audit,coverage,dashboard,schema,validation,profile,profiles,docs,aliases,config,scaffold,scaffolding,ci,hybrid,primary,init,switch,parity,generate,module,toml,smoke,install,modes,mode,engine,blueprint-init,blueprint-doctor,blueprint-migrate,compatibility,matrix,readiness,ci-contract,contract,compare,plan,dry-run,apply,vps,debian,ubuntu,arch,doctor,policy,platform,drift,check,container,lock,state,provider,providers,hetzner,github-actions
+provisioning-adapters|installer|Provisioning adapter selection for rcm, Nix, Home Manager, nix-darwin, and NixOS blueprints|provisioning,adapter,adapters,rcm,nix,home-manager,nix-darwin,nixos,flake,migration,audit,coverage,dashboard,schema,validation,profile,profiles,docs,aliases,config,scaffold,scaffolding,ci,hybrid,primary,init,switch,parity,generate,module,toml,smoke,install,modes,mode,engine,blueprint-init,blueprint-doctor,blueprint-migrate,blueprint-ci,compatibility,matrix,readiness,ci-contract,contract,portable,compare,plan,dry-run,apply,vps,debian,ubuntu,arch,doctor,policy,platform,drift,check,container,lock,state,provider,providers,hetzner,github-actions

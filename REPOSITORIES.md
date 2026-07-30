@@ -17,7 +17,7 @@ scripts/generate-docs.sh
 - Category: `top-level`
 - Route: `blueprint`
 - Summary: Blueprint structure and bootstrap composition
-- Keywords: `blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,github-actions,doctor,migrate,readiness,ci-contract,contract`
+- Keywords: `blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,github-actions,doctor,migrate,readiness,ci-contract,contract,portable`
 - Validator:
 
   ```bash
