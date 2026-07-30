@@ -495,10 +495,18 @@ blocking_risk_reasons() {
     local risks
     local blocking_reasons=""
     local risk
+    local -a paths=()
+    local -a risk_list=()
 
+    [ -n "$selected_paths" ] || {
+        printf "%s" "$blocking_reasons"
+        return 0
+    }
     IFS=',' read -r -a paths <<< "$selected_paths"
     for path in "${paths[@]}"; do
         risks="$(risk_flags_for_path "$path")"
+        [ -n "$risks" ] || continue
+        risk_list=()
         IFS=',' read -r -a risk_list <<< "$risks"
         for risk in "${risk_list[@]}"; do
             [ -n "$risk" ] || continue
