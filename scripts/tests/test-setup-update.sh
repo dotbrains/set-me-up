@@ -191,6 +191,23 @@ write_release_preflight_fixture() {
   "errors": []
 }
 EOF
+    cat > "$work_dir/installer/docs/json-contracts/provisioning-capabilities.example.json" <<'EOF'
+{
+  "contract": {
+    "version": 1,
+    "blueprint_keys": ["provisioning.mode", "provisioning.adapter", "provisioning.nix_adapter"],
+    "module_manifest_table": "adapters",
+    "module_adapter_required_keys": ["path"]
+  },
+  "adapters": [
+    { "id": "rcm" },
+    { "id": "home-manager" },
+    { "id": "nix-darwin" },
+    { "id": "nixos" },
+    { "id": "hybrid" }
+  ]
+}
+EOF
     mkdir -p "$work_dir/blueprint/examples/github-actions"
     local workflow
     for workflow in rcm nix hybrid; do
@@ -202,6 +219,24 @@ jobs:
       - run: python3 set-me-up-installer/smu.py provisioning-adapter preflight --json
 EOF
     done
+    mkdir -p "$work_dir/blueprint/scripts"
+    cat > "$work_dir/blueprint/scripts/validate-examples.sh" <<'EOF'
+#!/usr/bin/env bash
+cat <<'JSON'
+{
+  "valid": true,
+  "errors": [],
+  "readiness": {
+    "preflight": "passed",
+    "summary": {
+      "provider_examples": 6,
+      "workflow_preflight": 3
+    }
+  }
+}
+JSON
+EOF
+    chmod +x "$work_dir/blueprint/scripts/validate-examples.sh"
 }
 
 test_release_check_outputs_json_readiness() {

@@ -235,6 +235,33 @@ if not isinstance(payload["errors"], list):
 PY
 }
 
+check_installer_capabilities_contract() {
+    local contract="$repo_root/installer/docs/json-contracts/provisioning-capabilities.example.json"
+
+    current_stage="preflight-contracts:capabilities"
+    [ "$json_output" = true ] || printf "preflight-contract\tinstaller\t%s\n" "$contract"
+    python3 - "$contract" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+contract = payload.get("contract", {})
+if contract.get("version") != 1:
+    raise SystemExit("provisioning capabilities contract.version must be 1")
+if "provisioning.adapter" not in contract.get("blueprint_keys", []):
+    raise SystemExit("provisioning capabilities contract must name provisioning.adapter")
+if contract.get("module_manifest_table") != "adapters":
+    raise SystemExit("provisioning capabilities contract must use adapters table")
+if "path" not in contract.get("module_adapter_required_keys", []):
+    raise SystemExit("provisioning capabilities contract must require adapter path")
+adapters = {adapter.get("id"): adapter for adapter in payload.get("adapters", [])}
+for adapter_id in ("rcm", "home-manager", "nix-darwin", "nixos", "hybrid"):
+    if adapter_id not in adapters:
+        raise SystemExit(f"missing adapter capability: {adapter_id}")
+PY
+}
+
 check_blueprint_preflight_workflows() {
     local workflow
     local missing=false
@@ -253,9 +280,30 @@ check_blueprint_preflight_workflows() {
     [ "$missing" = false ]
 }
 
+check_blueprint_readiness_contract() {
+    current_stage="preflight-contracts:blueprint-readiness"
+    [ "$json_output" = true ] || printf "preflight-contract\tblueprint\treadiness-json\n"
+    "$repo_root/blueprint/scripts/validate-examples.sh" --json | python3 -c '
+import json
+import sys
+
+payload = json.load(sys.stdin)
+readiness = payload.get("readiness", {})
+summary = readiness.get("summary", {})
+if readiness.get("preflight") != "passed":
+    raise SystemExit("blueprint readiness preflight must pass")
+if summary.get("workflow_preflight") != 3:
+    raise SystemExit("blueprint readiness must report three workflow preflight checks")
+if summary.get("provider_examples") != 6:
+    raise SystemExit("blueprint readiness must report six provider examples")
+'
+}
+
 check_preflight_contracts() {
     check_installer_preflight_contract
+    check_installer_capabilities_contract
     check_blueprint_preflight_workflows
+    check_blueprint_readiness_contract
     preflight_contracts=true
 }
 
