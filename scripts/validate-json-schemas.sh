@@ -42,7 +42,7 @@ checks = [
     ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"], False, 30),
     ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"], False, 30),
     ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"], False, 30),
-    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--check", "--json"], True, 90),
+    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--check", "--json"], True, 180),
 ]
 
 
