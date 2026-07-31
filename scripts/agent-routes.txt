@@ -4,7 +4,7 @@ root-orchestration|.|Root setup orchestration, repo manifest, validation, root C
 installer|installer|Installer behavior and smu command implementation|installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet
 tests|tests|End-to-end provisioning scenarios|test,tests,e2e,scenario,provisioning,docker,vps,server,headless,digitalocean,droplet
 utilities|utilities|Shared utility shell functions|utility,utilities,shell,function,helper
-blueprint|blueprint|Blueprint structure and bootstrap composition|blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,provider-matrix,blueprint-recommend,recommend,recommendation,starter,write,validate-generated,capability,capabilities,github-actions,doctor,migrate,readiness,ci-contract,contract,portable,modular,architecture
+blueprint|blueprint|Blueprint structure and bootstrap composition|blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,provider-matrix,blueprint-recommend,recommend,recommendation,starter,write,validate-generated,capability,capabilities,github-actions,validate-contract,contract-validate,schema-backed,schema-backed-readiness,reusable-validator,doctor,migrate,readiness,ci-contract,contract,portable,modular,architecture
 docs|docs|Published documentation site and content|docs,documentation,site,guide
 ai-config|shared/ai-config|Shared AI agent configuration and skills|agent,ai,skill,skills,shared-config
 claude|home/claude|Claude Code configuration|claude,claude-code,agent-config

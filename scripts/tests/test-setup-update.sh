@@ -208,6 +208,51 @@ EOF
   ]
 }
 EOF
+    cat > "$work_dir/installer/smu.py" <<'EOF'
+#!/usr/bin/env python3
+import json
+import sys
+
+name = sys.argv[sys.argv.index("validate") + 1]
+path = sys.argv[sys.argv.index("--path") + 1]
+payload = json.load(sys.stdin if path == "-" else open(path, encoding="utf-8"))
+errors = []
+
+if name == "provisioning-preflight":
+    for key in ("adapter", "action", "host_supported", "can_apply", "preflight", "plan", "errors"):
+        if key not in payload:
+            errors.append(f"missing {key}")
+    if not isinstance(payload.get("plan", {}).get("commands"), list):
+        errors.append("plan.commands must be an array")
+elif name == "provisioning-capabilities":
+    contract = payload.get("contract", {})
+    adapters = {adapter.get("id") for adapter in payload.get("adapters", [])}
+    if contract.get("version") != 1:
+        errors.append("contract.version must be 1")
+    if contract.get("module_manifest_table") != "adapters":
+        errors.append("module_manifest_table must be adapters")
+    if "path" not in contract.get("module_adapter_required_keys", []):
+        errors.append("module_adapter_required_keys missing path")
+    for adapter_id in ("rcm", "home-manager", "nix-darwin", "nixos", "hybrid"):
+        if adapter_id not in adapters:
+            errors.append(f"missing {adapter_id}")
+elif name == "blueprint-ci-readiness":
+    readiness = payload.get("readiness", {})
+    summary = readiness.get("summary", {})
+    if readiness.get("preflight") != "passed":
+        errors.append("preflight must be passed")
+    if summary.get("workflow_preflight") != 3:
+        errors.append("workflow_preflight must be 3")
+    if summary.get("provider_examples") != 6:
+        errors.append("provider_examples must be 6")
+else:
+    errors.append(f"unknown contract {name}")
+
+for error in errors:
+    print(error, file=sys.stderr)
+sys.exit(1 if errors else 0)
+EOF
+    chmod +x "$work_dir/installer/smu.py"
     mkdir -p "$work_dir/blueprint/examples/github-actions"
     local workflow
     for workflow in rcm nix hybrid; do

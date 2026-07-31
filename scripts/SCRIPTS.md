@@ -205,6 +205,10 @@ scripts/configure-branch-protection.sh --plan
 scripts/configure-branch-protection.sh --check
 ```
 
+The release helper validates provisioning preflight, adapter capabilities, and
+blueprint CI readiness through `installer/smu.py contract validate`, so local
+checks and scheduled readiness use the same schema-backed contract rules.
+
 ## doctor.sh
 
 The `doctor.sh` command is read-only. It reports checkout state, route

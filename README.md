@@ -23,8 +23,10 @@ first-class VPS path documented in [scripts/VPS.md](scripts/VPS.md).
 The release-readiness workflow checks installer, blueprint, and scenario-test
 compatibility on a schedule. It also gates provisioning preflight drift by
 requiring the installer JSON contract example and blueprint GitHub Actions
-preflight steps to stay in sync. It also validates the versioned adapter
-capabilities contract and the blueprint CI readiness summary. It publishes a
+preflight steps to stay in sync. It calls the installer-owned `smu contract
+validate` rules for provisioning preflight, adapter capabilities, and blueprint
+CI readiness so schema drift is checked through the same CLI contract users
+consume. It publishes a
 `release-readiness.json` artifact, writes a run summary, opens or updates an
 issue when readiness fails, and closes that issue when readiness is green again.
 A separate install canary runs the public one-liner on a schedule.
