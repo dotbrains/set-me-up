@@ -18,6 +18,7 @@ release_title="${SMU_RELEASE_TITLE:-}"
 release_notes="${SMU_RELEASE_NOTES:-}"
 release_notes_file="${SMU_RELEASE_NOTES_FILE:-}"
 current_stage="parse-arguments"
+preflight_contracts=false
 
 usage() {
     printf "Usage: %s [--check|--push|--release TAG|--publish-plan|--candidate-check|--self-test] [--dry-run] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES|--notes-file FILE]\n" "$0" >&2
@@ -205,6 +206,59 @@ validate_repo() {
     fi
 }
 
+check_installer_preflight_contract() {
+    local contract="$repo_root/installer/docs/json-contracts/provisioning-preflight.example.json"
+
+    current_stage="preflight-contracts:installer"
+    [ "$json_output" = true ] || printf "preflight-contract\tinstaller\t%s\n" "$contract"
+    python3 - "$contract" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+contract_path = Path(sys.argv[1])
+with contract_path.open(encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+required = {"adapter", "action", "host_supported", "can_apply", "preflight", "plan", "errors"}
+missing = required.difference(payload)
+if missing:
+    raise SystemExit(f"missing provisioning preflight keys: {', '.join(sorted(missing))}")
+if not isinstance(payload["preflight"], str):
+    raise SystemExit("preflight must be a string status")
+if not isinstance(payload["plan"], dict):
+    raise SystemExit("plan must be an object")
+if not isinstance(payload["plan"].get("commands"), list):
+    raise SystemExit("plan.commands must be an array")
+if not isinstance(payload["errors"], list):
+    raise SystemExit("errors must be an array")
+PY
+}
+
+check_blueprint_preflight_workflows() {
+    local workflow
+    local missing=false
+
+    current_stage="preflight-contracts:blueprint"
+    for workflow in rcm nix hybrid; do
+        local path="$repo_root/blueprint/examples/github-actions/$workflow.yml"
+        [ "$json_output" = true ] || printf "preflight-contract\tblueprint\t%s\n" "$path"
+        if [ ! -f "$path" ] || ! grep -q "provisioning-adapter preflight" "$path"; then
+            [ "$json_output" = true ] || \
+                printf "Missing provisioning-adapter preflight step: %s\n" "$path" >&2
+            missing=true
+        fi
+    done
+
+    [ "$missing" = false ]
+}
+
+check_preflight_contracts() {
+    check_installer_preflight_contract
+    check_blueprint_preflight_workflows
+    preflight_contracts=true
+}
+
 require_clean_repo() {
     local path="$1"
 
@@ -352,6 +406,7 @@ fi
 validate_repo "installer" "scripts/validate.sh --all"
 validate_repo "blueprint" "scripts/validate.sh"
 validate_repo "tests" "scripts/validate.sh"
+check_preflight_contracts
 
 require_clean_repo "installer"
 require_clean_repo "blueprint"

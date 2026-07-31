@@ -120,8 +120,8 @@ release_status_json() {
         "$candidate_max_age_days" "$age_ok" "$(smu_json_escape "$release_tag")" \
         "$signed_tag" "$github_release" "$(smu_json_escape "$release_notes_file")"
     release_publish_plan_json
-    printf '],"validated":%s,"pushed":%s,"tagged":%s,"failed":%s,' \
-        "$validated" "$pushed" "$tagged" "$failed"
+    printf '],"validated":%s,"preflight_contracts":%s,"pushed":%s,"tagged":%s,"failed":%s,' \
+        "$validated" "${preflight_contracts:-false}" "$pushed" "$tagged" "$failed"
     release_provenance_json
     printf ',"repositories":['
     release_repositories_json

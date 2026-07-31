@@ -21,10 +21,12 @@ first-class VPS path documented in [scripts/VPS.md](scripts/VPS.md).
 ## Install/Update Readiness
 
 The release-readiness workflow checks installer, blueprint, and scenario-test
-compatibility on a schedule. It publishes a `release-readiness.json` artifact,
-writes a run summary, opens or updates an issue when readiness fails, and
-closes that issue when readiness is green again. A separate install canary runs
-the public one-liner on a schedule.
+compatibility on a schedule. It also gates provisioning preflight drift by
+requiring the installer JSON contract example and blueprint GitHub Actions
+preflight steps to stay in sync. It publishes a `release-readiness.json`
+artifact, writes a run summary, opens or updates an issue when readiness fails,
+and closes that issue when readiness is green again. A separate install canary
+runs the public one-liner on a schedule.
 
 Local maintainers can run:
 

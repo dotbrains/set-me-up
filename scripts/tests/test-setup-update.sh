@@ -176,6 +176,34 @@ copy_release_script_fixture() {
     cp "$repo_root/scripts/lib/release-readiness-render.sh" "$work_dir/scripts/lib/"
 }
 
+write_release_preflight_fixture() {
+    local work_dir="$1"
+
+    mkdir -p "$work_dir/installer/docs/json-contracts"
+    cat > "$work_dir/installer/docs/json-contracts/provisioning-preflight.example.json" <<'EOF'
+{
+  "adapter": "rcm",
+  "action": "install",
+  "host_supported": true,
+  "can_apply": false,
+  "preflight": "passed",
+  "plan": { "commands": [] },
+  "errors": []
+}
+EOF
+    mkdir -p "$work_dir/blueprint/examples/github-actions"
+    local workflow
+    for workflow in rcm nix hybrid; do
+        cat > "$work_dir/blueprint/examples/github-actions/$workflow.yml" <<'EOF'
+name: test
+jobs:
+  validate:
+    steps:
+      - run: python3 set-me-up-installer/smu.py provisioning-adapter preflight --json
+EOF
+    done
+}
+
 test_release_check_outputs_json_readiness() {
     local work_dir="$tmp_root/release-json"
     local output="$work_dir/output.json"
@@ -191,10 +219,13 @@ set -euo pipefail
 exit 0
 EOF
         chmod +x "$work_dir/$path/scripts/validate.sh"
+        write_release_preflight_fixture "$work_dir"
         git -C "$work_dir/$path" init --quiet
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
-        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        git -C "$work_dir/$path" add .
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
     done
 
@@ -223,6 +254,7 @@ assert payload["provenance"]["installer"] != ""
 assert payload["provenance"]["blueprint"] != ""
 assert payload["provenance"]["tests"] != ""
 assert payload["validated"] is True
+assert payload["preflight_contracts"] is True
 assert payload["pushed"] is False
 assert payload["tagged"] is True
 assert payload["failed"] == 0
@@ -248,7 +280,10 @@ EOF
         git -C "$work_dir/$path" init --quiet
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
-        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        write_release_preflight_fixture "$work_dir"
+        git -C "$work_dir/$path" add .
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
     done
 
@@ -285,6 +320,8 @@ test_release_publish_plan_outputs_actions() {
         git -C "$work_dir/$path" init --quiet
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
         touch "$work_dir/$path/README.md"
         git -C "$work_dir/$path" add README.md
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
@@ -336,7 +373,10 @@ EOF
         git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
-        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        write_release_preflight_fixture "$work_dir"
+        git -C "$work_dir/$path" add .
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
         git init --quiet --bare "$remote_dir/$path.git"
         git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
@@ -397,7 +437,10 @@ EOF
         git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
-        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        write_release_preflight_fixture "$work_dir"
+        git -C "$work_dir/$path" add .
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
         git init --quiet --bare "$remote_dir/$path.git"
         git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
@@ -451,7 +494,10 @@ EOF
         git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
-        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        write_release_preflight_fixture "$work_dir"
+        git -C "$work_dir/$path" add .
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
         git init --quiet --bare "$remote_dir/$path.git"
         git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
@@ -516,7 +562,10 @@ EOF
         git -C "$work_dir/$path" init --quiet --initial-branch "$branch"
         git -C "$work_dir/$path" config user.name "set-me-up test"
         git -C "$work_dir/$path" config user.email "set-me-up@example.test"
-        git -C "$work_dir/$path" add scripts/validate.sh
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        write_release_preflight_fixture "$work_dir"
+        git -C "$work_dir/$path" add .
         git -C "$work_dir/$path" commit --quiet -m "test fixture"
         git init --quiet --bare "$remote_dir/$path.git"
         git -C "$work_dir/$path" remote add origin "$remote_dir/$path.git"
