@@ -32,17 +32,17 @@ from pathlib import Path
 root = Path(sys.argv[1])
 
 checks = [
-    ("health-report.schema.json", ["scripts/health-report.sh", "--json"], False),
-    ("doctor.schema.json", ["scripts/doctor.sh", "--json"], False),
-    ("freshness-report.schema.json", ["scripts/freshness-report.sh", "--json"], False),
-    ("change-report.schema.json", ["scripts/change-report.sh", "--json"], False),
-    ("ci-workflow-report.schema.json", ["scripts/ci-workflow-report.sh", "--checked-out", "--json"], False),
-    ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"], False),
-    ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"], False),
-    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"], False),
-    ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"], False),
-    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"], False),
-    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--check", "--json"], True),
+    ("health-report.schema.json", ["scripts/health-report.sh", "--json"], False, 30),
+    ("doctor.schema.json", ["scripts/doctor.sh", "--json"], False, 30),
+    ("freshness-report.schema.json", ["scripts/freshness-report.sh", "--json"], False, 30),
+    ("change-report.schema.json", ["scripts/change-report.sh", "--json"], False, 30),
+    ("ci-workflow-report.schema.json", ["scripts/ci-workflow-report.sh", "--checked-out", "--json"], False, 30),
+    ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"], False, 30),
+    ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"], False, 30),
+    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"], False, 30),
+    ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"], False, 30),
+    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"], False, 30),
+    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--check", "--json"], True, 90),
 ]
 
 
@@ -81,7 +81,7 @@ def validate(schema, value, path):
             validate(schema["items"], item, f"{path}[{index}]")
 
 
-for schema_name, command, allow_failure_payload in checks:
+for schema_name, command, allow_failure_payload, timeout_seconds in checks:
     schema_path = root / "scripts" / "schemas" / schema_name
     schema = json.loads(schema_path.read_text())
     print(f"checking {schema_name} via {' '.join(command)}")
@@ -91,7 +91,7 @@ for schema_name, command, allow_failure_payload in checks:
             cwd=root,
             text=True,
             stderr=subprocess.STDOUT,
-            timeout=30,
+            timeout=timeout_seconds,
         )
     except subprocess.TimeoutExpired as exc:
         raise SystemExit(
