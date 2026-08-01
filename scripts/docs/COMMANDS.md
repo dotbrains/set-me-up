@@ -106,6 +106,12 @@ Usage: scripts/new-repo-check.sh <managed-local-path>
 Usage: scripts/release-install-update.sh [--check|--push|--release TAG|--publish-plan|--candidate-check|--self-test] [--dry-run] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES|--notes-file FILE]
 ```
 
+## scripts/release.sh
+
+```text
+Usage: scripts/release.sh [--check|--candidate|--publish] [release-install-update args...]
+```
+
 ## scripts/route-quality.sh
 
 ```text

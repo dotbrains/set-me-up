@@ -50,7 +50,7 @@ bash_checks() {
         scripts/route-quality.sh scripts/freshness-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
         scripts/configure-branch-protection.sh \
-        scripts/release-install-update.sh scripts/tree-smoke-test.sh \
+        scripts/release-install-update.sh scripts/release.sh scripts/tree-smoke-test.sh \
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
@@ -77,7 +77,7 @@ shell_checks() {
         scripts/health-report.sh scripts/route-quality.sh \
         scripts/freshness-report.sh scripts/new-repo-check.sh scripts/add-repo.sh \
         scripts/change-report.sh scripts/configure-branch-protection.sh \
-        scripts/release-install-update.sh \
+        scripts/release-install-update.sh scripts/release.sh \
         scripts/tree-smoke-test.sh \
         scripts/validate-json-schemas.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
@@ -362,6 +362,10 @@ structure_checks() {
     }
     [ -x scripts/release-install-update.sh ] || {
         printf "scripts/release-install-update.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/release.sh ] || {
+        printf "scripts/release.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/tree-smoke-test.sh ] || {

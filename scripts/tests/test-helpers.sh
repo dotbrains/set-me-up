@@ -133,6 +133,8 @@ copy_root_scripts() {
     cp "$repo_root/scripts/configure-branch-protection.sh" "$target/scripts/"
     [ ! -f "$repo_root/scripts/release-install-update.sh" ] || \
         cp "$repo_root/scripts/release-install-update.sh" "$target/scripts/"
+    [ ! -f "$repo_root/scripts/release.sh" ] || \
+        cp "$repo_root/scripts/release.sh" "$target/scripts/"
     cp "$repo_root/scripts/tree-smoke-test.sh" "$target/scripts/"
     cp "$repo_root/scripts/generate-command-docs.sh" "$target/scripts/"
     cp "$repo_root/scripts/validate-json-schemas.sh" "$target/scripts/"
