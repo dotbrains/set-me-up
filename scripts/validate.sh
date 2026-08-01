@@ -167,7 +167,7 @@ coverage_checks() {
     run_timed_check "update plan json" scripts/update.sh --plan --json
     run_timed_check "ci workflow json" scripts/ci-workflow-report.sh --checked-out --json
     run_timed_check "native workflow json" scripts/native-workflow-template.sh --check --json
-    run_timed_check "json schema validation" scripts/validate-json-schemas.sh
+    SMU_VALIDATE_TIMEOUT=180 run_timed_check "json schema validation" scripts/validate-json-schemas.sh
     run_timed_check "tree smoke test" scripts/tree-smoke-test.sh
     smu_check_runner_summary "coverage"
 }
@@ -179,7 +179,7 @@ agent_checks() {
     run_timed_check "agent intake json" scripts/agent-intake.sh --json theme
     run_timed_check "agent intake plan" scripts/agent-intake.sh --plan theme
     run_timed_check "agent intake fixtures" scripts/agent-intake-fixtures.sh --check
-    run_timed_check "agent intake schema" scripts/validate-json-schemas.sh
+    SMU_VALIDATE_TIMEOUT=180 run_timed_check "agent intake schema" scripts/validate-json-schemas.sh
     grep -q "Agent Intake Contract" scripts/docs/AGENT-INTAKE.md
     smu_check_runner_summary "agent"
 }

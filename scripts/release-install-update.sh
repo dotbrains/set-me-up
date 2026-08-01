@@ -242,6 +242,17 @@ check_installer_capabilities_contract() {
     record_release_contract "provisioning-capabilities" 1 "installer/smu.py contract validate" "$schema" "$contract"
 }
 
+check_dotfiles_compatibility_contract() {
+    local contract="$repo_root/installer/docs/json-contracts/dotfiles-compatibility.example.json"
+    local schema="$repo_root/installer/docs/json-contracts/schemas/dotfiles-compatibility.schema.json"
+
+    current_stage="preflight-contracts:dotfiles-compatibility"
+    [ "$json_output" = true ] || printf "preflight-contract\tinstaller\t%s\n" "$contract"
+    (cd "$repo_root/installer" && python3 smu.py contract validate dotfiles-compatibility --path "$contract") >/dev/null
+    (cd "$repo_root/installer" && python3 smu.py contract schema dotfiles-compatibility) >/dev/null
+    record_release_contract "dotfiles-compatibility" 1 "installer/smu.py contract validate" "$schema" "$contract"
+}
+
 check_blueprint_preflight_workflows() {
     local workflow
     local missing=false
@@ -275,6 +286,7 @@ check_blueprint_readiness_contract() {
 check_preflight_contracts() {
     check_installer_preflight_contract
     check_installer_capabilities_contract
+    check_dotfiles_compatibility_contract
     check_blueprint_preflight_workflows
     check_blueprint_readiness_contract
     preflight_contracts=true

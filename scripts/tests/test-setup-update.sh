@@ -208,6 +208,28 @@ EOF
   ]
 }
 EOF
+    cat > "$work_dir/installer/docs/json-contracts/dotfiles-compatibility.example.json" <<'EOF'
+{
+  "contract": { "name": "dotfiles-compatibility", "version": 1 },
+  "path": "/path/to/dotfiles",
+  "valid": true,
+  "mode": "hybrid",
+  "adapter": "hybrid",
+  "readiness": {
+    "install_shim": true,
+    "smu_blueprint": true,
+    "platform_scope": true,
+    "root_config": true,
+    "rcm_ready": false,
+    "nix_ready": false,
+    "hybrid_ready": true,
+    "vps_ready": true,
+    "ci_contract": true
+  },
+  "checks": [],
+  "errors": []
+}
+EOF
     cat > "$work_dir/installer/smu.py" <<'EOF'
 #!/usr/bin/env python3
 import json
@@ -254,6 +276,13 @@ elif name == "blueprint-ci-readiness":
         errors.append("workflow_preflight must be 3")
     if summary.get("provider_examples") != 6:
         errors.append("provider_examples must be 6")
+elif name == "dotfiles-compatibility":
+    readiness = payload.get("readiness", {})
+    if payload.get("contract", {}).get("version") != 1:
+        errors.append("contract.version must be 1")
+    for key in ("install_shim", "smu_blueprint", "platform_scope", "root_config", "ci_contract"):
+        if readiness.get(key) is not True:
+            errors.append(f"{key} must be true")
 else:
     errors.append(f"unknown contract {name}")
 
@@ -347,6 +376,7 @@ assert payload["preflight_contracts"] is True
 assert [contract["name"] for contract in payload["contracts"]] == [
     "provisioning-preflight",
     "provisioning-capabilities",
+    "dotfiles-compatibility",
     "blueprint-ci-readiness",
 ]
 assert all(contract["version"] == 1 for contract in payload["contracts"])
