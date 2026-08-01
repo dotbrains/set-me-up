@@ -19,6 +19,20 @@ release_notes="${SMU_RELEASE_NOTES:-}"
 release_notes_file="${SMU_RELEASE_NOTES_FILE:-}"
 current_stage="parse-arguments"
 preflight_contracts=false
+release_contracts_json=""
+
+record_release_contract() {
+    local name="$1"
+    local version="$2"
+    local validator="$3"
+    local schema="$4"
+    local path="$5"
+
+    if [ -n "$release_contracts_json" ]; then
+        release_contracts_json+=","
+    fi
+    release_contracts_json+="{\"name\":\"$(smu_json_escape "$name")\",\"version\":$version,\"validator\":\"$(smu_json_escape "$validator")\",\"schema\":\"$(smu_json_escape "$schema")\",\"path\":\"$(smu_json_escape "$path")\"}"
+}
 
 usage() {
     printf "Usage: %s [--check|--push|--release TAG|--publish-plan|--candidate-check|--self-test] [--dry-run] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES|--notes-file FILE]\n" "$0" >&2
@@ -208,18 +222,24 @@ validate_repo() {
 
 check_installer_preflight_contract() {
     local contract="$repo_root/installer/docs/json-contracts/provisioning-preflight.example.json"
+    local schema="$repo_root/installer/docs/json-contracts/schemas/provisioning-preflight.schema.json"
 
     current_stage="preflight-contracts:installer"
     [ "$json_output" = true ] || printf "preflight-contract\tinstaller\t%s\n" "$contract"
     (cd "$repo_root/installer" && python3 smu.py contract validate provisioning-preflight --path "$contract") >/dev/null
+    (cd "$repo_root/installer" && python3 smu.py contract schema provisioning-preflight) >/dev/null
+    record_release_contract "provisioning-preflight" 1 "installer/smu.py contract validate" "$schema" "$contract"
 }
 
 check_installer_capabilities_contract() {
     local contract="$repo_root/installer/docs/json-contracts/provisioning-capabilities.example.json"
+    local schema="$repo_root/installer/docs/json-contracts/schemas/provisioning-capabilities.schema.json"
 
     current_stage="preflight-contracts:capabilities"
     [ "$json_output" = true ] || printf "preflight-contract\tinstaller\t%s\n" "$contract"
     (cd "$repo_root/installer" && python3 smu.py contract validate provisioning-capabilities --path "$contract") >/dev/null
+    (cd "$repo_root/installer" && python3 smu.py contract schema provisioning-capabilities) >/dev/null
+    record_release_contract "provisioning-capabilities" 1 "installer/smu.py contract validate" "$schema" "$contract"
 }
 
 check_blueprint_preflight_workflows() {
@@ -241,10 +261,15 @@ check_blueprint_preflight_workflows() {
 }
 
 check_blueprint_readiness_contract() {
+    local schema="$repo_root/installer/docs/json-contracts/schemas/blueprint-ci-readiness.schema.json"
+
     current_stage="preflight-contracts:blueprint-readiness"
     [ "$json_output" = true ] || printf "preflight-contract\tblueprint\treadiness-json\n"
-    "$repo_root/blueprint/scripts/validate-examples.sh" --json | \
+    SMU_CONTRACT_CLI="python3 $repo_root/installer/smu.py" \
+        "$repo_root/blueprint/scripts/validate-examples.sh" --json | \
         (cd "$repo_root/installer" && python3 smu.py contract validate blueprint-ci-readiness --path -) >/dev/null
+    (cd "$repo_root/installer" && python3 smu.py contract schema blueprint-ci-readiness) >/dev/null
+    record_release_contract "blueprint-ci-readiness" 1 "installer/smu.py contract validate" "$schema" "blueprint/scripts/validate-examples.sh --json"
 }
 
 check_preflight_contracts() {

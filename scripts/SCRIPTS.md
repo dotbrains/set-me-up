@@ -208,6 +208,9 @@ scripts/configure-branch-protection.sh --check
 The release helper validates provisioning preflight, adapter capabilities, and
 blueprint CI readiness through `installer/smu.py contract validate`, so local
 checks and scheduled readiness use the same schema-backed contract rules.
+Schemas are inspectable with `installer/smu.py contract schema <name>` and are
+reported in the release-readiness JSON `contracts` array with the validator and
+payload path that were checked.
 
 ## doctor.sh
 

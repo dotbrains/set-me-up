@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "set-me-up release readiness",
   "type": "object",
-  "required": ["mode", "stage", "dry_run", "candidate", "release", "publish_plan", "validated", "preflight_contracts", "pushed", "tagged", "failed", "provenance", "repositories"],
+  "required": ["mode", "stage", "dry_run", "candidate", "release", "publish_plan", "validated", "preflight_contracts", "contracts", "pushed", "tagged", "failed", "provenance", "repositories"],
   "properties": {
     "mode": { "enum": ["check", "push", "publish-plan", "candidate-check", "self-test"] },
     "stage": { "type": "string" },
@@ -47,6 +47,21 @@
     },
     "validated": { "type": "boolean" },
     "preflight_contracts": { "type": "boolean" },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "version", "validator", "schema", "path"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "integer" },
+          "validator": { "type": "string" },
+          "schema": { "type": "string" },
+          "path": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
     "pushed": { "type": "boolean" },
     "tagged": { "type": "boolean" },
     "failed": { "type": "integer" },

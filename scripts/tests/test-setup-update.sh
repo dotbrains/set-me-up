@@ -213,7 +213,16 @@ EOF
 import json
 import sys
 
-name = sys.argv[sys.argv.index("validate") + 1]
+command = sys.argv[2]
+name = sys.argv[3]
+
+if command == "schema":
+    print(json.dumps({
+        "$id": f"https://dotbrains.dev/set-me-up/contracts/{name}.schema.json",
+        "type": "object",
+    }))
+    sys.exit(0)
+
 path = sys.argv[sys.argv.index("--path") + 1]
 payload = json.load(sys.stdin if path == "-" else open(path, encoding="utf-8"))
 errors = []
@@ -335,6 +344,13 @@ assert payload["provenance"]["blueprint"] != ""
 assert payload["provenance"]["tests"] != ""
 assert payload["validated"] is True
 assert payload["preflight_contracts"] is True
+assert [contract["name"] for contract in payload["contracts"]] == [
+    "provisioning-preflight",
+    "provisioning-capabilities",
+    "blueprint-ci-readiness",
+]
+assert all(contract["version"] == 1 for contract in payload["contracts"])
+assert all(contract["validator"] == "installer/smu.py contract validate" for contract in payload["contracts"])
 assert payload["pushed"] is False
 assert payload["tagged"] is True
 assert payload["failed"] == 0
@@ -384,6 +400,66 @@ with open(sys.argv[1], encoding="utf-8") as handle:
 assert payload["mode"] == "check"
 assert payload["stage"] == "validate:blueprint"
 assert payload["validated"] is False
+assert payload["failed"] != 0
+PY
+}
+
+test_release_contract_drift_outputs_json_stage() {
+    local work_dir="$tmp_root/release-contract-drift"
+    local output="$work_dir/output.json"
+
+    copy_release_script_fixture "$work_dir"
+
+    local path
+    for path in installer blueprint tests; do
+        mkdir -p "$work_dir/$path/scripts"
+        cat > "$work_dir/$path/scripts/validate.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+        chmod +x "$work_dir/$path/scripts/validate.sh"
+        write_release_preflight_fixture "$work_dir"
+        git -C "$work_dir/$path" init --quiet
+        git -C "$work_dir/$path" config user.name "set-me-up test"
+        git -C "$work_dir/$path" config user.email "set-me-up@example.test"
+        git -C "$work_dir/$path" config commit.gpgsign false
+        git -C "$work_dir/$path" config tag.gpgsign false
+        git -C "$work_dir/$path" add .
+        git -C "$work_dir/$path" commit --quiet -m "test fixture"
+    done
+
+    python3 - "$work_dir/installer/docs/json-contracts/provisioning-capabilities.example.json" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path, encoding="utf-8") as handle:
+    payload = json.load(handle)
+payload["adapters"] = [adapter for adapter in payload["adapters"] if adapter["id"] != "home-manager"]
+with open(path, "w", encoding="utf-8") as handle:
+    json.dump(payload, handle)
+PY
+    git -C "$work_dir/installer" add docs/json-contracts/provisioning-capabilities.example.json
+    git -C "$work_dir/installer" commit --quiet -m "contract drift"
+
+    if (
+        cd "$work_dir"
+        bash scripts/release-install-update.sh --check --json > "$output"
+    ); then
+        fail "release readiness succeeded after provisioning capabilities drift"
+    fi
+
+    python3 - "$output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+assert payload["mode"] == "check"
+assert payload["stage"] == "preflight-contracts:capabilities"
+assert payload["preflight_contracts"] is False
 assert payload["failed"] != 0
 PY
 }
