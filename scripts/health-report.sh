@@ -68,7 +68,11 @@ smu_each_repo_health "$repo_root" "$repos_file" "$routes_file" "$validators_file
 candidate_head="unknown"
 installer_head="unknown"
 if [ -d "$repo_root/installer/.git" ]; then
-    candidate_head="$(git -C "$repo_root/installer" ls-remote origin refs/heads/candidate 2>/dev/null | awk 'NR == 1 { print $1 }')"
+    if [ -n "${SMU_REPO_HEALTH_CACHE:-}" ]; then
+        candidate_head="$(git -C "$repo_root/installer" rev-parse refs/remotes/origin/candidate 2>/dev/null || printf unknown)"
+    else
+        candidate_head="$(git -C "$repo_root/installer" ls-remote origin refs/heads/candidate 2>/dev/null | awk 'NR == 1 { print $1 }')"
+    fi
     installer_head="$(git -C "$repo_root/installer" rev-parse HEAD 2>/dev/null || printf unknown)"
 fi
 workflow_count="$(find "$repo_root" -path "*/.github/workflows/*" -type f 2>/dev/null | wc -l | tr -d ' ')"
