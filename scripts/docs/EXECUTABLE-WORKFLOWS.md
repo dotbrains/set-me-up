@@ -1,5 +1,7 @@
 # Executable Workflows
 
+<!-- markdownlint-disable MD013 -->
+
 These command blocks are validated by `scripts/validate-executable-docs.sh`.
 They are intentionally dry-run or read-only surfaces so CI can keep the
 documented workflows aligned with the commands users run.
