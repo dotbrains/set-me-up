@@ -65,12 +65,14 @@ smu plan --machine vps --json
 ```bash
 smu fleet plan --hosts hosts.txt --profile vps --json
 smu fleet plan --profile vps --provisioning-adapter home-manager --json
+smu fleet apply --hosts hosts.txt --profile vps --dry-run --parallel 2 --continue-on-error --json
 ```
 
 ## release-package
 
 ```bash
 smu release-package --version 1.2.3 --channel latest-known-good --json
+smu release-package --version 1.2.3 --channel latest-known-good --output dist/set-me-up-1.2.3 --json
 smu release-notes --from release-readiness.json --output RELEASE.md
 ```
 
@@ -79,6 +81,7 @@ smu release-notes --from release-readiness.json --output RELEASE.md
 ```bash
 smu blueprint-registry --json
 smu blueprint-registry --search dotbrains --json
+smu blueprint-registry --registry-url https://example.com/smu-blueprints.json --json
 ```
 
 ## module-graph
@@ -114,6 +117,7 @@ smu doctor --strict --json
 ```bash
 smu policy check --preset ci --json
 smu policy check --preset strict --provisioning-adapter rcm --json
+smu policy check --root . --preset ci --json
 ```
 
 ## rollback-test
@@ -126,6 +130,6 @@ smu rollback doctor --json
 ## product-docs
 
 ```bash
-smu product-docs generate --output site/product-docs.md --json
+smu product-docs generate --source scripts/docs/EXECUTABLE-WORKFLOWS.md --output site/product-docs.md --json
 scripts/validate-executable-docs.sh
 ```

@@ -26,8 +26,10 @@ cd "$repo_root"
 
 python3 - "$mode" <<'PY'
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 mode = sys.argv[1]
@@ -52,24 +54,35 @@ def normalize(payload):
     }
 
 
-for query, fixture_path in fixtures.items():
-    payload = json.loads(subprocess.check_output(
-        ["bash", "scripts/agent-intake.sh", "--json", query],
+with tempfile.NamedTemporaryFile() as cache:
+    snapshot = subprocess.check_output(
+        ["bash", "scripts/repo-health-snapshot.sh"],
         text=True,
         timeout=90,
-    ))
-    normalized = normalize(payload)
-    if mode == "--write":
-        fixture_path.write_text(json.dumps(normalized, indent=2) + "\n")
-        continue
+    )
+    cache.write(snapshot.encode())
+    cache.flush()
+    env = {**os.environ, "SMU_REPO_HEALTH_CACHE": cache.name}
 
-    expected = json.loads(fixture_path.read_text())
-    if normalized != expected:
-        raise SystemExit(
-            f"{fixture_path} mismatch\n"
-            f"expected={json.dumps(expected, indent=2)}\n"
-            f"actual={json.dumps(normalized, indent=2)}"
-        )
+    for query, fixture_path in fixtures.items():
+        payload = json.loads(subprocess.check_output(
+            ["bash", "scripts/agent-intake.sh", "--json", query],
+            text=True,
+            timeout=30,
+            env=env,
+        ))
+        normalized = normalize(payload)
+        if mode == "--write":
+            fixture_path.write_text(json.dumps(normalized, indent=2) + "\n")
+            continue
+
+        expected = json.loads(fixture_path.read_text())
+        if normalized != expected:
+            raise SystemExit(
+                f"{fixture_path} mismatch\n"
+                f"expected={json.dumps(expected, indent=2)}\n"
+                f"actual={json.dumps(normalized, indent=2)}"
+            )
 
 print("Agent intake fixtures passed.")
 PY

@@ -94,11 +94,22 @@ validator_label_for_path() {
     local validator
     local var_name
     local value
+    local cached
 
     var_name="$(cache_var_name validator "$path")"
     if cache_has "$var_name"; then
         cache_get "$var_name"
         return 0
+    fi
+
+    if [ -n "${SMU_REPO_HEALTH_CACHE:-}" ]; then
+        cached="$(smu_repo_health_cache_for_path "$SMU_REPO_HEALTH_CACHE" "$path" || true)"
+        if [ -n "$cached" ]; then
+            IFS=$'\t' read -r _repo _path _category _state _sync _route value <<< "$cached"
+            cache_set "$var_name" "$value"
+            printf "%s" "$value"
+            return 0
+        fi
     fi
 
     if [ "$path" = "." ]; then
@@ -116,11 +127,22 @@ state_for_path() {
     local path="$1"
     local var_name
     local value
+    local cached
 
     var_name="$(cache_var_name state "$path")"
     if cache_has "$var_name"; then
         cache_get "$var_name"
         return 0
+    fi
+
+    if [ -n "${SMU_REPO_HEALTH_CACHE:-}" ]; then
+        cached="$(smu_repo_health_cache_for_path "$SMU_REPO_HEALTH_CACHE" "$path" || true)"
+        if [ -n "$cached" ]; then
+            IFS=$'\t' read -r _repo _path _category value _sync _route _validator <<< "$cached"
+            cache_set "$var_name" "$value"
+            printf "%s" "$value"
+            return 0
+        fi
     fi
 
     if [ "$path" = "." ]; then
@@ -137,11 +159,22 @@ sync_for_path() {
     local state
     local var_name
     local value
+    local cached
 
     var_name="$(cache_var_name sync "$path")"
     if cache_has "$var_name"; then
         cache_get "$var_name"
         return 0
+    fi
+
+    if [ -n "${SMU_REPO_HEALTH_CACHE:-}" ]; then
+        cached="$(smu_repo_health_cache_for_path "$SMU_REPO_HEALTH_CACHE" "$path" || true)"
+        if [ -n "$cached" ]; then
+            IFS=$'\t' read -r _repo _path _category _state value _route _validator <<< "$cached"
+            cache_set "$var_name" "$value"
+            printf "%s" "$value"
+            return 0
+        fi
     fi
 
     if [ "$path" = "." ]; then
