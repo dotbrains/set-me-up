@@ -191,6 +191,10 @@ test_agent_intake_examples_keep_core_queries_stable() {
         PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json "new repo" > "$output"
         assert_contains "$output" '"matchedIntents":["add-managed-repo"'
         assert_contains "$output" '"path":"."'
+
+        PATH="$bin_dir:$PATH" bash scripts/agent-intake.sh --json "set-me-up recommendations product safety operability validation documentation release governance audit" > "$output"
+        assert_contains "$output" '"matchedIntents":["continuous-improvement"'
+        assert_contains "$output" '"path":"."'
     )
 }
 
