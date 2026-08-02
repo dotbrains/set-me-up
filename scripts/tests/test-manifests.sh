@@ -182,9 +182,22 @@ test_validate_agent_reports_timed_check_timeout() {
 
     copy_root_scripts "$work_dir"
     mkdir -p "$work_dir/.git"
+    cat > "$work_dir/scripts/agent-intake.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+case "$1" in
+    --json)
+        printf '{"query":"theme","matchedIntents":[],"riskSummary":{"high":0,"medium":0,"low":0,"blocking":false,"reasons":[]},"ambiguities":[],"repositories":[],"nextCommands":[]}\n'
+        ;;
+    --plan)
+        printf "agent intake plan: theme\n"
+        ;;
+esac
+EOF
+    chmod +x "$work_dir/scripts/agent-intake.sh"
     cat > "$work_dir/scripts/agent-intake-fixtures.sh" <<'EOF'
 #!/usr/bin/env bash
-    sleep 10
+sleep 10
 EOF
     chmod +x "$work_dir/scripts/agent-intake-fixtures.sh"
 

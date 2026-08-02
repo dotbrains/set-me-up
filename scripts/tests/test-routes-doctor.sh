@@ -421,6 +421,30 @@ test_sync_report_json_lists_repositories() {
     assert_contains "$output" '"validator":"custom validate"'
 }
 
+test_repo_health_snapshot_feeds_reports() {
+    local work_dir="$tmp_root/repo-health-snapshot"
+    local bin_dir="$work_dir/bin"
+    local snapshot="$work_dir/repo-health.tsv"
+    local output="$work_dir/output.json"
+
+    copy_root_scripts "$work_dir"
+    mkdir -p "$work_dir/.git" "$work_dir/clean/.git"
+    printf "clean|clean|top-level\n" > "$work_dir/scripts/repos.txt"
+    printf "clean|clean|Clean repo|clean\n" > "$work_dir/scripts/agent-routes.txt"
+    printf "clean|custom validate\n" > "$work_dir/scripts/repo-validators.txt"
+    install_mock_git "$bin_dir"
+
+    (
+        cd "$work_dir"
+        PATH="$bin_dir:$PATH" bash scripts/repo-health-snapshot.sh --output "$snapshot"
+        SMU_REPO_HEALTH_CACHE="$snapshot" bash scripts/sync-report.sh --json > "$output"
+    )
+
+    assert_contains "$snapshot" $'repo\tpath\tcategory\tstate\tsync\troute\tvalidator'
+    assert_contains "$output" '"path":"clean"'
+    assert_contains "$output" '"sync":"synced"'
+}
+
 test_json_schema_validation_runs() {
     local work_dir="$tmp_root/schema-validation"
     local output="$work_dir/output.log"
@@ -455,4 +479,5 @@ test_change_report_json_lists_recent_commits
 test_freshness_report_json_lists_repositories
 test_capabilities_json_lists_routes
 test_sync_report_json_lists_repositories
+test_repo_health_snapshot_feeds_reports
 test_json_schema_validation_runs

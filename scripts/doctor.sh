@@ -9,6 +9,7 @@ validators_file="$repo_root/scripts/repo-validators.txt"
 
 source "$repo_root/scripts/lib/repos.sh"
 source "$repo_root/scripts/lib/repo-state.sh"
+source "$repo_root/scripts/lib/routes.sh"
 source "$repo_root/scripts/lib/validators.sh"
 source "$repo_root/scripts/lib/manifest-index.sh"
 source "$repo_root/scripts/lib/repo-health.sh"
@@ -80,28 +81,24 @@ inspect_repo() {
     local repo="$1"
     local path="$2"
     local category="$3"
-    local state
-    local validator
-    local validator_label="none"
+    local state="$4"
+    local sync_status="$5"
+    local route_id="$6"
+    local validator_label="$7"
     local route_status="missing-route"
-    local sync_status="unknown"
 
     : "$repo" "$category"
     total=$((total + 1))
-    state="$(smu_repo_state "$path")"
     count_state "$state"
-    sync_status="$(smu_repo_health_sync_for_state "$path" "$state")"
     count_sync "$sync_status"
 
-    if smu_validator_for_repo "$validators_file" "$path" >/dev/null; then
-        validator="$(smu_validator_for_repo "$validators_file" "$path")"
-        validator_label="$(smu_validator_label "$validator")"
+    if [ "$validator_label" != "none" ]; then
         has_validator=$((has_validator + 1))
     else
         no_validator=$((no_validator + 1))
     fi
 
-    if route_exists_for_path "$path"; then
+    if [ -n "$route_id" ]; then
         route_status="routed"
         routed=$((routed + 1))
     else
@@ -173,7 +170,7 @@ elif [ "$mode" = "--json" ]; then
     printf '{"repositories":['
 fi
 
-smu_each_repo "$repos_file" inspect_repo
+smu_each_repo_health "$repo_root" "$repos_file" "$routes_file" "$validators_file" inspect_repo
 if [ "$mode" = "--json" ]; then
     printf '],"route_drift":['
 fi

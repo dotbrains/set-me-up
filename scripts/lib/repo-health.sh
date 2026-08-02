@@ -111,6 +111,29 @@ smu_repo_health_clean() {
     [ -z "$(git -C "$repo_root/$path" status --porcelain 2>/dev/null || printf "unknown")" ]
 }
 
+smu_repo_health_cache_for_path() {
+    local cache_file="$1"
+    local requested_path="$2"
+    local repo
+    local path
+    local category
+    local state
+    local sync
+    local route_id
+    local validator
+
+    [ -f "$cache_file" ] || return 1
+    while IFS=$'\t' read -r repo path category state sync route_id validator _ || [ -n "$repo" ]; do
+        [ "$repo" = "repo" ] && [ "$path" = "path" ] && continue
+        if [ "$path" = "$requested_path" ]; then
+            printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+                "$repo" "$path" "$category" "$state" "$sync" "$route_id" "$validator"
+            return 0
+        fi
+    done < "$cache_file"
+    return 1
+}
+
 smu_each_repo_health() {
     local repo_root="$1"
     local repos_file="$2"
@@ -124,13 +147,22 @@ smu_each_repo_health() {
     local sync
     local route_id
     local validator
+    local cached
 
     while IFS='|' read -r repo path category _ || [ -n "$repo" ]; do
         [[ "$repo" =~ ^[[:space:]]*# || -z "$repo" ]] && continue
-        state="$(smu_repo_state "$path")"
-        sync="$(smu_repo_health_sync_for_state "$path" "$state")"
-        route_id="$(smu_repo_health_route_id "$routes_file" "$path")"
-        validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
+        cached=""
+        if [ -n "${SMU_REPO_HEALTH_CACHE:-}" ]; then
+            cached="$(smu_repo_health_cache_for_path "$SMU_REPO_HEALTH_CACHE" "$path" || true)"
+        fi
+        if [ -n "$cached" ]; then
+            IFS=$'\t' read -r repo path category state sync route_id validator <<< "$cached"
+        else
+            state="$(smu_repo_state "$path")"
+            sync="$(smu_repo_health_sync_for_state "$path" "$state")"
+            route_id="$(smu_repo_health_route_id "$routes_file" "$path")"
+            validator="$(smu_repo_health_validator_label "$validators_file" "$path")"
+        fi
         "$callback" "$repo" "$path" "$category" "$state" "$sync" "$route_id" "$validator"
     done < "$repos_file"
 }

@@ -51,7 +51,8 @@ bash_checks() {
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
         scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh scripts/tree-smoke-test.sh \
-        scripts/validate-json-schemas.sh \
+        scripts/validate-json-schemas.sh scripts/repo-health-snapshot.sh \
+        scripts/performance-budgets.sh scripts/validate-executable-docs.sh \
         scripts/tests/test-helpers.sh \
         scripts/tests/test-setup-update.sh scripts/tests/test-manifests.sh \
         scripts/tests/test-routes-doctor.sh scripts/tests/test-lib-modules.sh \
@@ -79,7 +80,8 @@ shell_checks() {
         scripts/change-report.sh scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh \
         scripts/tree-smoke-test.sh \
-        scripts/validate-json-schemas.sh \
+        scripts/validate-json-schemas.sh scripts/repo-health-snapshot.sh \
+        scripts/performance-budgets.sh scripts/validate-executable-docs.sh \
         scripts/tests/test-helpers.sh scripts/tests/test-setup-update.sh \
         scripts/tests/test-manifests.sh scripts/tests/test-routes-doctor.sh \
         scripts/tests/test-lib-modules.sh \
@@ -168,6 +170,8 @@ coverage_checks() {
     run_timed_check "ci workflow json" scripts/ci-workflow-report.sh --checked-out --json
     run_timed_check "native workflow json" scripts/native-workflow-template.sh --check --json
     SMU_VALIDATE_TIMEOUT=420 run_timed_check "json schema validation" scripts/validate-json-schemas.sh
+    run_timed_check "performance budgets" scripts/performance-budgets.sh
+    run_timed_check "executable docs" scripts/validate-executable-docs.sh
     run_timed_check "tree smoke test" scripts/tree-smoke-test.sh
     smu_check_runner_summary "coverage"
 }
@@ -213,6 +217,9 @@ structure_checks() {
         scripts/tree-smoke-test.sh
         scripts/generate-command-docs.sh
         scripts/validate-json-schemas.sh
+        scripts/repo-health-snapshot.sh
+        scripts/performance-budgets.sh
+        scripts/validate-executable-docs.sh
         scripts/repos.txt
         scripts/agent-routes.txt
         scripts/agent-intents.txt
@@ -258,6 +265,7 @@ structure_checks() {
         scripts/docs/INSTALL-UPDATE-RELEASE.md
         scripts/docs/INSTALL-UPDATE-COMPATIBILITY.md
         scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
+        scripts/docs/EXECUTABLE-WORKFLOWS.md
         .github/workflows/release-readiness.yml
         .github/workflows/install-canary.yml
         .gitignore

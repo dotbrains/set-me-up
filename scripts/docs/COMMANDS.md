@@ -100,6 +100,12 @@ Usage: scripts/native-workflow-template.sh [--report|--check] [--tsv|--json]
 Usage: scripts/new-repo-check.sh <managed-local-path>
 ```
 
+## scripts/performance-budgets.sh
+
+```text
+Usage: scripts/performance-budgets.sh
+```
+
 ## scripts/release-install-update.sh
 
 ```text
@@ -110,6 +116,12 @@ Usage: scripts/release-install-update.sh [--check|--candidate-promote|--push|--r
 
 ```text
 Usage: scripts/release.sh [--check|--candidate|--publish] [release-install-update args...]
+```
+
+## scripts/repo-health-snapshot.sh
+
+```text
+Usage: scripts/repo-health-snapshot.sh [--output PATH]
 ```
 
 ## scripts/route-quality.sh
@@ -152,6 +164,12 @@ Usage: scripts/tree-smoke-test.sh
 
 ```text
 Usage: scripts/update.sh [--plan|--apply] [--validate] [--text|--json]
+```
+
+## scripts/validate-executable-docs.sh
+
+```text
+Usage: scripts/validate-executable-docs.sh
 ```
 
 ## scripts/validate-json-schemas.sh

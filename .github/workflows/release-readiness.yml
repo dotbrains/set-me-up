@@ -34,45 +34,54 @@ jobs:
       - name: Summarize release readiness
         if: always()
         run: |
-          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY'
           import json
           from pathlib import Path
 
           path = Path("release-readiness.json")
+          markdown = Path("release-readiness.md")
           if not path.exists():
-              print("## Install/update release readiness")
-              print("")
-              print("Release readiness did not produce an artifact.")
+              markdown.write_text(
+                  "## Install/update release readiness\n\n"
+                  "Release readiness did not produce an artifact.\n",
+                  encoding="utf-8",
+              )
               raise SystemExit(0)
 
           with path.open(encoding="utf-8") as handle:
               payload = json.load(handle)
 
-          print("## Install/update release readiness")
-          print("")
-          print(f"- Mode: `{payload['mode']}`")
-          print(f"- Stage: `{payload['stage']}`")
-          print(f"- Candidate: `{payload['candidate']['ref']}`")
-          print(f"- Candidate fresh: `{payload['candidate']['fresh']}`")
-          print(f"- Candidate age: `{payload['candidate']['age_days']}` days")
-          print(f"- Workflow run: `{payload['provenance']['workflow_run']}`")
-          print(f"- Failed: `{payload['failed']}`")
-          print("")
-          print("| Repository | Branch | Clean | Sync |")
-          print("| --- | --- | --- | --- |")
+          lines = [
+              "## Install/update release readiness",
+              "",
+              f"- Mode: `{payload['mode']}`",
+              f"- Stage: `{payload['stage']}`",
+              f"- Candidate: `{payload['candidate']['ref']}`",
+              f"- Candidate fresh: `{payload['candidate']['fresh']}`",
+              f"- Candidate age: `{payload['candidate']['age_days']}` days",
+              f"- Workflow run: `{payload['provenance']['workflow_run']}`",
+              f"- Failed: `{payload['failed']}`",
+              "",
+              "| Repository | Branch | Clean | Sync |",
+              "| --- | --- | --- | --- |",
+          ]
           for repo in payload["repositories"]:
-              print(
+              lines.append(
                   f"| `{repo['path']}` | `{repo['branch']}` | "
                   f"`{repo['clean']}` | `{repo['sync']}` |"
               )
+          markdown.write_text("\n".join(lines) + "\n", encoding="utf-8")
           PY
+          cat release-readiness.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload release readiness artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release-readiness
-          path: release-readiness.json
+          path: |
+            release-readiness.json
+            release-readiness.md
           if-no-files-found: warn
 
       - name: Open or update readiness failure issue

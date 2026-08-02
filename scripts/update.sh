@@ -12,6 +12,7 @@ format="--text"
 source "$script_dir/lib/repos.sh"
 source "$script_dir/lib/repo-state.sh"
 source "$script_dir/lib/validators.sh"
+source "$script_dir/lib/repo-health.sh"
 source "$script_dir/lib/json.sh"
 
 usage() {
@@ -108,10 +109,21 @@ inspect_repo() {
     local path="$2"
     local category="$3"
     local state sync before after action validation
+    local cached _route_id _validator_label
 
     : "$repo" "$category"
-    state="$(smu_repo_state "$path")"
-    sync="unknown"
+    cached=""
+    _route_id=""
+    _validator_label=""
+    if [ -n "${SMU_REPO_HEALTH_CACHE:-}" ]; then
+        cached="$(smu_repo_health_cache_for_path "$SMU_REPO_HEALTH_CACHE" "$path" || true)"
+    fi
+    if [ -n "$cached" ]; then
+        IFS=$'\t' read -r repo path category state sync _route_id _validator_label <<< "$cached"
+    else
+        state="$(smu_repo_state "$path")"
+        sync="unknown"
+    fi
     before="unknown"
     after="unknown"
     validation="not-run"
@@ -124,7 +136,7 @@ inspect_repo() {
         [ "$state" != "detached" ]; then
         fetch_origin_quiet "$path"
     fi
-    if [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
+    if [ -z "$cached" ] && [ "$state" != "missing" ] && [ "$state" != "not-git" ] && \
         [ "$state" != "detached" ]; then
         sync="$(smu_repo_sync_status "$path")"
     fi
