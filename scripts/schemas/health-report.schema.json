@@ -20,6 +20,52 @@
         },
         "additionalProperties": false
       }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total", "clean", "synced"],
+      "properties": {
+        "total": { "type": "integer" },
+        "clean": { "type": "integer" },
+        "synced": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "release_readiness": {
+      "type": "object",
+      "required": ["installer", "candidate", "candidate_fresh"],
+      "properties": {
+        "installer": { "type": "string" },
+        "candidate": { "type": "string" },
+        "candidate_fresh": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "ci": {
+      "type": "object",
+      "required": ["workflow_files"],
+      "properties": {
+        "workflow_files": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "trust": {
+      "type": "object",
+      "required": ["module_manifests", "module_payload_dirs", "coverage_percent"],
+      "properties": {
+        "module_manifests": { "type": "integer" },
+        "module_payload_dirs": { "type": "integer" },
+        "coverage_percent": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "conformance": {
+      "type": "object",
+      "required": ["local_proxy_ready"],
+      "properties": {
+        "local_proxy_ready": { "type": "boolean" }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

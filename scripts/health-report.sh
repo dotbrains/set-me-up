@@ -65,12 +65,20 @@ print_repo() {
 }
 
 smu_each_repo_health "$repo_root" "$repos_file" "$routes_file" "$validators_file" print_repo
-candidate_head="$(git -C "$repo_root/installer" ls-remote origin refs/heads/candidate 2>/dev/null | awk 'NR == 1 { print $1 }')"
-installer_head="$(git -C "$repo_root/installer" rev-parse HEAD)"
+candidate_head="unknown"
+installer_head="unknown"
+if [ -d "$repo_root/installer/.git" ]; then
+    candidate_head="$(git -C "$repo_root/installer" ls-remote origin refs/heads/candidate 2>/dev/null | awk 'NR == 1 { print $1 }')"
+    installer_head="$(git -C "$repo_root/installer" rev-parse HEAD 2>/dev/null || printf unknown)"
+fi
 workflow_count="$(find "$repo_root" -path "*/.github/workflows/*" -type f 2>/dev/null | wc -l | tr -d ' ')"
-module_manifest_count="$(find "$repo_root/modules" -name module.toml -type f 2>/dev/null | wc -l | tr -d ' ')"
-module_dir_count="$(find "$repo_root/modules" -mindepth 2 -maxdepth 4 -type f \( -name packages -o -name brewfile -o -name "*.sh" \) 2>/dev/null | \
-    sed 's#/[^/]*$##' | sort -u | wc -l | tr -d ' ')"
+module_manifest_count=0
+module_dir_count=0
+if [ -d "$repo_root/modules" ]; then
+    module_manifest_count="$(find "$repo_root/modules" -name module.toml -type f 2>/dev/null | wc -l | tr -d ' ')"
+    module_dir_count="$(find "$repo_root/modules" -mindepth 2 -maxdepth 4 -type f \( -name packages -o -name brewfile -o -name "*.sh" \) 2>/dev/null | \
+        sed 's#/[^/]*$##' | sort -u | wc -l | tr -d ' ')"
+fi
 [ -n "$candidate_head" ] || candidate_head="unknown"
 candidate_fresh=false
 [ "$candidate_head" = "$installer_head" ] && candidate_fresh=true

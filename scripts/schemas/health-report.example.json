@@ -9,5 +9,26 @@
       "route": "installer",
       "validator": "scripts/validate.sh --all"
     }
-  ]
+  ],
+  "summary": {
+    "total": 1,
+    "clean": 1,
+    "synced": 1
+  },
+  "release_readiness": {
+    "installer": "abc123",
+    "candidate": "abc123",
+    "candidate_fresh": true
+  },
+  "ci": {
+    "workflow_files": 1
+  },
+  "trust": {
+    "module_manifests": 1,
+    "module_payload_dirs": 1,
+    "coverage_percent": 100
+  },
+  "conformance": {
+    "local_proxy_ready": true
+  }
 }

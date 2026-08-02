@@ -35,7 +35,7 @@ record_release_contract() {
 }
 
 usage() {
-    printf "Usage: %s [--check|--candidate|--push|--release TAG|--publish-plan|--candidate-check|--self-test] [--dry-run] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES|--notes-file FILE]\n" "$0" >&2
+    printf "Usage: %s [--check|--candidate-promote|--push|--release TAG|--publish-plan|--candidate-check|--self-test] [--dry-run] [--json] [--tag TAG] [--candidate REF] [--signed-tag] [--github-release] [--release-title TITLE] [--release-notes NOTES|--notes-file FILE]\n" "$0" >&2
 }
 
 on_exit() {
@@ -49,7 +49,7 @@ trap on_exit EXIT
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        --check | --candidate | --push | --publish-plan | --candidate-check | --self-test)
+        --check | --candidate-promote | --push | --publish-plan | --candidate-check | --self-test)
             mode="$1"
             ;;
         --release)
@@ -351,7 +351,7 @@ tag_installer_release() {
 }
 
 update_candidate_ref() {
-    if [ "$mode" != "--push" ] && [ "$mode" != "--candidate" ]; then
+    if [ "$mode" != "--push" ] && [ "$mode" != "--candidate-promote" ]; then
         return 0
     fi
     if [ -z "$candidate_ref" ]; then
@@ -456,7 +456,7 @@ if [ "$mode" = "--push" ]; then
     update_candidate_ref
 fi
 
-if [ "$mode" = "--candidate" ]; then
+if [ "$mode" = "--candidate-promote" ]; then
     update_candidate_ref
     candidate_check
 fi
@@ -468,7 +468,7 @@ if [ "$json_output" = true ]; then
     tagged=false
     [ -n "$release_tag" ] && tagged=true
     pushed=false
-    { [ "$mode" = "--push" ] || [ "$mode" = "--candidate" ]; } && [ "$dry_run" != true ] && pushed=true
+    { [ "$mode" = "--push" ] || [ "$mode" = "--candidate-promote" ]; } && [ "$dry_run" != true ] && pushed=true
     release_status_json 0 true "$pushed" "$tagged" "complete"
 else
     if [ "$dry_run" = true ]; then
@@ -479,5 +479,5 @@ else
     [ -n "$release_tag" ] && printf "release tag\t%s\n" "$release_tag"
     [ "$signed_tag" = true ] && printf "release provenance\tsigned-tag\n"
     [ "$github_release" = true ] && printf "github release\t%s\n" "$release_tag"
-    { [ "$mode" = "--push" ] || [ "$mode" = "--candidate" ]; } && [ -n "$candidate_ref" ] && printf "candidate ref\t%s\n" "$candidate_ref"
+    { [ "$mode" = "--push" ] || [ "$mode" = "--candidate-promote" ]; } && [ -n "$candidate_ref" ] && printf "candidate ref\t%s\n" "$candidate_ref"
 fi

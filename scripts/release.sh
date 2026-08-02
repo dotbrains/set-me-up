@@ -28,7 +28,7 @@ case "$mode" in
         exec "$repo_root/scripts/release-install-update.sh" --check "$@"
         ;;
     --candidate)
-        exec "$repo_root/scripts/release-install-update.sh" --candidate "$@"
+        exec "$repo_root/scripts/release-install-update.sh" --candidate-promote "$@"
         ;;
     --publish)
         exec "$repo_root/scripts/release-install-update.sh" --push "$@"
