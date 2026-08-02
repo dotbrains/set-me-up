@@ -49,6 +49,16 @@ require_workflow "hybrid" "smu provisioning-adapter preflight --adapter home-man
 require_workflow "release" "scripts/release.sh --check --json"
 require_workflow "migration" "smu migration-pr --repo . --mode hybrid --dry-run --json"
 require_workflow "rollback" "smu rollback doctor --json"
+require_workflow "fleet" "smu fleet plan --hosts hosts.txt --profile vps --json"
+require_workflow "release-package" "smu release-package --version 1.2.3 --channel latest-known-good --json"
+require_workflow "blueprint-registry" "smu blueprint-registry --json"
+require_workflow "module-graph" "smu module-graph base rcm nix --json"
+require_workflow "tui" "smu tui --profile vps --json"
+require_workflow "drift" "smu drift doctor --json"
+require_workflow "post-install" "smu post-install doctor --profile vps --json"
+require_workflow "policy" "smu policy check --preset ci --json"
+require_workflow "rollback-test" "smu rollback-test restore --json"
+require_workflow "product-docs" "smu product-docs generate --output site/product-docs.md --json"
 
 awk '
     /^```bash$/ { in_block = 1; next }

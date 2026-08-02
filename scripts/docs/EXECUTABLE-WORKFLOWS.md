@@ -59,3 +59,73 @@ smu rollback doctor --json
 smu rollback --dry-run
 smu plan --machine vps --json
 ```
+
+## fleet
+
+```bash
+smu fleet plan --hosts hosts.txt --profile vps --json
+smu fleet plan --profile vps --provisioning-adapter home-manager --json
+```
+
+## release-package
+
+```bash
+smu release-package --version 1.2.3 --channel latest-known-good --json
+smu release-notes --from release-readiness.json --output RELEASE.md
+```
+
+## blueprint-registry
+
+```bash
+smu blueprint-registry --json
+smu blueprint-registry --search dotbrains --json
+```
+
+## module-graph
+
+```bash
+smu module-graph base rcm nix --json
+smu plan --machine vps --json
+```
+
+## tui
+
+```bash
+smu tui --profile vps --json
+smu tui --profile vps --provisioning-adapter home-manager --json
+```
+
+## drift
+
+```bash
+smu drift doctor --json
+smu drift doctor --root . --json
+```
+
+## post-install
+
+```bash
+smu post-install doctor --profile vps --json
+smu doctor --strict --json
+```
+
+## policy
+
+```bash
+smu policy check --preset ci --json
+smu policy check --preset strict --provisioning-adapter rcm --json
+```
+
+## rollback-test
+
+```bash
+smu rollback-test restore --json
+smu rollback doctor --json
+```
+
+## product-docs
+
+```bash
+smu product-docs generate --output site/product-docs.md --json
+scripts/validate-executable-docs.sh
+```
