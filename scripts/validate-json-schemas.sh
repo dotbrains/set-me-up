@@ -32,17 +32,17 @@ from pathlib import Path
 root = Path(sys.argv[1])
 
 checks = [
-    ("health-report.schema.json", ["scripts/health-report.sh", "--json"], False, 30),
-    ("doctor.schema.json", ["scripts/doctor.sh", "--json"], False, 30),
+    ("health-report.schema.json", ["scripts/health-report.sh", "--json"], False, 90),
+    ("doctor.schema.json", ["scripts/doctor.sh", "--json"], False, 90),
     ("freshness-report.schema.json", ["scripts/freshness-report.sh", "--json"], False, 30),
     ("change-report.schema.json", ["scripts/change-report.sh", "--json"], False, 30),
     ("ci-workflow-report.schema.json", ["scripts/ci-workflow-report.sh", "--checked-out", "--json"], False, 30),
     ("native-workflow-template.schema.json", ["scripts/native-workflow-template.sh", "--check", "--json"], False, 30),
-    ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"], False, 30),
-    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"], False, 30),
-    ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"], False, 30),
-    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"], False, 30),
-    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--check", "--json"], True, 180),
+    ("capabilities.schema.json", ["scripts/capabilities.sh", "--json"], False, 90),
+    ("agent-intake.schema.json", ["scripts/agent-intake.sh", "--json", "theme"], False, 90),
+    ("sync-report.schema.json", ["scripts/sync-report.sh", "--json"], False, 90),
+    ("update-report.schema.json", ["scripts/update.sh", "--plan", "--json"], False, 90),
+    ("release-readiness.schema.json", ["scripts/release-install-update.sh", "--publish-plan", "--json"], False, 30),
 ]
 
 

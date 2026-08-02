@@ -6,6 +6,36 @@ set -euo pipefail
 strict=0
 minimum_score=40
 
+cache_var_name() {
+    local prefix="$1"
+    local path="$2"
+    local key
+
+    key="${path//[!a-zA-Z0-9_]/_}"
+    printf "__smu_agent_intake_%s_%s" "$prefix" "$key"
+}
+
+cache_has() {
+    local var_name="$1"
+
+    [ -n "${__smu_agent_intake_cache_dir:-}" ] && \
+        [ -f "$__smu_agent_intake_cache_dir/$var_name" ]
+}
+
+cache_get() {
+    local var_name="$1"
+
+    sed -n '1p' "$__smu_agent_intake_cache_dir/$var_name"
+}
+
+cache_set() {
+    local var_name="$1"
+    local value="$2"
+
+    [ -n "${__smu_agent_intake_cache_dir:-}" ] || return 0
+    printf "%s\n" "$value" > "$__smu_agent_intake_cache_dir/$var_name"
+}
+
 strict_risk_csv() {
     printf "dirty,detached,diverged,behind,missing,not-git,no-validator"
 }
@@ -62,47 +92,99 @@ route_details_for_path() {
 validator_label_for_path() {
     local path="$1"
     local validator
+    local var_name
+    local value
+
+    var_name="$(cache_var_name validator "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
+        return 0
+    fi
 
     if [ "$path" = "." ]; then
-        printf "scripts/validate.sh --all"
+        value="scripts/validate.sh --all"
     elif validator="$(smu_validator_for_repo "$validators_file" "$path")"; then
-        smu_validator_label "$validator"
+        value="$(smu_validator_label "$validator")"
     else
-        printf "none"
+        value="none"
     fi
+    cache_set "$var_name" "$value"
+    printf "%s" "$value"
 }
 
 state_for_path() {
     local path="$1"
+    local var_name
+    local value
+
+    var_name="$(cache_var_name state "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
+        return 0
+    fi
 
     if [ "$path" = "." ]; then
-        printf "root"
+        value="root"
     else
-        smu_repo_state "$path"
+        value="$(smu_repo_state "$path")"
     fi
+    cache_set "$var_name" "$value"
+    printf "%s" "$value"
 }
 
 sync_for_path() {
     local path="$1"
     local state
+    local var_name
+    local value
 
-    if [ "$path" = "." ]; then
-        printf "local"
+    var_name="$(cache_var_name sync "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
         return 0
     fi
 
-    state="$(smu_repo_state "$path")"
-    smu_repo_health_sync_for_state "$path" "$state"
+    if [ "$path" = "." ]; then
+        value="local"
+        cache_set "$var_name" "$value"
+        printf "%s" "$value"
+        return 0
+    fi
+
+    state="$(state_for_path "$path")"
+    value="$(smu_repo_health_sync_for_state "$path" "$state")"
+    cache_set "$var_name" "$value"
+    printf "%s" "$value"
 }
 
 docs_for_path() {
     local path="$1"
-    smu_repo_health_docs "$repo_root" "$path"
+    local var_name
+    local value
+
+    var_name="$(cache_var_name docs "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
+        return 0
+    fi
+    value="$(smu_repo_health_docs "$repo_root" "$path")"
+    cache_set "$var_name" "$value"
+    printf "%s" "$value"
 }
 
 doc_warnings_for_path() {
     local path="$1"
-    smu_repo_health_doc_warnings "$repo_root" "$path"
+    local var_name
+    local value
+
+    var_name="$(cache_var_name warnings "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
+        return 0
+    fi
+    value="$(smu_repo_health_doc_warnings "$repo_root" "$path")"
+    cache_set "$var_name" "$value"
+    printf "%s" "$value"
 }
 
 append_path() {
@@ -232,6 +314,13 @@ risk_flags_for_path() {
     local sync
     local validator
     local risks=""
+    local var_name
+
+    var_name="$(cache_var_name risks "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
+        return 0
+    fi
 
     state="$(state_for_path "$path")"
     sync="$(sync_for_path "$path")"
@@ -255,24 +344,36 @@ risk_flags_for_path() {
         risks="$(append_csv_unique "$risks" "missing-docs")"
     fi
 
+    cache_set "$var_name" "$risks"
     printf "%s" "$risks"
 }
 
 risk_level_for_path() {
+    local path="$1"
     local risks
+    local var_name
+    local value
 
-    risks="$(risk_flags_for_path "$1")"
+    var_name="$(cache_var_name risk_level "$path")"
+    if cache_has "$var_name"; then
+        cache_get "$var_name"
+        return 0
+    fi
+
+    risks="$(risk_flags_for_path "$path")"
     case ",$risks," in
         *,dirty,*|*,detached,*|*,diverged,*|*,missing,*|*,not-git,*|*,no-validator,*)
-            printf "high"
+            value="high"
             ;;
         *,behind,*|*,missing-docs,*)
-            printf "medium"
+            value="medium"
             ;;
         *)
-            printf "low"
+            value="low"
             ;;
     esac
+    cache_set "$var_name" "$value"
+    printf "%s" "$value"
 }
 
 strict_has_blocking_risks() {
@@ -364,6 +465,9 @@ high_confidence_intent_count() {
 }
 
 run_agent_intake() {
+    __smu_agent_intake_cache_dir="$(mktemp -d "${TMPDIR:-/tmp}/smu-agent-intake.XXXXXX")"
+    local result=0
+
     smu_validate_repos_manifest "$repos_file"
 
     selected_paths=""
@@ -379,6 +483,7 @@ run_agent_intake() {
 
     if [ -z "$selected_paths" ]; then
         printf "No agent intake matched: %s\n" "$query" >&2
+        rm -rf "$__smu_agent_intake_cache_dir"
         return 1
     fi
 
@@ -399,6 +504,8 @@ run_agent_intake() {
 
     if [ "$strict" -eq 1 ] && strict_has_blocking_risks; then
         printf "Strict agent intake failed: blocking risks present.\n" >&2
-        return 1
+        result=1
     fi
+    rm -rf "$__smu_agent_intake_cache_dir"
+    return "$result"
 }

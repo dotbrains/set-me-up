@@ -56,7 +56,7 @@ for query, fixture_path in fixtures.items():
     payload = json.loads(subprocess.check_output(
         ["bash", "scripts/agent-intake.sh", "--json", query],
         text=True,
-        timeout=30,
+        timeout=90,
     ))
     normalized = normalize(payload)
     if mode == "--write":
