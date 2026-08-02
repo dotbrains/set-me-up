@@ -63,6 +63,16 @@ require_workflow "policy" "smu policy check --preset ci --json"
 require_workflow "policy" "smu policy check --root . --preset ci --json"
 require_workflow "rollback-test" "smu rollback-test restore --json"
 require_workflow "product-docs" "smu product-docs generate --source scripts/docs/EXECUTABLE-WORKFLOWS.md --output site/product-docs.md --json"
+require_workflow "product-operations" "smu inventory --json"
+require_workflow "product-operations" "smu facts collect --json"
+require_workflow "product-operations" "smu plan diff --from previous-plan.json --to current-plan.json --json"
+require_workflow "product-operations" "smu approval --preset strict --dry-run --json"
+require_workflow "product-operations" "smu state timeline --json"
+require_workflow "product-operations" "smu lock --output smu.lock --json"
+require_workflow "product-operations" "smu bootstrap bundle --profile vps --output smu-bootstrap.zip --json"
+require_workflow "product-operations" "smu policy explain --preset ci --json"
+require_workflow "product-operations" "smu golden-examples --json"
+require_workflow "product-operations" "smu provenance --version 1.2.3 --json"
 
 awk '
     /^```bash$/ { in_block = 1; next }
