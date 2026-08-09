@@ -127,6 +127,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/health-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/route-quality.sh" "$target/scripts/"
     cp "$repo_root/scripts/freshness-report.sh" "$target/scripts/"
+    cp "$repo_root/scripts/utilities-pin-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/new-repo-check.sh" "$target/scripts/"
     cp "$repo_root/scripts/add-repo.sh" "$target/scripts/"
     cp "$repo_root/scripts/change-report.sh" "$target/scripts/"

@@ -40,6 +40,8 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/health-report.sh`: Machine-readable JSON health report.
 - `scripts/route-quality.sh`: Required route keyword quality gate.
 - `scripts/freshness-report.sh`: Last-commit freshness report.
+- `scripts/utilities-pin-report.sh`: Utilities version pin report comparing
+  each managed repo's `.utilities-version` against the utilities checkout.
 - `scripts/new-repo-check.sh`: Checklist validator for adding a managed repo.
 - `scripts/add-repo.sh`: Validated workflow for adding a managed repo.
 - `scripts/change-report.sh`: Recent cross-repo commit summary.

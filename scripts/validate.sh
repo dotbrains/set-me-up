@@ -48,6 +48,7 @@ bash_checks() {
         scripts/ci-workflow-report.sh scripts/generate-docs.sh \
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
+        scripts/utilities-pin-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
         scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh scripts/tree-smoke-test.sh \
@@ -76,7 +77,8 @@ shell_checks() {
         scripts/capabilities.sh scripts/ci-workflow-report.sh \
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
         scripts/health-report.sh scripts/route-quality.sh \
-        scripts/freshness-report.sh scripts/new-repo-check.sh scripts/add-repo.sh \
+        scripts/freshness-report.sh scripts/utilities-pin-report.sh \
+        scripts/new-repo-check.sh scripts/add-repo.sh \
         scripts/change-report.sh scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh \
         scripts/tree-smoke-test.sh \
@@ -209,6 +211,7 @@ structure_checks() {
         scripts/health-report.sh
         scripts/route-quality.sh
         scripts/freshness-report.sh
+        scripts/utilities-pin-report.sh
         scripts/new-repo-check.sh
         scripts/add-repo.sh
         scripts/change-report.sh
@@ -350,6 +353,10 @@ structure_checks() {
     }
     [ -x scripts/freshness-report.sh ] || {
         printf "scripts/freshness-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/utilities-pin-report.sh ] || {
+        printf "scripts/utilities-pin-report.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/new-repo-check.sh ] || {

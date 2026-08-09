@@ -166,6 +166,12 @@ Usage: scripts/tree-smoke-test.sh
 Usage: scripts/update.sh [--plan|--apply] [--validate] [--text|--json]
 ```
 
+## scripts/utilities-pin-report.sh
+
+```text
+Usage: scripts/utilities-pin-report.sh [--tsv]
+```
+
 ## scripts/validate-executable-docs.sh
 
 ```text

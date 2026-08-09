@@ -32,6 +32,7 @@ directory structure. These scripts help manage these repositories:
 - **`health-report.sh`**: Emit machine-readable repo health JSON
 - **`route-quality.sh`**: Enforce required route capability keywords
 - **`freshness-report.sh`**: Report last commit age for managed repos
+- **`utilities-pin-report.sh`**: Check utilities version pins across repos
 - **`new-repo-check.sh`**: Validate the checklist for adding a managed repo
 - **`add-repo.sh`**: Add a managed repo and validate the generated metadata
 - **`change-report.sh`**: Summarize recent commits across checked-out repos
@@ -390,6 +391,20 @@ scripts/freshness-report.sh
 scripts/freshness-report.sh --json
 SMU_STALE_DAYS=90 scripts/freshness-report.sh
 ```
+
+## utilities-pin-report.sh
+
+The `utilities-pin-report.sh` command compares each managed repo's
+`.utilities-version` pin (the minimum dotbrains/utilities release the repo
+expects) against the local utilities checkout and exits non-zero when a pin
+is newer than the checkout:
+
+```bash
+scripts/utilities-pin-report.sh
+```
+
+States: `ok`, `stale` (update the utilities checkout), `unpinned`, and
+`missing` (repo not checked out).
 
 ## new-repo-check.sh
 
