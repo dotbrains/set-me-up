@@ -140,15 +140,15 @@ set-me-up/
 ### Modules
 
 - [set-me-up-arch-modules](https://github.com/dotbrains/set-me-up-arch-modules)
-- [colorscheme-module](https://github.com/dotbrains/colorscheme-module)
+- [set-me-up-colorscheme-module](https://github.com/dotbrains/set-me-up-colorscheme-module)
 - [set-me-up-debian-modules](https://github.com/dotbrains/set-me-up-debian-modules)
 - [set-me-up-macos-modules](https://github.com/dotbrains/set-me-up-macos-modules)
-- [macports-module](https://github.com/dotbrains/macports-module)
+- [set-me-up-macports-module](https://github.com/dotbrains/set-me-up-macports-module)
 - [set-me-up-omarchy-modules](https://github.com/dotbrains/set-me-up-omarchy-modules)
-- [preferences-module](https://github.com/dotbrains/preferences-module)
-- [template-module](https://github.com/dotbrains/template-module)
+- [set-me-up-preferences-module](https://github.com/dotbrains/set-me-up-preferences-module)
+- [set-me-up-template-module](https://github.com/dotbrains/set-me-up-template-module)
 - [set-me-up-universal-modules](https://github.com/dotbrains/set-me-up-universal-modules)
-- [xcode-module](https://github.com/dotbrains/xcode-module)
+- [set-me-up-xcode-module](https://github.com/dotbrains/set-me-up-xcode-module)
 
 ### Shared
 

@@ -11,15 +11,15 @@ utilities|utilities|top-level
 
 # Module repositories
 set-me-up-arch-modules|modules/arch|module
-colorscheme-module|modules/colorschemes|module
+set-me-up-colorscheme-module|modules/colorschemes|module
 set-me-up-debian-modules|modules/debian|module
 set-me-up-macos-modules|modules/macos|module
-macports-module|modules/macports|module
-preferences-module|modules/preferences|module
-template-module|modules/template-module|module
+set-me-up-macports-module|modules/macports|module
+set-me-up-preferences-module|modules/preferences|module
+set-me-up-template-module|modules/template-module|module
 set-me-up-universal-modules|modules/universal|module
 set-me-up-omarchy-modules|modules/omarchy|module
-xcode-module|modules/xcode|module
+set-me-up-xcode-module|modules/xcode|module
 
 # Shared repositories
 shared-ai-config|shared/ai-config|shared

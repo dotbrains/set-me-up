@@ -95,9 +95,9 @@ scripts/generate-docs.sh
   scripts/validate.sh --all
   ```
 
-### colorscheme-module
+### set-me-up-colorscheme-module
 
-- URL: <https://github.com/dotbrains/colorscheme-module>
+- URL: <https://github.com/dotbrains/set-me-up-colorscheme-module>
 - Path: `modules/colorschemes`
 - Category: `module`
 - Route: `modules-colorschemes`
@@ -138,9 +138,9 @@ scripts/generate-docs.sh
   find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
   ```
 
-### macports-module
+### set-me-up-macports-module
 
-- URL: <https://github.com/dotbrains/macports-module>
+- URL: <https://github.com/dotbrains/set-me-up-macports-module>
 - Path: `modules/macports`
 - Category: `module`
 - Route: `modules-macports`
@@ -152,9 +152,9 @@ scripts/generate-docs.sh
   scripts/validate.sh --all
   ```
 
-### preferences-module
+### set-me-up-preferences-module
 
-- URL: <https://github.com/dotbrains/preferences-module>
+- URL: <https://github.com/dotbrains/set-me-up-preferences-module>
 - Path: `modules/preferences`
 - Category: `module`
 - Route: `modules-preferences`
@@ -167,9 +167,9 @@ scripts/generate-docs.sh
   '*.sh' -exec bash -n {} +
   ```
 
-### template-module
+### set-me-up-template-module
 
-- URL: <https://github.com/dotbrains/template-module>
+- URL: <https://github.com/dotbrains/set-me-up-template-module>
 - Path: `modules/template-module`
 - Category: `module`
 - Route: `modules-template`
@@ -210,9 +210,9 @@ scripts/generate-docs.sh
   scripts/validate.sh --all
   ```
 
-### xcode-module
+### set-me-up-xcode-module
 
-- URL: <https://github.com/dotbrains/xcode-module>
+- URL: <https://github.com/dotbrains/set-me-up-xcode-module>
 - Path: `modules/xcode`
 - Category: `module`
 - Route: `modules-xcode`
