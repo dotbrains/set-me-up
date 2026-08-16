@@ -48,7 +48,7 @@ bash_checks() {
         scripts/ci-workflow-report.sh scripts/generate-docs.sh \
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
-        scripts/utilities-pin-report.sh \
+        scripts/utilities-pin-report.sh scripts/readme-check.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
         scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh scripts/tree-smoke-test.sh \
@@ -65,6 +65,7 @@ bash_checks() {
         scripts/lib/check-runner.sh scripts/lib/repo-health.sh \
         scripts/lib/agent-intake-match.sh scripts/lib/agent-intake-render.sh \
         scripts/lib/release-readiness-render.sh
+    python3 -c "import ast; ast.parse(open('scripts/lib/update-readme.py').read())"
 }
 
 shell_checks() {
@@ -78,6 +79,7 @@ shell_checks() {
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
         scripts/health-report.sh scripts/route-quality.sh \
         scripts/freshness-report.sh scripts/utilities-pin-report.sh \
+        scripts/readme-check.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh \
         scripts/change-report.sh scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh \
@@ -212,6 +214,7 @@ structure_checks() {
         scripts/route-quality.sh
         scripts/freshness-report.sh
         scripts/utilities-pin-report.sh
+        scripts/readme-check.sh
         scripts/new-repo-check.sh
         scripts/add-repo.sh
         scripts/change-report.sh
@@ -238,6 +241,7 @@ structure_checks() {
         scripts/lib/agent-intake-match.sh
         scripts/lib/agent-intake-render.sh
         scripts/lib/release-readiness-render.sh
+        scripts/lib/update-readme.py
         scripts/test-root-scripts.sh
         scripts/tests/test-helpers.sh
         scripts/tests/test-setup-update.sh
@@ -359,6 +363,10 @@ structure_checks() {
         printf "scripts/utilities-pin-report.sh must be executable\\n" >&2
         exit 1
     }
+    [ -x scripts/readme-check.sh ] || {
+        printf "scripts/readme-check.sh must be executable\\n" >&2
+        exit 1
+    }
     [ -x scripts/new-repo-check.sh ] || {
         printf "scripts/new-repo-check.sh must be executable\\n" >&2
         exit 1
@@ -419,6 +427,7 @@ structure_checks() {
     grep -q "Quick Setup" README.md
     grep -q "Directory Structure" README.md
     grep -q "Repositories" README.md
+    scripts/readme-check.sh
 
     scripts/generate-docs.sh --check
     scripts/generate-command-docs.sh --check

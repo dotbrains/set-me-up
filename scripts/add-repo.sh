@@ -65,6 +65,8 @@ append_line "$repos_file" "$repo|$path|$category"
 append_line "$routes_file" "$route_id|$path|$summary|$keywords"
 append_line "$validators_file" "$path|$validator"
 
+python3 "$repo_root/scripts/lib/update-readme.py" "$repo" "$path" "$category" "$summary"
+
 scripts/generate-docs.sh
 scripts/new-repo-check.sh "$path"
 scripts/validate.sh --structure
