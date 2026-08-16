@@ -96,6 +96,7 @@ set-me-up/
 ├── shared/
 │   └── ai-config/      # Shared AI agent/skill definitions
 ├── modules/
+│   ├── arch/           # Generic Arch Linux modules
 │   ├── colorschemes/    # Color scheme configurations
 │   ├── debian/         # Debian/Linux modules
 │   ├── macos/          # macOS/Homebrew modules
@@ -138,6 +139,7 @@ set-me-up/
 
 ### Modules
 
+- [set-me-up-arch-modules](https://github.com/dotbrains/set-me-up-arch-modules)
 - [colorscheme-module](https://github.com/dotbrains/colorscheme-module)
 - [set-me-up-debian-modules](https://github.com/dotbrains/set-me-up-debian-modules)
 - [set-me-up-macos-modules](https://github.com/dotbrains/set-me-up-macos-modules)

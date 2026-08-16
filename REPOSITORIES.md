@@ -81,6 +81,20 @@ scripts/generate-docs.sh
   ./tests/main.sh && ./tests/integration_test.sh
   ```
 
+### set-me-up-arch-modules
+
+- URL: <https://github.com/dotbrains/set-me-up-arch-modules>
+- Path: `modules/arch`
+- Category: `module`
+- Route: `arch`
+- Summary: Generic Arch Linux package installation (any Arch-based system)
+- Keywords: `arch,arch-linux,linux,pacman,aur,yay`
+- Validator:
+
+  ```bash
+  scripts/validate.sh --all
+  ```
+
 ### colorscheme-module
 
 - URL: <https://github.com/dotbrains/colorscheme-module>

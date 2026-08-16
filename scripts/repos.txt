@@ -10,6 +10,7 @@ set-me-up-tests|tests|top-level
 utilities|utilities|top-level
 
 # Module repositories
+set-me-up-arch-modules|modules/arch|module
 colorscheme-module|modules/colorschemes|module
 set-me-up-debian-modules|modules/debian|module
 set-me-up-macos-modules|modules/macos|module
