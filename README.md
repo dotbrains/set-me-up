@@ -100,6 +100,7 @@ set-me-up/
 │   ├── debian/         # Debian/Linux modules
 │   ├── macos/          # macOS/Homebrew modules
 │   ├── macports/       # MacPorts module
+│   ├── omarchy/        # Omarchy (Arch + Hyprland) modules
 │   ├── preferences/    # Preferences module
 │   ├── template-module/ # Template for new modules
 │   ├── universal/      # Universal modules
@@ -141,6 +142,7 @@ set-me-up/
 - [set-me-up-debian-modules](https://github.com/dotbrains/set-me-up-debian-modules)
 - [set-me-up-macos-modules](https://github.com/dotbrains/set-me-up-macos-modules)
 - [macports-module](https://github.com/dotbrains/macports-module)
+- [set-me-up-omarchy-modules](https://github.com/dotbrains/set-me-up-omarchy-modules)
 - [preferences-module](https://github.com/dotbrains/preferences-module)
 - [template-module](https://github.com/dotbrains/template-module)
 - [set-me-up-universal-modules](https://github.com/dotbrains/set-me-up-universal-modules)
