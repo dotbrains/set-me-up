@@ -55,6 +55,9 @@ trap 'rm -f "$tmp_file"' EXIT
         printf "  %s\n", remaining
     }
     NR > 1 {
+        if (NR > 2) {
+            printf "\n"
+        }
         printf "### %s\n\n", $1
         printf "- URL: <https://github.com/dotbrains/%s>\n", $1
         printf "- Path: `%s`\n", $2
@@ -66,9 +69,6 @@ trap 'rm -f "$tmp_file"' EXIT
         printf "  ```bash\n"
         print_command($7)
         printf "  ```\n"
-        if (NR < 29) {
-            printf "\n"
-        }
     }'
 } > "$tmp_file"
 

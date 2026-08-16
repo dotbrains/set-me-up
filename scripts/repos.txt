@@ -17,6 +17,7 @@ macports-module|modules/macports|module
 preferences-module|modules/preferences|module
 template-module|modules/template-module|module
 set-me-up-universal-modules|modules/universal|module
+set-me-up-omarchy-modules|modules/omarchy|module
 xcode-module|modules/xcode|module
 
 # Shared repositories

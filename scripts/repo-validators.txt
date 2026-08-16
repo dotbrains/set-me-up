@@ -28,3 +28,4 @@ home/.config/television|scripts/validate.sh --all
 home/.config/tmux|scripts/validate.sh --all
 home/.config/zed|scripts/validate.sh --all
 home/.config/zsh|scripts/validate.sh --all
+modules/omarchy|scripts/validate.sh --all

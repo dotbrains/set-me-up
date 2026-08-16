@@ -182,6 +182,20 @@ scripts/generate-docs.sh
   find . -type f -name '*.sh' -not -path '*/.git/*' -exec bash -n {} +
   ```
 
+### set-me-up-omarchy-modules
+
+- URL: <https://github.com/dotbrains/set-me-up-omarchy-modules>
+- Path: `modules/omarchy`
+- Category: `module`
+- Route: `omarchy`
+- Summary: Omarchy (Arch + Hyprland) package installation and update hook
+- Keywords: `omarchy,arch,hyprland,linux,pacman,aur,dhh`
+- Validator:
+
+  ```bash
+  scripts/validate.sh --all
+  ```
+
 ### xcode-module
 
 - URL: <https://github.com/dotbrains/xcode-module>
