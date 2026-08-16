@@ -106,6 +106,12 @@ Usage: scripts/new-repo-check.sh <managed-local-path>
 Usage: scripts/performance-budgets.sh
 ```
 
+## scripts/readme-check.sh
+
+```text
+Usage: scripts/readme-check.sh
+```
+
 ## scripts/release-install-update.sh
 
 ```text
