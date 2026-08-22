@@ -42,6 +42,9 @@ belong in those child repositories; this file explains how to route it.
 - `scripts/freshness-report.sh`: Last-commit freshness report.
 - `scripts/utilities-pin-report.sh`: Utilities version pin report comparing
   each managed repo's `.utilities-version` against the utilities checkout.
+- `scripts/notion-fallback-drift-report.sh`: Report drift in the
+  hand-duplicated `ntn` Notion fallback command across the claude, codex,
+  and opencode managed repos.
 - `scripts/new-repo-check.sh`: Checklist validator for adding a managed repo.
 - `scripts/add-repo.sh`: Validated workflow for adding a managed repo.
 - `scripts/change-report.sh`: Recent cross-repo commit summary.

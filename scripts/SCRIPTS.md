@@ -33,6 +33,8 @@ directory structure. These scripts help manage these repositories:
 - **`route-quality.sh`**: Enforce required route capability keywords
 - **`freshness-report.sh`**: Report last commit age for managed repos
 - **`utilities-pin-report.sh`**: Check utilities version pins across repos
+- **`notion-fallback-drift-report.sh`**: Check the `ntn` Notion fallback
+  command for drift across claude, codex, and opencode
 - **`new-repo-check.sh`**: Validate the checklist for adding a managed repo
 - **`add-repo.sh`**: Add a managed repo and validate the generated metadata
 - **`change-report.sh`**: Summarize recent commits across checked-out repos
@@ -405,6 +407,22 @@ scripts/utilities-pin-report.sh
 
 States: `ok`, `stale` (update the utilities checkout), `unpinned`, and
 `missing` (repo not checked out).
+
+## notion-fallback-drift-report.sh
+
+The `notion-fallback-drift-report.sh` command checks that claude, codex,
+and opencode's hand-maintained `ntn` (official Notion CLI) fallback
+commands still invoke the same subcommand and flags. There's no shared
+source to assemble these from — the command body differs per tool (a
+slash command for claude/opencode, a sandbox `prefix_rule` for codex) — so
+this compares invocation shape instead, ignoring argument values:
+
+```bash
+scripts/notion-fallback-drift-report.sh
+```
+
+States: `ok`, `drift` (a repo is missing an expected fragment), and
+`missing` (repo not checked out, or its fallback file doesn't exist).
 
 ## new-repo-check.sh
 

@@ -100,6 +100,12 @@ Usage: scripts/native-workflow-template.sh [--report|--check] [--tsv|--json]
 Usage: scripts/new-repo-check.sh <managed-local-path>
 ```
 
+## scripts/notion-fallback-drift-report.sh
+
+```text
+Usage: scripts/notion-fallback-drift-report.sh [--tsv]
+```
+
 ## scripts/performance-budgets.sh
 
 ```text

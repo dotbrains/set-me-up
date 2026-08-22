@@ -49,6 +49,7 @@ bash_checks() {
         scripts/native-workflow-template.sh scripts/health-report.sh \
         scripts/route-quality.sh scripts/freshness-report.sh \
         scripts/utilities-pin-report.sh scripts/readme-check.sh \
+        scripts/notion-fallback-drift-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh scripts/change-report.sh \
         scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh scripts/tree-smoke-test.sh \
@@ -79,7 +80,7 @@ shell_checks() {
         scripts/generate-docs.sh scripts/native-workflow-template.sh \
         scripts/health-report.sh scripts/route-quality.sh \
         scripts/freshness-report.sh scripts/utilities-pin-report.sh \
-        scripts/readme-check.sh \
+        scripts/readme-check.sh scripts/notion-fallback-drift-report.sh \
         scripts/new-repo-check.sh scripts/add-repo.sh \
         scripts/change-report.sh scripts/configure-branch-protection.sh \
         scripts/release-install-update.sh scripts/release.sh \
@@ -214,6 +215,7 @@ structure_checks() {
         scripts/route-quality.sh
         scripts/freshness-report.sh
         scripts/utilities-pin-report.sh
+        scripts/notion-fallback-drift-report.sh
         scripts/readme-check.sh
         scripts/new-repo-check.sh
         scripts/add-repo.sh
@@ -361,6 +363,10 @@ structure_checks() {
     }
     [ -x scripts/utilities-pin-report.sh ] || {
         printf "scripts/utilities-pin-report.sh must be executable\\n" >&2
+        exit 1
+    }
+    [ -x scripts/notion-fallback-drift-report.sh ] || {
+        printf "scripts/notion-fallback-drift-report.sh must be executable\\n" >&2
         exit 1
     }
     [ -x scripts/readme-check.sh ] || {
