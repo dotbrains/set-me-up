@@ -240,7 +240,7 @@ name = sys.argv[3]
 
 if command == "schema":
     print(json.dumps({
-        "$id": f"https://dotbrains.dev/set-me-up/contracts/{name}.schema.json",
+        "$id": f"https://smeltery.dev/set-me-up/contracts/{name}.schema.json",
         "type": "object",
     }))
     sys.exit(0)
@@ -642,7 +642,7 @@ EOF
             --release-notes "Release notes" > "$output"
     )
 
-    assert_contains "$gh_log" "release create v0.0.1 --repo dotbrains/set-me-up-installer --title Installer v0.0.1 --notes Release notes"
+    assert_contains "$gh_log" "release create v0.0.1 --repo smeltery/set-me-up-installer --title Installer v0.0.1 --notes Release notes"
     python3 - "$output" <<'PY'
 import json
 import sys
@@ -765,7 +765,7 @@ EOF
             --candidate "" --notes-file "$notes_file" > "$output"
     )
 
-    assert_contains "$gh_log" "release create v0.0.3 --repo dotbrains/set-me-up-installer --title set-me-up installer v0.0.3 --notes Release notes from file"
+    assert_contains "$gh_log" "release create v0.0.3 --repo smeltery/set-me-up-installer --title set-me-up installer v0.0.3 --notes Release notes from file"
     python3 - "$output" "$notes_file" <<'PY'
 import json
 import sys

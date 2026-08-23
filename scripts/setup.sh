@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Constants
-readonly GITHUB_ORG="https://github.com/dotbrains"
+readonly GITHUB_ORG="https://github.com/smeltery"
 readonly REPO_NAME="set-me-up"
 REPO_ROOT=""
 REPOS_FILE=""

@@ -59,7 +59,7 @@ trap 'rm -f "$tmp_file"' EXIT
             printf "\n"
         }
         printf "### %s\n\n", $1
-        printf "- URL: <https://github.com/dotbrains/%s>\n", $1
+        printf "- URL: <https://github.com/smeltery/%s>\n", $1
         printf "- Path: `%s`\n", $2
         printf "- Category: `%s`\n", $3
         printf "- Route: `%s`\n", $4

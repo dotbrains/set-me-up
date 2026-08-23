@@ -9,7 +9,7 @@ documented workflows aligned with the commands users run.
 ## vps
 
 ```bash
-INSTALL_URL="https://raw.githubusercontent.com/dotbrains/set-me-up-installer/main/install.sh"
+INSTALL_URL="https://raw.githubusercontent.com/smeltery/set-me-up-installer/main/install.sh"
 curl -fsSL "$INSTALL_URL" | bash -s -- --profile vps --plan
 smu plan --machine vps --json
 smu doctor --strict --json
@@ -82,7 +82,7 @@ smu release-notes --from release-readiness.json --output RELEASE.md
 
 ```bash
 smu blueprint-registry --json
-smu blueprint-registry --search dotbrains --json
+smu blueprint-registry --search smeltery --json
 smu blueprint-registry --registry-url https://example.com/smu-blueprints.json --json
 ```
 

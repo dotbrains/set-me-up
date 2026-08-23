@@ -174,7 +174,7 @@ test_add_repo_updates_manifests_and_docs() {
         "new/repo|scripts/validate.sh --all"
     assert_contains "$work_dir/REPOSITORIES.md" "### new-repo"
     assert_contains "$work_dir/README.md" \
-        "- [new-repo](https://github.com/dotbrains/new-repo)"
+        "- [new-repo](https://github.com/smeltery/new-repo)"
     assert_contains "$output" "Added managed repo new-repo at new/repo."
 }
 

@@ -10,14 +10,14 @@ Remote execution (recommended for first-time setup):
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/dotbrains/set-me-up/master/\
+  https://raw.githubusercontent.com/smeltery/set-me-up/master/\
 scripts/setup.sh | bash
 ```
 
 Local execution:
 
 ```bash
-git clone https://github.com/dotbrains/set-me-up.git
+git clone https://github.com/smeltery/set-me-up.git
 cd set-me-up
 chmod +x scripts/setup.sh
 ./scripts/setup.sh
@@ -25,7 +25,7 @@ chmod +x scripts/setup.sh
 
 ### Features
 
-- Clones repositories from the dotbrains GitHub organization
+- Clones repositories from the smeltery GitHub organization
 - Skips repositories that already exist
 - Clones repositories with submodules (`--recursive`)
 - Organizes repositories by category (top-level, shared, module, config)
@@ -94,7 +94,7 @@ This prevents accidental loss of work-in-progress changes.
 
 To add a new repository to the set-me-up collection:
 
-1. Create the repository in the dotbrains GitHub organization
+1. Create the repository in the smeltery GitHub organization
 2. Add an entry to `repos.txt`:
 
    ```text

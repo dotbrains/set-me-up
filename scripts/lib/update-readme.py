@@ -32,7 +32,7 @@ TREE_ANCHOR_TOKEN = {
 
 
 def update_bullet_list(text, repo, category):
-    link = f"- [{repo}](https://github.com/dotbrains/{repo})"
+    link = f"- [{repo}](https://github.com/smeltery/{repo})"
     if link in text:
         return text, False
 

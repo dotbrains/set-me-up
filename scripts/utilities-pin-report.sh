@@ -2,7 +2,7 @@
 
 # Report utilities version pins for managed repositories.
 #
-# A consumer repo may declare the minimum dotbrains/utilities release it
+# A consumer repo may declare the minimum smeltery/utilities release it
 # expects in a .utilities-version file at its root (plain semver, e.g.
 # "1.2.0"). This report compares each pin against the version of the
 # local utilities checkout (UTILITIES_VERSION in utilities/import.sh)

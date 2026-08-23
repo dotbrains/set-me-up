@@ -33,7 +33,7 @@ cd "$repo_root"
 missing=()
 while IFS='|' read -r repo _path _category; do
     [[ "$repo" =~ ^#.*$ || -z "$repo" ]] && continue
-    link="[$repo](https://github.com/dotbrains/$repo)"
+    link="[$repo](https://github.com/smeltery/$repo)"
     grep -qF -- "$link" "$readme_file" || missing+=("$repo")
 done < "$repos_file"
 

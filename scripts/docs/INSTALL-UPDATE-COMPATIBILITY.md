@@ -7,10 +7,10 @@ blueprint, or scenario-test release is considered ready.
 
 | Installer ref | Blueprint ref | Scenario | Environment | Required check |
 | --- | --- | --- | --- | --- |
-| `main` | `dotbrains/set-me-up-blueprint@master` | `default` | Docker Linux | `scripts/release-install-update.sh --check` |
+| `main` | `smeltery/set-me-up-blueprint@master` | `default` | Docker Linux | `scripts/release-install-update.sh --check` |
 | `main` | `nicholasadamou/dotfiles@main` | `dotfiles` | Docker Linux | `scripts/release-install-update.sh --check` |
 | `main` | `nicholasadamou/dotfiles@main` | `dotfiles-macos` | macOS native | Manual or GitHub Actions scenario run |
-| `candidate` | `dotbrains/set-me-up-blueprint@master` | `default` | Docker Linux | `SMU_INSTALLER_REF=candidate` scenario run |
+| `candidate` | `smeltery/set-me-up-blueprint@master` | `default` | Docker Linux | `SMU_INSTALLER_REF=candidate` scenario run |
 
 ## Candidate Channel
 
@@ -25,7 +25,7 @@ Consumers can test the candidate channel without changing the stable install
 URL:
 
 ```bash
-SMU_INSTALLER_REF=candidate bash <(curl -sSL https://raw.githubusercontent.com/dotbrains/set-me-up-installer/main/install.sh) --plan --json
+SMU_INSTALLER_REF=candidate bash <(curl -sSL https://raw.githubusercontent.com/smeltery/set-me-up-installer/main/install.sh) --plan --json
 ```
 
 Use a fully custom installer source when validating a fork:

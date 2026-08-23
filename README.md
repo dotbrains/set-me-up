@@ -1,15 +1,15 @@
 # set-me-up 👷🏼
 
-[![Lint](https://github.com/dotbrains/set-me-up/workflows/Lint/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/lint.yml)
-[![Tests](https://github.com/dotbrains/set-me-up/workflows/Tests/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/tests.yml)
-[![Release Readiness](https://github.com/dotbrains/set-me-up/actions/workflows/release-readiness.yml/badge.svg)](https://github.com/dotbrains/set-me-up/actions/workflows/release-readiness.yml)
+[![Lint](https://github.com/smeltery/set-me-up/workflows/Lint/badge.svg)](https://github.com/smeltery/set-me-up/actions/workflows/lint.yml)
+[![Tests](https://github.com/smeltery/set-me-up/workflows/Tests/badge.svg)](https://github.com/smeltery/set-me-up/actions/workflows/tests.yml)
+[![Release Readiness](https://github.com/smeltery/set-me-up/actions/workflows/release-readiness.yml/badge.svg)](https://github.com/smeltery/set-me-up/actions/workflows/release-readiness.yml)
 [![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/License-PolyForm%20Shield%201.0.0-blue.svg)](https://polyformproject.org/licenses/shield/1.0.0)
 
 A comprehensive dotfiles and system configuration framework.
 
 ## Documentation
 
-For detailed information about how set-me-up works, see the [documentation](https://github.com/dotbrains/set-me-up-docs).
+For detailed information about how set-me-up works, see the [documentation](https://github.com/smeltery/set-me-up-docs).
 
 For information about the setup and update scripts, see [scripts/SCRIPTS.md](scripts/SCRIPTS.md).
 For the generated repository, route, capability, and validator index, see
@@ -50,7 +50,7 @@ validation locally.
 To clone all repositories and recreate the complete directory structure:
 
 ```bash
-git clone https://github.com/dotbrains/set-me-up.git
+git clone https://github.com/smeltery/set-me-up.git
 cd set-me-up
 chmod +x scripts/setup.sh
 ./scripts/setup.sh
@@ -128,48 +128,48 @@ set-me-up/
 
 ### Core
 
-- [set-me-up-blueprint](https://github.com/dotbrains/set-me-up-blueprint)
-- [set-me-up-docs](https://github.com/dotbrains/set-me-up-docs)
-- [set-me-up-installer](https://github.com/dotbrains/set-me-up-installer)
-- [utilities](https://github.com/dotbrains/utilities)
+- [set-me-up-blueprint](https://github.com/smeltery/set-me-up-blueprint)
+- [set-me-up-docs](https://github.com/smeltery/set-me-up-docs)
+- [set-me-up-installer](https://github.com/smeltery/set-me-up-installer)
+- [utilities](https://github.com/smeltery/utilities)
 
 ### Testing
 
-- [set-me-up-tests](https://github.com/dotbrains/set-me-up-tests)
+- [set-me-up-tests](https://github.com/smeltery/set-me-up-tests)
 
 ### Modules
 
-- [set-me-up-arch-modules](https://github.com/dotbrains/set-me-up-arch-modules)
-- [set-me-up-colorscheme-module](https://github.com/dotbrains/set-me-up-colorscheme-module)
-- [set-me-up-debian-modules](https://github.com/dotbrains/set-me-up-debian-modules)
-- [set-me-up-macos-modules](https://github.com/dotbrains/set-me-up-macos-modules)
-- [set-me-up-macports-module](https://github.com/dotbrains/set-me-up-macports-module)
-- [set-me-up-omarchy-modules](https://github.com/dotbrains/set-me-up-omarchy-modules)
-- [set-me-up-preferences-module](https://github.com/dotbrains/set-me-up-preferences-module)
-- [set-me-up-template-module](https://github.com/dotbrains/set-me-up-template-module)
-- [set-me-up-universal-modules](https://github.com/dotbrains/set-me-up-universal-modules)
-- [set-me-up-xcode-module](https://github.com/dotbrains/set-me-up-xcode-module)
+- [set-me-up-arch-modules](https://github.com/smeltery/set-me-up-arch-modules)
+- [set-me-up-colorscheme-module](https://github.com/smeltery/set-me-up-colorscheme-module)
+- [set-me-up-debian-modules](https://github.com/smeltery/set-me-up-debian-modules)
+- [set-me-up-macos-modules](https://github.com/smeltery/set-me-up-macos-modules)
+- [set-me-up-macports-module](https://github.com/smeltery/set-me-up-macports-module)
+- [set-me-up-omarchy-modules](https://github.com/smeltery/set-me-up-omarchy-modules)
+- [set-me-up-preferences-module](https://github.com/smeltery/set-me-up-preferences-module)
+- [set-me-up-template-module](https://github.com/smeltery/set-me-up-template-module)
+- [set-me-up-universal-modules](https://github.com/smeltery/set-me-up-universal-modules)
+- [set-me-up-xcode-module](https://github.com/smeltery/set-me-up-xcode-module)
 
 ### Shared
 
-- [shared-ai-config](https://github.com/dotbrains/shared-ai-config)
+- [shared-ai-config](https://github.com/smeltery/shared-ai-config)
 
 ### Config
 
-- [alacritty](https://github.com/dotbrains/alacritty)
-- [bash](https://github.com/dotbrains/bash)
-- [claude](https://github.com/dotbrains/claude)
-- [codex](https://github.com/dotbrains/codex)
-- [fish](https://github.com/dotbrains/fish)
-- [gh-dash](https://github.com/dotbrains/gh-dash)
-- [nushell](https://github.com/dotbrains/nushell)
-- [nvim](https://github.com/dotbrains/nvim)
-- [opencode](https://github.com/dotbrains/opencode)
-- [pi](https://github.com/dotbrains/pi)
-- [television](https://github.com/dotbrains/television)
-- [tmux](https://github.com/dotbrains/tmux)
-- [zed](https://github.com/dotbrains/zed)
-- [zsh](https://github.com/dotbrains/zsh)
+- [alacritty](https://github.com/smeltery/alacritty)
+- [bash](https://github.com/smeltery/bash)
+- [claude](https://github.com/smeltery/claude)
+- [codex](https://github.com/smeltery/codex)
+- [fish](https://github.com/smeltery/fish)
+- [gh-dash](https://github.com/smeltery/gh-dash)
+- [nushell](https://github.com/smeltery/nushell)
+- [nvim](https://github.com/smeltery/nvim)
+- [opencode](https://github.com/smeltery/opencode)
+- [pi](https://github.com/smeltery/pi)
+- [television](https://github.com/smeltery/television)
+- [tmux](https://github.com/smeltery/tmux)
+- [zed](https://github.com/smeltery/zed)
+- [zsh](https://github.com/smeltery/zsh)
 
 ## License
 

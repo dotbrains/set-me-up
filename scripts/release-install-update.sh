@@ -389,7 +389,7 @@ publish_github_release() {
         return 2
     fi
 
-    local -a command=(gh release create "$release_tag" --repo dotbrains/set-me-up-installer)
+    local -a command=(gh release create "$release_tag" --repo smeltery/set-me-up-installer)
     if [ -n "$release_title" ]; then
         command+=(--title "$release_title")
     else

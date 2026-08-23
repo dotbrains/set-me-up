@@ -12,7 +12,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-blueprint
 
-- URL: <https://github.com/dotbrains/set-me-up-blueprint>
+- URL: <https://github.com/smeltery/set-me-up-blueprint>
 - Path: `blueprint`
 - Category: `top-level`
 - Route: `blueprint`
@@ -26,7 +26,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-docs
 
-- URL: <https://github.com/dotbrains/set-me-up-docs>
+- URL: <https://github.com/smeltery/set-me-up-docs>
 - Path: `docs`
 - Category: `top-level`
 - Route: `docs`
@@ -40,7 +40,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-installer
 
-- URL: <https://github.com/dotbrains/set-me-up-installer>
+- URL: <https://github.com/smeltery/set-me-up-installer>
 - Path: `installer`
 - Category: `top-level`
 - Route: `installer`
@@ -54,7 +54,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-tests
 
-- URL: <https://github.com/dotbrains/set-me-up-tests>
+- URL: <https://github.com/smeltery/set-me-up-tests>
 - Path: `tests`
 - Category: `top-level`
 - Route: `tests`
@@ -69,7 +69,7 @@ scripts/generate-docs.sh
 
 ### utilities
 
-- URL: <https://github.com/dotbrains/utilities>
+- URL: <https://github.com/smeltery/utilities>
 - Path: `utilities`
 - Category: `top-level`
 - Route: `utilities`
@@ -83,7 +83,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-arch-modules
 
-- URL: <https://github.com/dotbrains/set-me-up-arch-modules>
+- URL: <https://github.com/smeltery/set-me-up-arch-modules>
 - Path: `modules/arch`
 - Category: `module`
 - Route: `arch`
@@ -97,7 +97,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-colorscheme-module
 
-- URL: <https://github.com/dotbrains/set-me-up-colorscheme-module>
+- URL: <https://github.com/smeltery/set-me-up-colorscheme-module>
 - Path: `modules/colorschemes`
 - Category: `module`
 - Route: `modules-colorschemes`
@@ -112,7 +112,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-debian-modules
 
-- URL: <https://github.com/dotbrains/set-me-up-debian-modules>
+- URL: <https://github.com/smeltery/set-me-up-debian-modules>
 - Path: `modules/debian`
 - Category: `module`
 - Route: `modules-debian`
@@ -126,7 +126,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-macos-modules
 
-- URL: <https://github.com/dotbrains/set-me-up-macos-modules>
+- URL: <https://github.com/smeltery/set-me-up-macos-modules>
 - Path: `modules/macos`
 - Category: `module`
 - Route: `modules-macos`
@@ -140,7 +140,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-macports-module
 
-- URL: <https://github.com/dotbrains/set-me-up-macports-module>
+- URL: <https://github.com/smeltery/set-me-up-macports-module>
 - Path: `modules/macports`
 - Category: `module`
 - Route: `modules-macports`
@@ -154,7 +154,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-preferences-module
 
-- URL: <https://github.com/dotbrains/set-me-up-preferences-module>
+- URL: <https://github.com/smeltery/set-me-up-preferences-module>
 - Path: `modules/preferences`
 - Category: `module`
 - Route: `modules-preferences`
@@ -169,7 +169,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-template-module
 
-- URL: <https://github.com/dotbrains/set-me-up-template-module>
+- URL: <https://github.com/smeltery/set-me-up-template-module>
 - Path: `modules/template-module`
 - Category: `module`
 - Route: `modules-template`
@@ -184,7 +184,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-universal-modules
 
-- URL: <https://github.com/dotbrains/set-me-up-universal-modules>
+- URL: <https://github.com/smeltery/set-me-up-universal-modules>
 - Path: `modules/universal`
 - Category: `module`
 - Route: `modules-universal`
@@ -198,7 +198,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-omarchy-modules
 
-- URL: <https://github.com/dotbrains/set-me-up-omarchy-modules>
+- URL: <https://github.com/smeltery/set-me-up-omarchy-modules>
 - Path: `modules/omarchy`
 - Category: `module`
 - Route: `omarchy`
@@ -212,7 +212,7 @@ scripts/generate-docs.sh
 
 ### set-me-up-xcode-module
 
-- URL: <https://github.com/dotbrains/set-me-up-xcode-module>
+- URL: <https://github.com/smeltery/set-me-up-xcode-module>
 - Path: `modules/xcode`
 - Category: `module`
 - Route: `modules-xcode`
@@ -226,7 +226,7 @@ scripts/generate-docs.sh
 
 ### shared-ai-config
 
-- URL: <https://github.com/dotbrains/shared-ai-config>
+- URL: <https://github.com/smeltery/shared-ai-config>
 - Path: `shared/ai-config`
 - Category: `shared`
 - Route: `ai-config`
@@ -240,7 +240,7 @@ scripts/generate-docs.sh
 
 ### alacritty
 
-- URL: <https://github.com/dotbrains/alacritty>
+- URL: <https://github.com/smeltery/alacritty>
 - Path: `home/.config/alacritty`
 - Category: `config`
 - Route: `alacritty`
@@ -254,7 +254,7 @@ scripts/generate-docs.sh
 
 ### bash
 
-- URL: <https://github.com/dotbrains/bash>
+- URL: <https://github.com/smeltery/bash>
 - Path: `home/.config/bash`
 - Category: `config`
 - Route: `bash`
@@ -268,7 +268,7 @@ scripts/generate-docs.sh
 
 ### claude
 
-- URL: <https://github.com/dotbrains/claude>
+- URL: <https://github.com/smeltery/claude>
 - Path: `home/claude`
 - Category: `config`
 - Route: `claude`
@@ -282,7 +282,7 @@ scripts/generate-docs.sh
 
 ### codex
 
-- URL: <https://github.com/dotbrains/codex>
+- URL: <https://github.com/smeltery/codex>
 - Path: `home/codex`
 - Category: `config`
 - Route: `codex`
@@ -296,7 +296,7 @@ scripts/generate-docs.sh
 
 ### fish
 
-- URL: <https://github.com/dotbrains/fish>
+- URL: <https://github.com/smeltery/fish>
 - Path: `home/.config/fish`
 - Category: `config`
 - Route: `fish`
@@ -311,7 +311,7 @@ scripts/generate-docs.sh
 
 ### gh-dash
 
-- URL: <https://github.com/dotbrains/gh-dash>
+- URL: <https://github.com/smeltery/gh-dash>
 - Path: `home/.config/gh-dash`
 - Category: `config`
 - Route: `gh-dash`
@@ -325,7 +325,7 @@ scripts/generate-docs.sh
 
 ### nushell
 
-- URL: <https://github.com/dotbrains/nushell>
+- URL: <https://github.com/smeltery/nushell>
 - Path: `home/.config/nushell`
 - Category: `config`
 - Route: `nushell`
@@ -339,7 +339,7 @@ scripts/generate-docs.sh
 
 ### nvim
 
-- URL: <https://github.com/dotbrains/nvim>
+- URL: <https://github.com/smeltery/nvim>
 - Path: `home/.config/nvim`
 - Category: `config`
 - Route: `nvim`
@@ -353,7 +353,7 @@ scripts/generate-docs.sh
 
 ### opencode
 
-- URL: <https://github.com/dotbrains/opencode>
+- URL: <https://github.com/smeltery/opencode>
 - Path: `home/.config/opencode`
 - Category: `config`
 - Route: `opencode`
@@ -367,7 +367,7 @@ scripts/generate-docs.sh
 
 ### pi
 
-- URL: <https://github.com/dotbrains/pi>
+- URL: <https://github.com/smeltery/pi>
 - Path: `home/pi`
 - Category: `config`
 - Route: `pi`
@@ -381,7 +381,7 @@ scripts/generate-docs.sh
 
 ### television
 
-- URL: <https://github.com/dotbrains/television>
+- URL: <https://github.com/smeltery/television>
 - Path: `home/.config/television`
 - Category: `config`
 - Route: `television`
@@ -395,7 +395,7 @@ scripts/generate-docs.sh
 
 ### tmux
 
-- URL: <https://github.com/dotbrains/tmux>
+- URL: <https://github.com/smeltery/tmux>
 - Path: `home/.config/tmux`
 - Category: `config`
 - Route: `tmux`
@@ -409,7 +409,7 @@ scripts/generate-docs.sh
 
 ### zed
 
-- URL: <https://github.com/dotbrains/zed>
+- URL: <https://github.com/smeltery/zed>
 - Path: `home/.config/zed`
 - Category: `config`
 - Route: `zed`
@@ -423,7 +423,7 @@ scripts/generate-docs.sh
 
 ### zsh
 
-- URL: <https://github.com/dotbrains/zsh>
+- URL: <https://github.com/smeltery/zsh>
 - Path: `home/.config/zsh`
 - Category: `config`
 - Route: `zsh`

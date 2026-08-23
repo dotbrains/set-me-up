@@ -3,7 +3,7 @@
 set -euo pipefail
 
 mode="${1:---plan}"
-owner="${SMU_GITHUB_OWNER:-dotbrains}"
+owner="${SMU_GITHUB_OWNER:-smeltery}"
 drift=0
 
 usage() {

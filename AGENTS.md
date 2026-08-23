@@ -3,7 +3,7 @@
 ## Project Snapshot
 
 `set-me-up` is the root coordinator and working hub for a collection of
-dotbrains setup, dotfile, installer, module, test, utility, and
+smeltery setup, dotfile, installer, module, test, utility, and
 agent-configuration repositories. Its main job is to clone those repositories
 into a predictable local directory layout so a user can start here, describe a
 goal, and let an agent find the right repo or repos to change.

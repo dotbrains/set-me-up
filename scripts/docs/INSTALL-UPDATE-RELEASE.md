@@ -41,7 +41,7 @@ release-readiness checks as `main`.
 Users and CI can then test that channel with:
 
 ```bash
-SMU_INSTALLER_REF=candidate bash <(curl -sSL https://raw.githubusercontent.com/dotbrains/set-me-up-installer/main/install.sh) --plan --json
+SMU_INSTALLER_REF=candidate bash <(curl -sSL https://raw.githubusercontent.com/smeltery/set-me-up-installer/main/install.sh) --plan --json
 ```
 
 ## Local Validation
@@ -72,7 +72,7 @@ scripts/release-install-update.sh --release vX.Y.Z --notes-file scripts/docs/INS
 ```
 
 Use `--signed-tag` when local GPG signing is configured. Use `--github-release`
-to create a GitHub Release in `dotbrains/set-me-up-installer`; omit
+to create a GitHub Release in `smeltery/set-me-up-installer`; omit
 `--release-notes` to let GitHub generate notes, or pass explicit notes for a
 manual release summary. Use `--notes-file` for markdown release notes. Use
 `--release vX.Y.Z` as the one-command maintainer release flow; it validates,
@@ -120,7 +120,7 @@ scripts/docs/INSTALL-UPDATE-RELEASE-NOTES.md
 ```
 
 The scheduled install canary runs the public one-liner against
-`dotbrains/set-me-up-installer/main` and opens `install-canary` issues when the
+`smeltery/set-me-up-installer/main` and opens `install-canary` issues when the
 published entrypoint breaks.
 
 When root files changed, also run:

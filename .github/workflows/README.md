@@ -89,6 +89,6 @@ do not clone or pull remote repositories.
 Add these badges to your main README.md:
 
 ```markdown
-![Lint](https://github.com/dotbrains/set-me-up/workflows/Lint/badge.svg)
-![Tests](https://github.com/dotbrains/set-me-up/workflows/Tests/badge.svg)
+![Lint](https://github.com/smeltery/set-me-up/workflows/Lint/badge.svg)
+![Tests](https://github.com/smeltery/set-me-up/workflows/Tests/badge.svg)
 ```

@@ -397,7 +397,7 @@ SMU_STALE_DAYS=90 scripts/freshness-report.sh
 ## utilities-pin-report.sh
 
 The `utilities-pin-report.sh` command compares each managed repo's
-`.utilities-version` pin (the minimum dotbrains/utilities release the repo
+`.utilities-version` pin (the minimum smeltery/utilities release the repo
 expects) against the local utilities checkout and exits non-zero when a pin
 is newer than the checkout:
 
