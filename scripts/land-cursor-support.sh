@@ -142,4 +142,9 @@ if [ "$merge_prs" -eq 1 ]; then
     fi
 fi
 
-printf "Done. Root set-me-up PR: https://github.com/smeltery/set-me-up/pull/5\\n"
+pr_url="$(gh pr view --repo smeltery/set-me-up cursor/cursor-agent-support --json url -q .url 2>/dev/null || true)"
+if [ -n "$pr_url" ]; then
+    printf "Done. Root set-me-up PR: %s\\n" "$pr_url"
+else
+    printf "Done. Check https://github.com/smeltery/set-me-up/pulls for the root PR.\\n"
+fi

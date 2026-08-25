@@ -129,6 +129,7 @@ copy_root_scripts() {
     cp "$repo_root/scripts/freshness-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/utilities-pin-report.sh" "$target/scripts/"
     cp "$repo_root/scripts/notion-fallback-drift-report.sh" "$target/scripts/"
+    cp "$repo_root/scripts/land-cursor-support.sh" "$target/scripts/"
     cp "$repo_root/scripts/readme-check.sh" "$target/scripts/"
     cp "$repo_root/scripts/new-repo-check.sh" "$target/scripts/"
     cp "$repo_root/scripts/add-repo.sh" "$target/scripts/"
