@@ -88,41 +88,41 @@ both scripts.
 
 ```text
 set-me-up/
-├── blueprint/          # Blueprint configuration
-├── docs/               # Documentation
-├── installer/          # Installation scripts
-├── tests/              # Docker-based provisioning test scenarios
-├── utilities/          # Utility scripts
+├── blueprint/           # Blueprint configuration
+├── docs/                # Documentation
+├── installer/           # Installation scripts
+├── tests/               # Docker-based provisioning test scenarios
+├── utilities/           # Utility scripts
 ├── shared/
-│   └── ai-config/      # Shared AI agent/skill definitions
+│   └── ai-config/       # Shared AI agent/skill definitions
 ├── modules/
-│   ├── arch/           # Generic Arch Linux modules
+│   ├── arch/            # Generic Arch Linux modules
 │   ├── colorschemes/    # Color scheme configurations
-│   ├── debian/         # Debian/Linux modules
-│   ├── macos/          # macOS/Homebrew modules
-│   ├── macports/       # MacPorts module
-│   ├── omarchy/        # Omarchy (Arch + Hyprland) modules
-│   ├── preferences/    # Preferences module
+│   ├── debian/          # Debian/Linux modules
+│   ├── macos/           # macOS/Homebrew modules
+│   ├── macports/        # MacPorts module
+│   ├── omarchy/         # Omarchy (Arch + Hyprland) modules
+│   ├── preferences/     # Preferences module
 │   ├── template-module/ # Template for new modules
-│   ├── universal/      # Universal modules
-│   └── xcode/          # Xcode module
+│   ├── universal/       # Universal modules
+│   └── xcode/           # Xcode module
 └── home/
-    ├── codex/          # Codex CLI configuration
-    ├── claude/         # Claude Code configuration
-    ├── pi/             # pi coding agent configuration
+    ├── codex/           # Codex CLI configuration
+    ├── claude/          # Claude Code configuration
+    ├── pi/              # pi coding agent configuration
     └── .config/
-        ├── alacritty/  # Alacritty terminal config
-        ├── bash/       # Bash configuration
-        ├── fish/       # Fish shell configuration
-        ├── gh-dash/    # GitHub dashboard configuration
-        ├── nushell/    # Nushell configuration
-        ├── nvim/       # Neovim configuration
-        ├── opencode/   # OpenCode configuration
-        ├── television/ # Television (tv) configuration
-        ├── tmux/       # Tmux configuration
-        ├── zed/        # Zed configuration
-        ├── cursor/             # Cursor agent configuration
-        └── zsh/        # Zsh configuration
+        ├── alacritty/   # Alacritty terminal config
+        ├── bash/        # Bash configuration
+        ├── fish/        # Fish shell configuration
+        ├── gh-dash/     # GitHub dashboard configuration
+        ├── nushell/     # Nushell configuration
+        ├── nvim/        # Neovim configuration
+        ├── opencode/    # OpenCode configuration
+        ├── television/  # Television (tv) configuration
+        ├── tmux/        # Tmux configuration
+        ├── zed/         # Zed configuration
+        ├── cursor/      # Cursor agent configuration
+        └── zsh/         # Zsh configuration
 ```
 
 ## Repositories
