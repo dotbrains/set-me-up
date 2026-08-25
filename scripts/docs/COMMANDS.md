@@ -88,6 +88,12 @@ Usage: scripts/generate-docs.sh [--write|--check]
 Usage: scripts/health-report.sh [--json]
 ```
 
+## scripts/land-cursor-support.sh
+
+```text
+Usage: scripts/land-cursor-support.sh [--create-prs] [--merge]
+```
+
 ## scripts/native-workflow-template.sh
 
 ```text
