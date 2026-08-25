@@ -161,17 +161,17 @@ set-me-up/
 - [bash](https://github.com/smeltery/bash)
 - [claude](https://github.com/smeltery/claude)
 - [codex](https://github.com/smeltery/codex)
+- [opencode](https://github.com/smeltery/opencode)
+- [cursor](https://github.com/smeltery/cursor)
 - [fish](https://github.com/smeltery/fish)
 - [gh-dash](https://github.com/smeltery/gh-dash)
 - [nushell](https://github.com/smeltery/nushell)
 - [nvim](https://github.com/smeltery/nvim)
-- [opencode](https://github.com/smeltery/opencode)
 - [pi](https://github.com/smeltery/pi)
 - [television](https://github.com/smeltery/television)
 - [tmux](https://github.com/smeltery/tmux)
 - [zed](https://github.com/smeltery/zed)
 - [zsh](https://github.com/smeltery/zsh)
-- [cursor](https://github.com/smeltery/cursor)
 
 ## License
 
