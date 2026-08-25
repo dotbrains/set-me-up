@@ -121,6 +121,7 @@ set-me-up/
         ├── television/ # Television (tv) configuration
         ├── tmux/       # Tmux configuration
         ├── zed/        # Zed configuration
+        ├── cursor/             # Cursor agent configuration
         └── zsh/        # Zsh configuration
 ```
 
@@ -170,6 +171,7 @@ set-me-up/
 - [tmux](https://github.com/smeltery/tmux)
 - [zed](https://github.com/smeltery/zed)
 - [zsh](https://github.com/smeltery/zsh)
+- [cursor](https://github.com/smeltery/cursor)
 
 ## License
 

@@ -434,3 +434,17 @@ scripts/generate-docs.sh
   ```bash
   scripts/validate.sh --all
   ```
+
+### cursor
+
+- URL: <https://github.com/smeltery/cursor>
+- Path: `home/cursor`
+- Category: `config`
+- Route: `cursor`
+- Summary: Cursor agent configuration
+- Keywords: `cursor,cursor-cli,agent,agent-config,cli`
+- Validator:
+
+  ```bash
+  scripts/validate.sh --all
+  ```

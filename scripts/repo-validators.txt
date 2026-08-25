@@ -30,3 +30,4 @@ home/.config/zed|scripts/validate.sh --all
 home/.config/zsh|scripts/validate.sh --all
 modules/omarchy|scripts/validate.sh --all
 modules/arch|scripts/validate.sh --all
+home/cursor|scripts/validate.sh --all

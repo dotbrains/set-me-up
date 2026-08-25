@@ -59,6 +59,9 @@ test_route_lookup_covers_core_concepts() {
         bash scripts/route.sh codex > "$output"
         assert_contains "$output" "home/codex"
 
+        bash scripts/route.sh cursor > "$output"
+        assert_contains "$output" "home/cursor"
+
         bash scripts/route.sh macos > "$output"
         assert_contains "$output" "modules/macos"
 
