@@ -39,3 +39,4 @@ television|home/.config/television|config
 tmux|home/.config/tmux|config
 zed|home/.config/zed|config
 zsh|home/.config/zsh|config
+cursor|home/cursor|config

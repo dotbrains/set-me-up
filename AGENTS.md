@@ -142,6 +142,7 @@ ownership.
 - AI agent shared configuration and skills: `shared/ai-config/`.
 - Claude Code configuration: `home/claude/`.
 - Codex configuration: `home/codex/`.
+- Cursor agent configuration: `home/cursor/`.
 - Pi agent configuration: `home/pi/`.
 - Shell configs: `home/.config/bash/`, `home/.config/fish/`,
   `home/.config/nushell/`, and `home/.config/zsh/`.
@@ -167,7 +168,7 @@ history:
 - `blueprint/`, `docs/`, `installer/`, `tests/`, and `utilities/`
 - `modules/*`
 - `shared/ai-config/`
-- `home/claude/`, `home/codex/`, `home/pi/`
+- `home/claude/`, `home/codex/`, `home/cursor/`, `home/pi/`
 - `home/.config/*`
 
 It is valid to edit those paths when the routed goal belongs there. Keep each

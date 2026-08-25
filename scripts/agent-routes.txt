@@ -34,3 +34,4 @@ productization|installer|Productized setup surfaces for releases, fleets, regist
 continuous-improvement|.|Continuous improvement audits across routing, product safety, validation, docs, CI, release readiness, and repo health|continuous-improvement,audit,audits,recommendation,recommendations,what-else,next,tranche,safety,operability,validation,documentation,release,governance,health,trust,ship,shipped,landed,main,candidate,readiness,set-me-up
 omarchy|modules/omarchy|Omarchy (Arch + Hyprland) package installation and update hook|omarchy,arch,hyprland,linux,pacman,aur,dhh
 arch|modules/arch|Generic Arch Linux package installation (any Arch-based system)|arch,arch-linux,linux,pacman,aur,yay
+cursor|home/cursor|Cursor agent configuration|cursor,cursor-cli,agent,agent-config,cli
