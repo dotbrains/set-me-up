@@ -442,7 +442,7 @@ scripts/generate-docs.sh
 - Category: `config`
 - Route: `cursor`
 - Summary: Cursor agent configuration
-- Keywords: `cursor,cursor-cli,agent,agent-config,cli`
+- Keywords: `cursor,cursor-agent,cursor-cli,agent,agent-config,cli`
 - Validator:
 
   ```bash

@@ -109,6 +109,7 @@ set-me-up/
 └── home/
     ├── codex/           # Codex CLI configuration
     ├── claude/          # Claude Code configuration
+    ├── cursor/          # Cursor agent configuration
     ├── pi/              # pi coding agent configuration
     └── .config/
         ├── alacritty/   # Alacritty terminal config
@@ -121,7 +122,6 @@ set-me-up/
         ├── television/  # Television (tv) configuration
         ├── tmux/        # Tmux configuration
         ├── zed/         # Zed configuration
-        ├── cursor/      # Cursor agent configuration
         └── zsh/         # Zsh configuration
 ```
 
@@ -161,9 +161,9 @@ set-me-up/
 - [bash](https://github.com/smeltery/bash)
 - [claude](https://github.com/smeltery/claude)
 - [codex](https://github.com/smeltery/codex)
+- [cursor](https://github.com/smeltery/cursor)
 - [opencode](https://github.com/smeltery/opencode)
 - [pi](https://github.com/smeltery/pi)
-- [cursor](https://github.com/smeltery/cursor)
 - [fish](https://github.com/smeltery/fish)
 - [gh-dash](https://github.com/smeltery/gh-dash)
 - [nushell](https://github.com/smeltery/nushell)
