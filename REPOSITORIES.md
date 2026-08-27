@@ -45,7 +45,7 @@ scripts/generate-docs.sh
 - Category: `top-level`
 - Route: `installer`
 - Summary: Installer behavior and smu command implementation
-- Keywords: `installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet`
+- Keywords: `installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet,local,machine,override,personal,dotfiles`
 - Validator:
 
   ```bash
