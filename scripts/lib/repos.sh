@@ -117,3 +117,20 @@ smu_each_repo_in_category() {
         "$callback" "$repo" "$path" "$category"
     done < "$repos_file"
 }
+
+smu_local_repos_file() {
+    local script_dir="$1"
+    printf "%s/local-repos.txt" "$script_dir"
+}
+
+smu_each_repo_with_optional_local() {
+    local repos_file="$1"
+    local callback="$2"
+    local script_dir="${repos_file%/*}"
+
+    smu_each_repo "$repos_file" "$callback"
+
+    if [ -f "$(smu_local_repos_file "$script_dir")" ]; then
+        smu_each_repo "$(smu_local_repos_file "$script_dir")" "$callback"
+    fi
+}

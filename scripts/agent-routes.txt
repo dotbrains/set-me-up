@@ -1,7 +1,7 @@
 # Agent route map for set-me-up
 # Format: route_id|local_path|summary|keywords
 root-orchestration|.|Root setup orchestration, repo manifest, validation, root CI|setup,update,manifest,root,validation,ci
-installer|installer|Installer behavior and smu command implementation|installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet
+installer|installer|Installer behavior and smu command implementation|installer,smu,cli,theme,prompt,catalog,profile,vps,server,headless,digitalocean,droplet,local,machine,override,personal,dotfiles
 tests|tests|End-to-end provisioning scenarios|test,tests,e2e,scenario,provisioning,docker,vps,server,headless,digitalocean,droplet
 utilities|utilities|Shared utility shell functions|utility,utilities,shell,function,helper
 blueprint|blueprint|Blueprint structure and bootstrap composition|blueprint,bootstrap,composition,vps,server,headless,digitalocean,droplet,mode,modes,engine,provider,providers,provider-matrix,blueprint-recommend,recommend,recommendation,starter,write,validate-generated,capability,capabilities,github-actions,validate-contract,contract-validate,schema-backed,schema-backed-readiness,reusable-validator,json-schema,contract-schema,schema-command,schema-validation,contract-metadata,release-artifact,doctor,migrate,readiness,ci-contract,contract,portable,modular,architecture

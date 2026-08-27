@@ -222,7 +222,7 @@ if [ "$format" = "--text" ]; then
     printf "\nUpdating set-me-up repositories...\n\n"
 fi
 
-smu_each_repo "$repos_file" inspect_repo
+smu_each_repo_with_optional_local "$repos_file" inspect_repo
 
 if [ "$mode" = "--apply" ] && [ "$validate_after" -eq 1 ]; then
     validate_updated_repos

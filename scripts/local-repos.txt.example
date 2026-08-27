@@ -1,0 +1,3 @@
+# Optional local-only repositories for this machine.
+# Copy to scripts/local-repos.txt and use the same format as scripts/repos.txt:
+# repo_name|local_path|category

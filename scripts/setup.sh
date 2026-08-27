@@ -135,5 +135,13 @@ for category in "${SMU_REPO_CATEGORIES[@]}"; do
     clone_category "$category"
 done
 
+LOCAL_REPOS_FILE="$(smu_local_repos_file "$REPO_ROOT/scripts")"
+if [ -f "$LOCAL_REPOS_FILE" ] && smu_validate_repos_manifest "$LOCAL_REPOS_FILE"; then
+    echo "📌 Cloning local-only repositories from scripts/local-repos.txt..."
+    echo ""
+    smu_each_repo "$LOCAL_REPOS_FILE" clone_repo
+    echo ""
+fi
+
 echo "🎉 Setup complete! All repositories have been cloned."
 echo ""
